@@ -12,7 +12,7 @@ public final class PackedCard {
      */
     public static boolean isValid(int pkCard) {
         if (((pkCard & Bits32.mask(0, 4)) >= 0) && ((pkCard & Bits32.mask(0, 4)) <= 8)
-                && (((pkCard & Bits32.mask(6, 26)) == 0) && (pkCard != INVALID))) {               //????
+                && (((pkCard & Bits32.mask(6, 26)) == 0) && (pkCard != INVALID))) {
             return true;
         } else {
             return false;

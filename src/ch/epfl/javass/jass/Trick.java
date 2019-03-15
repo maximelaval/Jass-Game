@@ -9,7 +9,7 @@ public final class Trick {
         this.pkTrick = pkTrick;
     }
 
-    public final static long INVALID = 0xFF_FF_FF_FF;
+    public final static Trick INVALID = ofPacked(PackedTrick.INVALID);
 
 
     public static Trick firstEmpty(Color trump, PlayerId firstPlayer) {
@@ -54,6 +54,10 @@ public final class Trick {
 
     public Color trump() {
         return PackedTrick.trump(pkTrick);
+    }
+
+    public int index() {
+        return PackedTrick.index(pkTrick);
     }
 
     public PlayerId player(int index) {

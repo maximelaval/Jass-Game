@@ -149,7 +149,7 @@ public final class PackedTrick {
 
     }
     public static Card.Color baseColor(int pkTrick) {
-        // assert(!isFull(pkTrick));
+        assert(!isEmpty(pkTrick));
         return color(card(pkTrick, 0));
     }
 
