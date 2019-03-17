@@ -15,7 +15,7 @@ public final class TurnState {
     private PackedTrick pkCurrentTrick;
 
     public TurnState initial(Card.Color trump, Score score, PlayerId firstPlayer) {
-        return new TurnState()
+        return new TurnState();
     }
 
     public TurnState ofPackedComponents(long pkScore, long pkUnplayedCards, int pkTrick) {
