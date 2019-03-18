@@ -113,15 +113,13 @@ public final class PackedTrick {
     }
 
     public static int size(int pkTrick) {
-        boolean potentialCard0 = PackedCard.isValid(extract(pkTrick, 0, 6));
-        boolean potentialCard1 = PackedCard.isValid(extract(pkTrick, 6, 6));
-        boolean potentialCard2 = PackedCard.isValid(extract(pkTrick, 12, 6));
-        boolean potentialCard3 = PackedCard.isValid(extract(pkTrick, 18, 6));
-        if (potentialCard3) return 4;
-        if (potentialCard2) return 3;
-        if (potentialCard1) return 2;
-        if (potentialCard0) return 1;
-        else return 0;
+
+        for (int i = 4; i > 0; --i) {
+            if (PackedCard.isValid(card(pkTrick, i -1))) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     public static Card.Color trump(int pkTrick) {

@@ -5,11 +5,12 @@ import ch.epfl.javass.jass.Card.*;
 public final class Trick {
 
     private int pkTrick;
+
     private Trick(int pkTrick) {
         this.pkTrick = pkTrick;
     }
 
-    public final static Trick INVALID = ofPacked(PackedTrick.INVALID);
+    public final static Trick INVALID = new Trick(PackedTrick.INVALID);
 
 
     public static Trick firstEmpty(Color trump, PlayerId firstPlayer) {
@@ -30,7 +31,7 @@ public final class Trick {
 
     public Trick nextEmpty() {
         if (this.isFull()) {
-            return ofPacked(PackedTrick.nextEmpty(pkTrick));
+            return new Trick(PackedTrick.nextEmpty(pkTrick));
         } else {
             throw new IllegalStateException();
         }

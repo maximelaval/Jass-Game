@@ -1,449 +1,180 @@
 package ch.epfl.javass.jass;
 
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.SplittableRandom;
-
+import static ch.epfl.javass.jass.Card.Color.CLUB;
+import static ch.epfl.javass.jass.Card.Color.DIAMOND;
+import static ch.epfl.javass.jass.Card.Color.HEART;
+import static ch.epfl.javass.jass.Card.Color.SPADE;
+import static ch.epfl.javass.jass.Card.Rank.ACE;
+import static ch.epfl.javass.jass.Card.Rank.EIGHT;
+import static ch.epfl.javass.jass.Card.Rank.JACK;
+import static ch.epfl.javass.jass.Card.Rank.KING;
+import static ch.epfl.javass.jass.Card.Rank.NINE;
+import static ch.epfl.javass.jass.Card.Rank.QUEEN;
+import static ch.epfl.javass.jass.Card.Rank.SIX;
+import static ch.epfl.javass.jass.Card.Rank.TEN;
+import static ch.epfl.javass.jass.PlayerId.PLAYER_1;
+import static ch.epfl.test.TestRandomizer.RANDOM_ITERATIONS;
+import static ch.epfl.test.TestRandomizer.newRandom;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-//import static ch.epfl.javass.jass.PackedTrick.isValid;
-import static ch.epfl.javass.jass.PackedScore.pack;
-import static ch.epfl.test.TestRandomizer.RANDOM_ITERATIONS;
-import static ch.epfl.test.TestRandomizer.newRandom;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.SplittableRandom;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import ch.epfl.javass.bits.Bits32;
-import ch.epfl.javass.bits.Bits64;
 import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.Card.Rank;
-import ch.epfl.javass.jass.TeamId;
 
 public class PackedTrickTest {
+    // Short syntax to create cards, DO NOT DO THIS IN YOUR PROGRAM!!!
+    private static int c(Color color, Rank rank) {
+        return PackedCard.pack(color, rank);
+    }
+
+    private static long cardSet(int... pkCards) {
+        long pkCardSet = PackedCardSet.EMPTY;
+        for (int pkCard: pkCards)
+            pkCardSet = PackedCardSet.add(pkCardSet, pkCard);
+        return pkCardSet;
+    }
+
+    private static int trick(int index, Color trump, PlayerId firstPlayer, int... pkCards) {
+        int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+        for (int pkCard: pkCards)
+            pkTrick = PackedTrick.withAddedCard(pkTrick, pkCard);
+        pkTrick = (pkTrick & ~(0b1111 << 24)) | (index << 24);
+        return pkTrick;
+    }
+
+    private static int indexForHand(long pkHand) {
+        return 9 - PackedCardSet.size(pkHand);
+    }
+
+    private static final List<Long> ALL_SINGLETONS =
+            Collections.unmodifiableList(
+                    Arrays.asList(
+                            0x0000000000000001L,
+                            0x0000000000000002L,
+                            0x0000000000000004L,
+                            0x0000000000000008L,
+                            0x0000000000000010L,
+                            0x0000000000000020L,
+                            0x0000000000000040L,
+                            0x0000000000000080L,
+                            0x0000000000000100L,
+                            0x0000000000010000L,
+                            0x0000000000020000L,
+                            0x0000000000040000L,
+                            0x0000000000080000L,
+                            0x0000000000100000L,
+                            0x0000000000200000L,
+                            0x0000000000400000L,
+                            0x0000000000800000L,
+                            0x0000000001000000L,
+                            0x0000000100000000L,
+                            0x0000000200000000L,
+                            0x0000000400000000L,
+                            0x0000000800000000L,
+                            0x0000001000000000L,
+                            0x0000002000000000L,
+                            0x0000004000000000L,
+                            0x0000008000000000L,
+                            0x0000010000000000L,
+                            0x0001000000000000L,
+                            0x0002000000000000L,
+                            0x0004000000000000L,
+                            0x0008000000000000L,
+                            0x0010000000000000L,
+                            0x0020000000000000L,
+                            0x0040000000000000L,
+                            0x0080000000000000L,
+                            0x0100000000000000L));
+
+    private static long nextCardSet(SplittableRandom rng, int size) {
+        List<Long> cards = new ArrayList<>(ALL_SINGLETONS);
+        Collections.shuffle(cards, new Random(rng.nextLong()));
+        long s = 0;
+        for (long l: cards.subList(0, size))
+            s |= l;
+        assert Long.bitCount(s) == size;
+        return s;
+    }
+
+    private static Color nextColor(SplittableRandom rng) {
+        return Color.ALL.get(rng.nextInt(Color.COUNT));
+    }
+
+    private static Rank nextRank(SplittableRandom rng) {
+        return Rank.ALL.get(rng.nextInt(Rank.COUNT));
+    }
+
+    private static PlayerId nextPlayerId(SplittableRandom rng) {
+        return PlayerId.ALL.get(rng.nextInt(PlayerId.COUNT));
+    }
+
+    private static int nextPackedCard(SplittableRandom rng) {
+        return PackedCard.pack(nextColor(rng), nextRank(rng));
+    }
 
     @Test
-    void winningPlayerTest() {
-        int playerId = 0;
-        int counter = 0;
-        ArrayList<Integer> cards = new ArrayList<>();
-        Color trump;
-        int noIdea = 0;
-        boolean winnter = false;
-        boolean is = false;
-        boolean comming = false;
-        int winningCard;
-        int nbCard = -1;
+    void packedTrickInvalidHasCorrectValue() {
+        assertEquals(~0, PackedTrick.INVALID);
+    }
+
+    @Test
+    void isValidWorksWithZeroToFourValidCards() {
         SplittableRandom rng = newRandom();
         for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            if (PackedTrick.isValid(iterations)
-                    && ((Bits32.extract(iterations, 0, 6) != 0b111111)
-                            || Bits32.extract(iterations, 6, 6) != 0b111111
-                            || Bits32.extract(iterations, 12, 6) != 0b111111
-                            || Bits32.extract(iterations, 18, 6) != 0b111111)) {
-                cards.clear();
-                ;
-                counter = 0;
-                playerId = Bits32.extract(iterations, 28, 2);
-                trump = Card.Color.ALL.get(Bits32.extract(iterations, 30, 2));
-                for (int j = 0; j < 4; ++j) {
-                    if (Bits32.extract(iterations, 6 * j, 6) != 0b111111) {
-                        cards.add(Bits32.extract(iterations, 6 * j, 6));
-                        counter += 1;
-                    }
-                }
-                winningCard = cards.get(0);
-                for (int k = 0; k < counter - 1; ++k) {
-                    if (PackedCard.isBetter(trump, cards.get(k + 1),
-                            winningCard)) {
-                        winningCard = cards.get(k + 1);
-                    }
-                }
-                noIdea = cards.indexOf(winningCard);
-                assertEquals((noIdea + playerId) % 4,
-                        PackedTrick.winningPlayer(iterations).ordinal());
-
-            }
+            int pkTrick = ~0;
+            for (int size = 0; size <= 4; ++size)
+                pkTrick = (pkTrick << 6) | nextPackedCard(rng);
+            pkTrick &= 0b111111_111111_111111_111111;
+            assertTrue(PackedTrick.isValid(pkTrick));
         }
     }
 
     @Test
-    void playableCardTestUnit2() {
-        int pkTrick1 = PackedTrick.firstEmpty(Card.Color.SPADE,
-                PlayerId.PLAYER_1);
-        long pkHand1 = 0b0000_0000_0010_0000_0000_0000_0000_0000_0000_0000_0001_0000_0000_0000_0000_0000L;
-        int pkTrick2 = Bits32.pack(0b110, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0, 2);
-        long pkHand2 = 0b0000_0000_0001_0000_0000_0000_0000_0000_0000_0000_0000_1010_0000_0000_0010_0000L;
-        int pkTrick3 = Bits32.pack(0b110, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0, 2);
-        long pkHand3 = 0b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0001_0000_0000_0000_1010_0000L;
-        int pkTrick4 = Bits32.pack(0b10_0110, 6, 0b0, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, 0, 4, 0, 2, 0, 2);
-        long pkHand4 = 0b0000_0000_0010_0000_0000_0000_0001_0000_0000_0000_0000_0000_0000_0000_0000_0010L;
-        int pkTrick5 = Bits32.pack(0b11_0001, 6, 0b1_0011, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0b1,
-                2);
-        long pkHand5 = 0b0000_0000_0000_0000_0000_0000_1000_0000_0000_0000_0000_0100_0000_0000_1000_0001L;
-        int pkTrick6 = Bits32.pack(0b1_0101, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0, 2);
-        long pkHand6 = 0b0000_0000_0000_0001_0000_0000_0001_0000_0000_0000_1000_0000_0000_0000_0000_1000L;
-        int pkTrick7 = Bits32.pack(0b11_0011, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0b11,
-                2);
-        long pkHand7 = 0b0000_0000_0000_0000_0000_0000_1000_1000_0000_0000_0100_0000_0000_0001_0000_0000L;
-        int pkTrick8 = Bits32.pack(0b1000, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0b10,
-                2);
-        long pkHand8 = 0b0000_0000_0000_0000_0000_0000_0010_0010_0000_0000_0100_0000_0000_0000_1000_0000L;
-        int pkTrick9 = Bits32.pack(0b11_0100, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0b10,
-                2);
-        long pkHand9 = 0b0000_0000_0000_0010_0000_0000_0000_1000_0000_0000_0001_0001_0000_0000_0000_0000L;
-        int pkTrick10 = Bits32.pack(0b10_0100, 6, 0b0100, 6, PackedCard.INVALID,
-                6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0, 2);
-        long pkHand10 = 0b0000_0000_1000_0000_0000_0000_1010_0000_0000_0000_0000_0001_0000_0000_0000_0000L;
-        int pkTrick11 = Bits32.pack(0b10_0100, 6, 0b0100, 6, PackedCard.INVALID,
-                6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0, 2);
-        long pkHand11 = 0b0000_0000_0000_0000_0000_0000_1010_0000_0000_0000_0000_0001_0000_0000_0000_0100L;
-        System.out.println("{\u266110 \u2663J} expected\n" + PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick1, pkHand1)));
-        System.out.println();
-        System.out.println("{\u2660J \u26617 \u26619 \u266310} expected\n"
-                + PackedCardSet.toString(
-                        PackedTrick.playableCards(pkTrick2, pkHand2)));
-        System.out.println();
-        System.out.println("{\u2660J \u2660K} expected\n" + PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick3, pkHand3)));
-        System.out.println();
-        System.out.println("{\u26607 \u266210} expected\n" + PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick4, pkHand4)));
-        System.out.println();
-        System.out.println(
-                "{\u26606 \u2660K \u2662K} expected\n" + PackedCardSet.toString(
-                        PackedTrick.playableCards(pkTrick5, pkHand5)));
-        System.out.println();
-        System.out.println("{\u26609 \u2661K} expected\n" + PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick6, pkHand6)));
-        System.out.println();
-        System.out.println("{\u2660A \u2661Q \u26629 \u2662K} expected\n"
-                + PackedCardSet.toString(
-                        PackedTrick.playableCards(pkTrick7, pkHand7)));
-        System.out.println();
-        System.out.println(
-                "{\u2660K \u26627 \u2662J} expected\n" + PackedCardSet.toString(
-                        PackedTrick.playableCards(pkTrick8, pkHand8)));
-        System.out.println();
-        System.out.println("{\u26629 \u26637} expected\n" + PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick9, pkHand9)));
-        System.out.println();
-        System.out.println("{\u2662J \u2662K} expected\n" + PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick10, pkHand10)));
-        System.out.println();
-        System.out.println("{\u2662J \u2662K} expected\n" + PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick11, pkHand11)));
-    }
+    void isValidWorksWithInvalidMixOfValidAndInvalidCards() {
+        int[][] invalidCardPos = new int[][] {
+            { 0 },
+            { 1 },
+            { 2 },
+            { 0, 1 },
+            { 0, 2 },
+            { 0, 3 },
+            { 1, 2 },
+            { 1, 3 },
+            { 0, 1, 2 },
+            { 0, 1, 3 },
+            { 0, 2, 3 },
+        };
 
-    @Test
-    void playableCardsWorks() {
-        // deux cartes jouables: valet de pique, as de coeur
-        // en main: 8 de pique, valet de pique, as de coeur, 7 de trèfle
-        // premiere carte jouée: 6 de coeur, as de pique, 6 de trèfle, atout
-        // pique
-        assertEquals(0b100000000_0000000000100000L, PackedTrick.playableCards(
-                0b00_11_0000_111111_110000_001000_010000,
-                0b10_0000000000000000_0000000100000000_0000000000100100L));
-
-        // en main: 9 de pique, valet de pique, 6 de coeur, 7 coeur;
-        // premiere carte jouée: 10 de coeur, atout carreau
-        assertEquals(0b11_0000000000000000L, PackedTrick.playableCards(
-                0b10_11_0000_111111_111111_111111_010100,
-                0b00_0000000000000000_0000000000000011_0000000000101000L));
-
-        // en main: 6 de pique, 7 de pique, 8 de pique, 6 de coeur
-        // premiere carte jouée: 9 de pique, 2nd: 10 de pique, atout pique
-        assertEquals(0b0_0000000000000111L, PackedTrick.playableCards(
-                0b00_11_0000_111111_111111_000100_000011,
-                0b00_0000000000000000_0000000000000001_0000000000000111L));
-
-        // en main: 6 de pique, 7 de pique, 8 de pique, 6 de coeur
-        // premiere carte jouée: 9 de carreau, 2nd: 10 de pique, atout carreau
-        assertEquals(0b1_0000000000000111L, PackedTrick.playableCards(
-                0b10_11_0000_111111_111111_000100_100011,
-                0b00_0000000000000000_0000000000000001_0000000000000111L));
-
-        // en main: 6 de pique, 7 de pique, 8 de pique, as de pique
-        // premiere carte jouée: 9 de carreau, 2nd: 10 de pique, atout pique
-        assertEquals(0b0_0000000100000000L, PackedTrick.playableCards(
-                0b00_11_0000_111111_111111_000100_100011,
-                0b00_0000000000000000_0000000000000000_0000000100000111L));
-
-        // atout pas demandé, mais pas coupé, et peut pas suivre
-        assertEquals(0b1000000000000000000000001000000000000000000100100L,
-                PackedTrick.playableCards(
-                        0b00_11_0000_111111_110001_010000_100000,
-                        0b1000000000000000000000001000000000000000000100100L));
-        assertEquals(0b1000000000000000000100000L,
-                PackedTrick.playableCards(
-                        0b00_10_0000_111111_111111_001000_010000,
-                        0b1000000000000000000000001000000000000000000100100L));
-
-        // que des atouts dans la main, pas atout demandé, mais qqn coupe et pas
-        // moyen de surcouper
-        // en main: 6, 7 et 8 de pique
-        // première carte jouée: 9 de carreau, deuxieme carte jouée: 10 de
-        // pique, atout pique
-        assertEquals(0b0_0000000000000111L, PackedTrick.playableCards(
-                0b00_11_0000_111111_111111_000100_100011,
-                0b00_0000000000000000_0000000000000000_0000000000000111L));
-
-        // quand qqn a couper, tu peux pas sous couper, tu peux pas suivre, et
-        // t'as une carte qui n'est pas d'atout
-        // 6, 7 ,8 de pique et 6 de coeur, atout pique,
-        // premiere carte jouee 9 de carreau, deuxieme carte 10 de pique
-        assertEquals(0b1_0000000000000000L, PackedTrick.playableCards(
-                0b00_11_0000_111111_111111_000100_100011,
-                0b00_0000000000000000_0000000000000001_0000000000000111L));
-
-        // qqn a coupé, peut surcouper, peut pas suivre
-        // 6, 7 ,9 de pique et 6 de coeur, atout pique,
-        // premiere carte jouee 9 de carreau, deuxieme carte 10 de pique
-        assertEquals(0b1_0000000000001000L, PackedTrick.playableCards(
-                0b00_11_0000_111111_111111_000100_100011,
-                0b00_0000000000000000_0000000000000001_0000000000001011L));
-
-        // qqn a coupé, pas surcouper, peut suivre
-        // 6, 7 ,8 de pique et 6 de coeur, atout pique,
-        // premiere carte jouee 9 de coeur, deuxieme carte 10 de pique
-        assertEquals(0b1_0000000000000000L, PackedTrick.playableCards(
-                0b00_11_0000_111111_111111_000100_010011,
-                0b00_0000000000000000_0000000000000001_0000000000000111L));
-
-        // on est le quatrieme joueur, les deux joueurs precedents ont coupe
-        // 6, 7 ,8 de pique et 6 de coeur, atout pique,
-        // premiere carte jouee 9 de coeur, deuxieme carte 10 de pique,
-        // troisième carte bourre
-        assertEquals(0b1_0000000000000000L, PackedTrick.playableCards(
-                0b00_11_0000_111111_000101_000100_010011,
-                0b00_0000000000000000_0000000000000001_0000000000000111L));
-
-        // on est le quatrieme joueur, les deux joueurs precedents ont coupe
-        // 6, 7 ,9 de pique et 6 de coeur, atout pique,
-        // premiere carte jouee 9 de coeur, deuxieme carte 10 de pique,
-        // troisième carte bourre
-        assertEquals(0b1_0000000000000000L, PackedTrick.playableCards(
-                0b00_11_0000_111111_000101_000100_010011,
-                0b00_0000000000000000_0000000000000001_0000000000001011L));
-
-        // qqn a coupé, peut surcouper, peut suivre
-        // 6, 7 ,9 de pique et 6 de coeur, atout pique
-        // premiere carte jouee 9 de coeur, deuxieme carte 10 de pique
-        assertEquals(0b00_0000000000000000_0000000000000001_0000000000001000L,
-                PackedTrick.playableCards(
-                        0b00_11_0000_111111_111111_000100_010011,
-                        0b00_0000000000000000_0000000000000001_0000000000001011L));
-
-        // qqn a coupé, pas d'atout plus haut, soit autre couleur, pas de
-        // couleur de base
-        // 6, 7 ,8 de pique et 6 de coeur, atout pique
-        // premiere carte jouee 9 de carreau, deuxieme carte 10 de pique
-        assertEquals(0b1_0000000000000000L, PackedTrick.playableCards(
-                0b00_11_0000_111111_111111_000100_100011,
-                0b00_0000000000000000_0000000000000001_0000000000000111L));
-
-        // cas normal: atout demandé, tout le monde a atout, atout pique
-        // en main: 6, 7, 8 de pique, 6 de coeur
-        // première carte jouée: 9 de pique, après 10 de pique, après bourre
-        assertEquals(0b0_0000000000000111L, PackedTrick.playableCards(
-                0b00_11_0000_111111_000101_000100_000011,
-                0b00_0000000000000000_0000000000000001_0000000000000111L));
-
-        // personne n'a coupé, on a de l'atout
-        // en main: 6, 7, 8 de pique
-        // première carte jouée: 9 de coeur, après 10 de coeur, après valet de
-        // coeur
-        assertEquals(0b0_0000000000000111L, PackedTrick.playableCards(
-                0b00_11_0000_111111_010101_010100_010011,
-                0b00_0000000000000000_0000000000000000_0000000000000111L));
-
-        // peut couper mais peut pas suivre
-        // en main: 6, 7, 8 de pique, 6 de coeur
-        // première carte jouée: 9 de coeur, après 10 de coeur, après valet de
-        // coeur
-        assertEquals(0b1_0000000000000111L, PackedTrick.playableCards(
-                0b00_11_0000_111111_010101_010100_010011,
-                0b00_0000000000000000_0000000000000001_0000000000000111L));
-
-        // cas de la dernière pli, on peut jouer tout ce qu'on a en main
-        // en main: 6 de pique
-        // première carte jouée: 7 de coeur, atout coeur
-        assertEquals(0b0_0000000000000001L, PackedTrick.playableCards(
-                0b01_11_0000_111111_111111_111111_010001,
-                0b00_0000000000000000_0000000000000000_0000000000000001L));
-
-        // cas de la dernière pli, on peut jouer tout ce qu'on a en main
-        // en main: 6 de pique
-        // première carte jouée: 7 de coeur, deuxieme carte: 8 de carreau atout
-        // coeur
-        assertEquals(0b0_0000000000000001L, PackedTrick.playableCards(
-                0b01_11_0000_111111_111111_100011_010001,
-                0b00_0000000000000000_0000000000000000_0000000000000001L));
-
-        // cas de la dernière pli, on peut jouer tout ce qu'on a en main
-        // en main: 6 de pique
-        // première carte jouée: 7 de coeur, deuxieme carte: 8 de carreau,
-        // troisieme carte: as de trefle, atout coeur
-        assertEquals(0b0_0000000000000001L, PackedTrick.playableCards(
-                0b01_11_0000_111111_111000_100011_010001,
-                0b00_0000000000000000_0000000000000000_0000000000000001L));
-
-        // jamais une main vide, set retourné toujours un subset de la main
-        // donnée
-
-        ArrayList<Integer> cards = new ArrayList<>();
-        for (int i = 0; i < Card.Rank.COUNT; ++i) {
-            for (int j = 0; j < Card.Color.COUNT; ++j) {
-                cards.add(PackedCard.pack(Color.ALL.get(j), Rank.ALL.get(i)));
-            }
-        }
-        for (int i = 1; i < PackedCardSet.subsetOfColor(PackedCardSet.ALL_CARDS,
-                Color.SPADE); ++i) {
-            for (int j = 0; j < cards.size(); ++j) {
-                for (int m = 0; m < cards.size(); ++m) {
-                    assertTrue(PackedTrick.playableCards(
-                            (0b00_11_0000_111111_111111 << 12)
-                                    | (cards.get(j) << 6) | cards.get(m),
-                            ((i << 48) | (i << 32) | (i << 16) | i)) > 0);
-                    assertTrue((PackedTrick.playableCards(
-                            (0b00_11_0000_111111_111111 << 12)
-                                    | (cards.get(j) << 6) | cards.get(m),
-                            ((i << 48) | (i << 32) | (i << 16) | i))
-                            & ((i << 48) | (i << 32) | (i << 16) | i)) > 0);
-                }
-            }
-        }
-    }
-
-    @Test
-    void playableCardTestUnit() {
-        int pkTrick1 = PackedTrick.firstEmpty(Card.Color.SPADE,
-                PlayerId.PLAYER_1);
-        long pkHand1 = 0b0000_0000_0010_0000_0000_0000_0000_0000_0000_0000_0001_0000_0000_0000_0000_0000L;
-        int pkTrick2 = Bits32.pack(0b110, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0, 2);
-        long pkHand2 = 0b0000_0000_0001_0000_0000_0000_0000_0000_0000_0000_0000_1010_0000_0000_0010_0000L;
-        int pkTrick3 = Bits32.pack(0b110, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0, 2);
-        long pkHand3 = 0b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0001_0000_0000_0000_1010_0000L;
-        int pkTrick4 = Bits32.pack(0b10_0110, 6, 0b0, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, 0, 4, 0, 2, 0, 2);
-        long pkHand4 = 0b0000_0000_0010_0000_0000_0000_0001_0000_0000_0000_0000_0000_0000_0000_0000_0010L;
-        int pkTrick5 = Bits32.pack(0b11_0001, 6, 0b1_0011, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0b1,
-                2);
-        long pkHand5 = 0b0000_0000_0000_0000_0000_0000_1000_0000_0000_0000_0000_0100_0000_0000_1000_0001L;
-        int pkTrick6 = Bits32.pack(0b1_0101, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0, 2);
-        long pkHand6 = 0b0000_0000_0000_0001_0000_0000_0001_0000_0000_0000_1000_0000_0000_0000_0000_1000L;
-        int pkTrick7 = Bits32.pack(0b11_0011, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0b11,
-                2);
-        long pkHand7 = 0b0000_0000_0000_0000_0000_0000_1000_1000_0000_0000_0100_0000_0000_0001_0000_0000L;
-        int pkTrick8 = Bits32.pack(0b1000, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0b10,
-                2);
-        long pkHand8 = 0b0000_0000_0000_0000_0000_0000_0010_0010_0000_0000_0100_0000_0000_0000_1000_0000L;
-        int pkTrick9 = Bits32.pack(0b11_0100, 6, PackedCard.INVALID, 6,
-                PackedCard.INVALID, 6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0b10,
-                2);
-        long pkHand9 = 0b0000_0000_0000_0010_0000_0000_0000_1000_0000_0000_0001_0001_0000_0000_0000_0000L;
-        int pkTrick10 = Bits32.pack(0b10_0100, 6, 0b0100, 6, PackedCard.INVALID,
-                6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0, 2);
-        long pkHand10 = 0b0000_0000_1000_0000_0000_0000_1010_0000_0000_0000_0000_0001_0000_0000_0000_0000L;
-        int pkTrick11 = Bits32.pack(0b10_0100, 6, 0b0100, 6, PackedCard.INVALID,
-                6, PackedCard.INVALID, 6, 0, 4, 0, 2, 0, 2);
-        long pkHand11 = 0b0000_0000_0000_0000_0000_0000_1010_0000_0000_0000_0000_0001_0000_0000_0000_0100L;
-        assertEquals("{\u266110,\u2663J}", PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick1, pkHand1)));
-        assertEquals("{\u2660J,\u26617,\u26619,\u266310}", PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick2, pkHand2)));
-        assertEquals("{\u2660J,\u2660K}", PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick3, pkHand3)));
-        assertEquals("{\u26607,\u266210}", PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick4, pkHand4)));
-        assertEquals("{\u26606,\u2660K,\u2662K}", PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick5, pkHand5)));
-        assertEquals("{\u26609,\u2661K}", PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick6, pkHand6)));
-        assertEquals("{\u2660A,\u2661Q,\u26629,\u2662K}", PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick7, pkHand7)));
-        assertEquals("{\u2660K,\u26627,\u2662J}", PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick8, pkHand8)));
-        assertEquals("{\u26629,\u26637}", PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick9, pkHand9)));
-        assertEquals("{\u2662J,\u2662K}", PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick10, pkHand10)));
-        assertEquals("{\u2662J,\u2662K}", PackedCardSet
-                .toString(PackedTrick.playableCards(pkTrick11, pkHand11)));
-    }
-
-    @Test
-    void isValidWorks() {
         SplittableRandom rng = newRandom();
-        for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            assertEquals(IsValidTest(iterations), PackedTrick.isValid(iterations));
+        for (int[] invalidCards: invalidCardPos) {
+            int pkTrick = 0;
+            for (int i = 0; i < 4; ++i)
+                pkTrick = (pkTrick << 6) | nextPackedCard(rng);
+            for (int i: invalidCards)
+                pkTrick |= PackedCard.INVALID << (i * 6);
+            assertFalse(PackedTrick.isValid(pkTrick));
         }
-    }
-
-    private boolean IsValidTest(int pkTrick) {
-        if ((Bits32.extract(pkTrick, 24, 4) < 9)) {
-            int Card0 = Bits32.extract(pkTrick, 0, 6);
-            int Card1 = Bits32.extract(pkTrick, 6, 6);
-            int Card2 = Bits32.extract(pkTrick, 12, 6);
-            int Card3 = Bits32.extract(pkTrick, 18, 6);
-            if ((PackedCard.isValid(Card0) && PackedCard.isValid(Card1)
-                    && PackedCard.isValid(Card2)
-                    && PackedCard.isValid(Card3))) {
-                return true;
-            }
-            if ((PackedCard.isValid(Card0) && PackedCard.isValid(Card1)
-                    && PackedCard.isValid(Card2) && (Card3 == 0b111111))) {
-                return true;
-            }
-            if ((PackedCard.isValid(Card0) && PackedCard.isValid(Card1)
-                    && (Card2 == 0b111111) && (Card3 == 0b111111))) {
-                return true;
-            }
-            if ((PackedCard.isValid(Card0) && (Card1 == 0b111111)
-                    && (Card2 == 0b111111)) && (Card3 == 0b111111)) {
-                return true;
-            }
-            if ((Card0 == 0b111111) && (Card1 == 0b111111)
-                    && (Card2 == 0b111111) && (Card3 == 0b111111)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Test
     void firstEmptyWorks() {
-        for (int j = 0; j < 4; ++j) {
-            for (int i = 0; i < 4; ++i) {
-                int trick = PackedTrick.firstEmpty(Color.ALL.get(j),
-                        PlayerId.ALL.get(i));
-                int shouldBe1 = Bits32.extract(trick, 0, 24);
-                int shouldBe0 = Bits32.extract(trick, 24, 4);
-                int shouldBePlayer = Bits32.extract(trick, 28, 2);
-                int shouldBeColor = Bits32.extract(trick, 30, 2);
-                assertTrue((shouldBeColor == (j)));
-                assertTrue((shouldBePlayer == (i)));
-                assertTrue(shouldBe0 == 0);
-                assertTrue(shouldBe1 == 0b111111111111111111111111);
+        for (Color trump: Color.ALL) {
+            for (PlayerId firstPlayer: PlayerId.ALL) {
+                int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+                assertTrue(PackedTrick.isEmpty(pkTrick));
+                assertEquals(0, PackedTrick.index(pkTrick));
+                assertEquals(trump, PackedTrick.trump(pkTrick));
+                assertEquals(firstPlayer, PackedTrick.player(pkTrick, 0));
             }
         }
     }
@@ -452,96 +183,20 @@ public class PackedTrickTest {
     void nextEmptyWorks() {
         SplittableRandom rng = newRandom();
         for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            if (PackedTrick.isValid(iterations)
-                    && (Bits32.extract(iterations, 0, 6) != 0b111111)
-                    && (Bits32.extract(iterations, 6, 6) != 0b111111)
-                    && (Bits32.extract(iterations, 12, 6) != 0b111111)
-                    && (Bits32.extract(iterations, 18, 6) != 0b111111)) {
-                if (Bits32.extract(iterations, 24, 4) == 8) {
-                    assertEquals(PackedTrick.INVALID,
-                            PackedTrick.nextEmpty(iterations));
-                } else {
-                    int nextTrick = PackedTrick.nextEmpty(iterations);
+            Color trump = nextColor(rng);
+            PlayerId firstPlayer = nextPlayerId(rng);
+            int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+            for (int j = 0; j < 9; ++j) {
+                assertTrue(PackedTrick.isEmpty(pkTrick));
+                assertEquals(j, PackedTrick.index(pkTrick));
+                assertEquals(trump, PackedTrick.trump(pkTrick));
 
-                    assertEquals(Bits32.extract(nextTrick, 0, 24),
-                            0b111111111111111111111111);
-                    assertEquals(Bits32.extract(iterations, 30, 2),
-                            Bits32.extract(nextTrick, 30, 2));
-                    assertEquals(PackedTrick.winningPlayer(iterations),
-                            PlayerId.ALL.get(Bits32.extract(nextTrick, 28, 2)));
-                    assertEquals(Bits32.extract(iterations, 24, 4) + 1,
-                            Bits32.extract(nextTrick, 24, 4));
-                }
+                long pkTrickCards = nextCardSet(rng, 4);
+                for (int k = 0; k < 4; ++k)
+                    pkTrick = PackedTrick.withAddedCard(pkTrick, PackedCardSet.get(pkTrickCards, k));
+                pkTrick = PackedTrick.nextEmpty(pkTrick);
             }
-        }
-    }
-
-    @Test
-    void sizeWorks() {
-        int shouldBeThisSize;
-        SplittableRandom rng = newRandom();
-        for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            shouldBeThisSize = 0;
-            if (PackedTrick.isValid(iterations)) {
-                for (int j = 0; j < 4; ++j) {
-                    if (Bits32.extract(iterations, 6 * j, 6) != 0b111111) {
-                        shouldBeThisSize += 1;
-                    }
-                }
-                assertEquals(shouldBeThisSize, PackedTrick.size(iterations));
-            }
-        }
-    }
-
-    @Test
-    void cardWorks() {
-        SplittableRandom rng = newRandom();
-        for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            if (PackedTrick.isValid(iterations)) {
-                for (int j = 0; j < 4; ++j) {
-                    int shouldBeThatCard = Bits32.extract(iterations, 6 * j, 6);
-                    if (PackedCard.isValid(shouldBeThatCard)) {
-                        assertEquals(shouldBeThatCard,
-                                PackedTrick.card(iterations, j));
-
-                    }
-                }
-            }
-        }
-    }
-
-    @Test
-    void withAddedCardWorks() {
-        int k;
-        int index;
-        int ones = 0b111111;
-        SplittableRandom rng = newRandom();
-        for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            if (PackedTrick.isValid(iterations) && ((iterations
-                    & 0b111111000000000000000000) == (0b111111 << 18))) {
-                for (int j = 0; j < 64; ++j) {
-                    if (PackedCard.isValid(j)) {
-                        k = 0;
-                        index = 0;
-                        while (k < 4) {
-                            if (Bits32.extract(iterations, k * 6, 6) == 0b111111) {
-                                index = k;
-                                k = 5;
-                            } else {
-                                k++;
-                            }
-                        }
-
-                        assertEquals(
-                                (iterations - (ones << 6 * index)) + (j << 6 * index),
-                                PackedTrick.withAddedCard(iterations, j));
-                    }
-                }
-            }
+            assertEquals(PackedTrick.INVALID, pkTrick);
         }
     }
 
@@ -549,14 +204,18 @@ public class PackedTrickTest {
     void isLastWorks() {
         SplittableRandom rng = newRandom();
         for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            if (PackedTrick.isValid(iterations)) {
-                if (Bits32.extract(iterations, 24, 4) == 8) {
-                    assertTrue(PackedTrick.isLast(iterations));
-                } else {
-                    assertFalse(PackedTrick.isLast(iterations));
-                }
+            Color trump = nextColor(rng);
+            PlayerId firstPlayer = nextPlayerId(rng);
+            int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+            for (int j = 0; j < 8; ++j) {
+                assertFalse(PackedTrick.isLast(pkTrick));
+
+                long pkTrickCards = nextCardSet(rng, 4);
+                for (int k = 0; k < 4; ++k)
+                    pkTrick = PackedTrick.withAddedCard(pkTrick, PackedCardSet.get(pkTrickCards, k));
+                pkTrick = PackedTrick.nextEmpty(pkTrick);
             }
+            assertTrue(PackedTrick.isLast(pkTrick));
         }
     }
 
@@ -564,13 +223,17 @@ public class PackedTrickTest {
     void isEmptyWorks() {
         SplittableRandom rng = newRandom();
         for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            if (PackedTrick.isValid(iterations)) {
-                if (Bits32.extract(iterations, 0, 24) == 0b111111111111111111111111) {
-                    assertTrue(PackedTrick.isEmpty(iterations));
-                } else {
-                    assertFalse(PackedTrick.isEmpty(iterations));
+            Color trump = nextColor(rng);
+            PlayerId firstPlayer = nextPlayerId(rng);
+            int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+            for (int j = 0; j < 9; ++j) {
+                assertTrue(PackedTrick.isEmpty(pkTrick));
+                long pkTrickCards = nextCardSet(rng, 4);
+                for (int k = 0; k < 4; ++k) {
+                    pkTrick = PackedTrick.withAddedCard(pkTrick, PackedCardSet.get(pkTrickCards, k));
+                    assertFalse(PackedTrick.isEmpty(pkTrick));
                 }
+                pkTrick = PackedTrick.nextEmpty(pkTrick);
             }
         }
     }
@@ -579,18 +242,36 @@ public class PackedTrickTest {
     void isFullWorks() {
         SplittableRandom rng = newRandom();
         for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            if (PackedTrick.isValid(iterations)) {
-                if ((Bits32.extract(iterations, 0, 4) < 9)
-                        && (Bits32.extract(iterations, 6, 4) < 9)
-                        && (Bits32.extract(iterations, 12, 4) < 9)
-                        && (Bits32.extract(iterations, 18, 4) < 9)) {
-                    assertTrue(PackedTrick.isFull(iterations));
+            Color trump = nextColor(rng);
+            PlayerId firstPlayer = nextPlayerId(rng);
+            int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+            for (int j = 0; j < 9; ++j) {
+                long pkTrickCards = nextCardSet(rng, 4);
+                for (int k = 0; k < 4; ++k) {
+                    assertFalse(PackedTrick.isFull(pkTrick));
+                    pkTrick = PackedTrick.withAddedCard(pkTrick, PackedCardSet.get(pkTrickCards, k));
                 }
+                assertTrue(PackedTrick.isFull(pkTrick));
+                pkTrick = PackedTrick.nextEmpty(pkTrick);
+            }
+        }
+    }
 
-                else {
-                    assertFalse(PackedTrick.isFull(iterations));
+    @Test
+    void sizeWorks() {
+        SplittableRandom rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
+            Color trump = nextColor(rng);
+            PlayerId firstPlayer = nextPlayerId(rng);
+            int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+            for (int j = 0; j < 9; ++j) {
+                long pkTrickCards = nextCardSet(rng, 4);
+                assertEquals(0, PackedTrick.size(pkTrick));
+                for (int k = 0; k < 4; ++k) {
+                    pkTrick = PackedTrick.withAddedCard(pkTrick, PackedCardSet.get(pkTrickCards, k));
+                    assertEquals(k + 1, PackedTrick.size(pkTrick));
                 }
+                pkTrick = PackedTrick.nextEmpty(pkTrick);
             }
         }
     }
@@ -599,39 +280,69 @@ public class PackedTrickTest {
     void trumpWorks() {
         SplittableRandom rng = newRandom();
         for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            if (PackedTrick.isValid(iterations)) {
-                int colorIndex = Bits32.extract(iterations, 30, 2);
-                assertEquals(Color.ALL.get(colorIndex),
-                        PackedTrick.trump(iterations));
+            Color trump = nextColor(rng);
+            PlayerId firstPlayer = nextPlayerId(rng);
+            int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+            for (int j = 0; j < 9; ++j) {
+                long pkTrickCards = nextCardSet(rng, 4);
+                assertEquals(trump, PackedTrick.trump(pkTrick));
+                for (int k = 0; k < 4; ++k) {
+                    pkTrick = PackedTrick.withAddedCard(pkTrick, PackedCardSet.get(pkTrickCards, k));
+                    assertEquals(trump, PackedTrick.trump(pkTrick));
+                }
+                pkTrick = PackedTrick.nextEmpty(pkTrick);
             }
         }
     }
 
     @Test
     void playerWorks() {
-        SplittableRandom rng = newRandom();
-        for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-           // if (PackedTrick.isValid(iterations)) {
-                int playerIndex = Bits32.extract(iterations, 28, 2);
-                for (int j = 0; j < 4; ++j) {
-                    assertEquals(PlayerId.ALL.get((playerIndex + j) % 4),
-                            PackedTrick.player(iterations, j));
-
+        for (Color trump: Color.ALL) {
+            for (PlayerId firstPlayer: PlayerId.ALL) {
+                int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+                PlayerId player = firstPlayer;
+                for (int j = 0; j < PlayerId.COUNT; ++j) {
+                    assertEquals(player, PackedTrick.player(pkTrick, j));
+                    player = PlayerId.ALL.get((player.ordinal() + 1) % PlayerId.COUNT);
                 }
             }
         }
-
+    }
 
     @Test
     void indexWorks() {
         SplittableRandom rng = newRandom();
         for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            if (PackedTrick.isValid(iterations)) {
-                int index = Bits32.extract(iterations, 24, 4);
-                assertEquals(index, PackedTrick.index(iterations));
+            Color trump = nextColor(rng);
+            PlayerId firstPlayer = nextPlayerId(rng);
+            int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+            for (int j = 0; j < 9; ++j) {
+                long pkTrickCards = nextCardSet(rng, 4);
+                for (int k = 0; k < 4; ++k) {
+                    assertEquals(j, PackedTrick.index(pkTrick));
+                    pkTrick = PackedTrick.withAddedCard(pkTrick, PackedCardSet.get(pkTrickCards, k));
+                }
+                assertEquals(j, PackedTrick.index(pkTrick));
+                pkTrick = PackedTrick.nextEmpty(pkTrick);
+            }
+        }
+    }
+
+    @Test
+    void cardWorks() {
+        SplittableRandom rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
+            Color trump = nextColor(rng);
+            PlayerId firstPlayer = nextPlayerId(rng);
+            int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+            for (int j = 0; j < 9; ++j) {
+                long pkTrickCards = nextCardSet(rng, 4);
+                for (int k = 0; k < 4; ++k) {
+                    pkTrick = PackedTrick.withAddedCard(pkTrick, PackedCardSet.get(pkTrickCards, k));
+                    for (int l = 0; l <= k; ++l)
+                        assertEquals(PackedCardSet.get(pkTrickCards, l), PackedTrick.card(pkTrick, l));
+                }
+                pkTrick = PackedTrick.nextEmpty(pkTrick);
             }
         }
     }
@@ -640,58 +351,135 @@ public class PackedTrickTest {
     void baseColorWorks() {
         SplittableRandom rng = newRandom();
         for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            if (PackedTrick.isValid(iterations)) {
-                int shouldBeThatColor = Bits32.extract(iterations, 4, 2);
-                assertEquals(shouldBeThatColor,
-                        PackedTrick.baseColor(iterations).ordinal());
+            int pkTrick = PackedTrick.firstEmpty(nextColor(rng), nextPlayerId(rng));
+            int trickSize = rng.nextInt(1, 5);
+            long pkTrickCards = nextCardSet(rng, trickSize);
+            for (int j = 0; j < trickSize; ++j)
+                pkTrick = PackedTrick.withAddedCard(pkTrick, PackedCardSet.get(pkTrickCards, j));
+            Color baseColor = PackedCard.color(PackedCardSet.get(pkTrickCards, 0));
+            assertEquals(baseColor, PackedTrick.baseColor(pkTrick));
+        }
+    }
+
+    @Test
+    void allCardsArePlayableAtTrickBeginning() {
+        SplittableRandom rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
+            int pkTrick = PackedTrick.firstEmpty(nextColor(rng), nextPlayerId(rng));
+            long pkHand = nextCardSet(rng, 9);
+            assert PackedCardSet.size(pkHand) == 9;
+            assertEquals(pkHand, PackedTrick.playableCards(pkTrick, pkHand));
+        }
+    }
+
+    @Test
+    void playableCardsIsNeverEmptyIfHandIsNotEmpty() {
+        SplittableRandom rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
+            Color trump = nextColor(rng);
+            PlayerId firstPlayer = nextPlayerId(rng);
+            int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+
+            CardSet remainingCards = CardSet.ALL_CARDS;
+            for (int j = 0; j < 9; ++j) {
+                int handSize = 9 - j;
+                for (int k = 0; k < 3; ++k) {
+                    int cardI = rng.nextInt(remainingCards.size());
+                    Card card = remainingCards.get(cardI);
+                    remainingCards = remainingCards.remove(card);
+                    pkTrick = PackedTrick.withAddedCard(pkTrick, card.packed());
+
+                    CardSet hand = remainingCards;
+                    assert hand.size() >= handSize;
+                    while (hand.size() > handSize) {
+                        int l = rng.nextInt(hand.size());
+                        hand = hand.remove(hand.get(l));
+                    }
+                    assertTrue(! PackedCardSet.isEmpty(PackedTrick.playableCards(pkTrick, hand.packed())));
+                }
+                pkTrick = PackedTrick.nextEmpty(pkTrick);
             }
         }
     }
 
     @Test
-    void pointsWorks() {
-        int Card0, Card1, Card2, Card3, trump, points0, points1, points2,
-                points3, pointBonus;
+    void playableCardsWorksInTrickyCase1() {
+        // No obligation to follow when one only has the jack of trump
+        long pkHand = cardSet(c(SPADE, SIX), c(SPADE, JACK), c(HEART, JACK));
+        int pkTrick = trick(indexForHand(pkHand), HEART, PLAYER_1, c(HEART, SIX), c(SPADE, TEN), c(SPADE, NINE));
+        assertEquals(pkHand, PackedTrick.playableCards(pkTrick, pkHand));
+    }
+
+    @Test
+    void playableCardsWorksInTrickyCase2() {
+        // Under-cutting is forbidden
+        long pkHand = cardSet(c(SPADE, EIGHT), c(SPADE, JACK), c(SPADE, KING));
+        int pkTrick = trick(indexForHand(pkHand), SPADE, PLAYER_1, c(HEART, SIX), c(SPADE, TEN), c(SPADE, QUEEN));
+
+        long expPlayable = cardSet(c(SPADE, JACK), c(SPADE, KING));
+        long actPlayable = PackedTrick.playableCards(pkTrick, pkHand);
+
+        assertEquals(expPlayable, actPlayable);
+    }
+
+    @Test
+    void playableCardsWorksInTrickyCase3() {
+        // Under-cutting is allowed when there is no other choice
+        long pkHand = cardSet(c(SPADE, SIX), c(SPADE, EIGHT), c(SPADE, TEN));
+        int pkTrick = trick(indexForHand(pkHand), SPADE, PLAYER_1, c(HEART, SIX), c(SPADE, ACE));
+        assertEquals(pkHand, PackedTrick.playableCards(pkTrick, pkHand));
+    }
+
+    @Test
+    void playableCardsWorksInTrickyCase4() {
+        // Cutting with the 6 of trump is allowed
+        long pkHand = cardSet(c(SPADE, SIX), c(HEART, SIX));
+        int pkTrick = trick(indexForHand(pkHand), SPADE, PLAYER_1, c(HEART, TEN));
+        assertEquals(pkHand, PackedTrick.playableCards(pkTrick, pkHand));
+    }
+
+    @Test
+    void playableCardsWorksInTrickyCase5() {
+        // Any card can be played if one cannot follow, and nobody cut
+        long pkHand = cardSet(c(SPADE, SIX), c(HEART, SIX),  c(SPADE, TEN),  c(CLUB, TEN));
+        int pkTrick = trick(indexForHand(pkHand), SPADE, PLAYER_1, c(DIAMOND, TEN),  c(DIAMOND, SIX));
+        assertEquals(pkHand, PackedTrick.playableCards(pkTrick, pkHand));
+    }
+
+    @Test
+    void pointsSumTo157() {
         SplittableRandom rng = newRandom();
         for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
-            int iterations = rng.nextInt();
-            if (PackedTrick.isValid(iterations)) {
-                Card0 = Bits32.extract(iterations, 0, 6);
-                Card1 = Bits32.extract(iterations, 6, 6);
-                Card2 = Bits32.extract(iterations, 12, 6);
-                Card3 = Bits32.extract(iterations, 18, 6);
-                trump = Bits32.extract(iterations, 30, 2);
-                pointBonus = 0;
-                points0 = 0;
-                points1 = 0;
-                points2 = 0;
-                points3 = 0;
-                if (PackedCard.isValid(Card0)) {
-                    points0 = PackedCard.points(Color.ALL.get(trump), Card0);
+            Color trump = nextColor(rng);
+            PlayerId firstPlayer = nextPlayerId(rng);
+            int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+            CardSet remainingCards = CardSet.ALL_CARDS;
+            int totalPoints = 0;
+            for (int j = 0; j < 9; ++j) {
+                for (int k = 0; k < 4; ++k) {
+                    int cardI = rng.nextInt(remainingCards.size());
+                    Card card = remainingCards.get(cardI);
+                    pkTrick = PackedTrick.withAddedCard(pkTrick, card.packed());
+                    remainingCards = remainingCards.remove(card);
                 }
-                if (PackedCard.isValid(Card1)) {
-                    points1 = PackedCard.points(Color.ALL.get(trump), Card1);
-                }
-                if (PackedCard.isValid(Card2)) {
-                    points2 = PackedCard.points(Color.ALL.get(trump), Card2);
-                }
-                if (PackedCard.isValid(Card3)) {
-                    points3 = PackedCard.points(Color.ALL.get(trump), Card3);
-                }
-                if (Bits32.extract(iterations, 24, 4) == 8) {
-                    pointBonus += 5;
-                }
-                // les cartes entrée dans points sont toutes valides
-                // si on entre des mauvaises cartes , assertError
-                if (PackedCard.isValid(Card0) && PackedCard.isValid(Card1)
-                        && PackedCard.isValid(Card2)
-                        && PackedCard.isValid(Card3)) {
-                    int sum = points0 + points1 + points2 + points3
-                            + pointBonus;
-                    assertEquals(sum, PackedTrick.points(iterations));
-                }
+                totalPoints += PackedTrick.points(pkTrick);
+                pkTrick = PackedTrick.nextEmpty(pkTrick);
             }
+            assertEquals(157, totalPoints);
         }
+    }
+
+    @Test
+    void winningPlayerWorksInTrickyCase1() {
+        // If the 3rd player under-cut, the 2nd one is the winner
+        int pkTrick = trick(0, SPADE, PLAYER_1, c(HEART, TEN),  c(SPADE, NINE), c(SPADE, EIGHT));
+        assertEquals(PlayerId.PLAYER_2, PackedTrick.winningPlayer(pkTrick));
+    }
+
+    @Test
+    void winningPlayerWorksInTrickyCase2() {
+        // If nobody could follow or cut, the 1st player is the winner
+        int pkTrick = trick(0, SPADE, PLAYER_1, c(HEART, SIX),  c(DIAMOND, NINE), c(DIAMOND, EIGHT));
+        assertEquals(PlayerId.PLAYER_1, PackedTrick.winningPlayer(pkTrick));
     }
 }
