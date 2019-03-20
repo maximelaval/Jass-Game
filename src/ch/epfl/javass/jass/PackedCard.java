@@ -2,7 +2,15 @@ package ch.epfl.javass.jass;
 
 import ch.epfl.javass.bits.Bits32;
 
+/**
+ * Let one works with cards packed in an int type.
+ * @author Lucas Meier (283726)
+ */
 public final class PackedCard {
+
+    /**
+     * Represents an invalid packed card.
+     */
     public final static int INVALID = 0b111111;
 
     /**

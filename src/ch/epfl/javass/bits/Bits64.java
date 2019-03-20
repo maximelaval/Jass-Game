@@ -2,6 +2,10 @@ package ch.epfl.javass.bits;
 
 import static ch.epfl.javass.Preconditions.checkArgument;
 
+/**
+ * Let one works with 32 bits vectors stored in int variable.
+ * @author Lucas Meier (283726)
+ */
 public final class Bits64 {
 
     private Bits64() {

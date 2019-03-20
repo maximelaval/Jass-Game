@@ -4,8 +4,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Represents a 36 cards game card.
+ * @author Lucas Meier (283726)
+ */
 public final class Card {
 
+    /**
+     * Defines a card color.
+     * @author Lucas Meier (283726)
+     */
     public enum Color {
         SPADE("\u2660"),
         HEART("\u2661"),
@@ -18,15 +26,30 @@ public final class Card {
             this.symbol = symbol;
         }
 
+        /**
+         * Represents all colours.
+         */
         public static final List<Color> ALL =
                 Collections.unmodifiableList(Arrays.asList(values()));
+
+        /**
+         * The number of different colours.
+         */
         public static final int COUNT = 4;
 
+        /**
+         * Returns a written representation of a colour.
+         * @return a written representation of a colour.
+         */
         public String toString() {
             return this.symbol;
         }
     }
 
+    /**
+     * Defines a card rank.
+     * @author Lucas Meier (283726)
+     */
     public enum Rank {
         SIX("6", 0),
         SEVEN("7", 1),
@@ -46,18 +69,29 @@ public final class Card {
             this.trumpOrdinal = trumpOrdinal;
         }
 
+        /**
+         * Represents all ranks.
+         */
         public static final List<Rank> ALL =
                 Collections.unmodifiableList(Arrays.asList(values()));
+
+        /**
+         * The number of different ranks.
+         */
         public static final int COUNT = 9;
 
         /**
-         * returns the position of the trump card.
-         * @return returns the position of the trump card.
+         * Returns the position of the trump card.
+         * @return the position of the trump card.
          */
         public int trumpOrdinal() {
             return this.trumpOrdinal;
         }
 
+        /**
+         * Return a written representation of a rank.
+         * @return a written representation of a rank.
+         */
         public String toString() {
             return this.symbol;
         }

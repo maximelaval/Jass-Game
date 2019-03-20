@@ -1,5 +1,9 @@
 package ch.epfl.javass.bits;
 
+/**
+ *Let one works with 32 bits vectors stored in int variable.
+ * @author Lucas Meier (283726)
+ */
 public final class Bits32 {
 
     private Bits32() {

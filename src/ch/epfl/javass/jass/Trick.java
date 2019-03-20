@@ -2,6 +2,10 @@ package ch.epfl.javass.jass;
 
 import ch.epfl.javass.jass.Card.*;
 
+/**
+ * Represents a trick of a Jass game.
+ * @author Lucas Meier (283726)
+ */
 public final class Trick {
 
     private int pkTrick;

@@ -18,6 +18,7 @@ public final class PacedPlayer implements Player {
         setPlayers(ownId, playerNames);
     }
 
+
     @Override
     public void updateHand(CardSet newHand) {
         this.updateHand(newHand);

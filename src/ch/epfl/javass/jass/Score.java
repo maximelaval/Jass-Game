@@ -1,5 +1,9 @@
 package ch.epfl.javass.jass;
 
+/**
+ * Represents the scores of a Jass game.
+ * @author Lucas Meier (283726)
+ */
 public final class Score {
     public static final Score INITIAL = new Score(0);
     private long pkScore;

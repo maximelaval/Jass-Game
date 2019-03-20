@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Defines the identity (the number) of a player.
+ * @author Lucas Meier (283726)
+ */
 public enum PlayerId {
     PLAYER_1,
     PLAYER_2,

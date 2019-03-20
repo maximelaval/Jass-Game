@@ -1,5 +1,10 @@
 package ch.epfl.javass;
 
+/**
+ * Define a few checking methods.
+ * @author Lucas Meier (283726)
+ *
+ */
 public final class Preconditions {
     private Preconditions() {
 

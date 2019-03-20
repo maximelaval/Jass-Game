@@ -4,11 +4,21 @@ import java.util.StringJoiner;
 import static ch.epfl.javass.bits.Bits64.*;
 
 /**
- *
+ *Let one works with card sets packed in a long type.
+ * @author Lucas Meier (283726)
  */
 public final class PackedCardSet {
+
+    /**
+     * Represents an empty packed card set.
+     */
     public static final long EMPTY = 0L;
+
+    /**
+     * Represents a card set containing every cards.
+     */
     public static final long ALL_CARDS = 0b111111111000000011111111100000001111111110000000111111111L;
+
     final private static long [][] trumpTable =  computeTrump();
     final private static long []subColorTable=  computeSubColor();
 

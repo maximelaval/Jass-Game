@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Defines a team for the game.
+ * @author Lucas Meier (283726)
+ */
 public enum TeamId {
     TEAM_1,
     TEAM_2

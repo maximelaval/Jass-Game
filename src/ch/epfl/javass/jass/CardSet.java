@@ -6,6 +6,10 @@ import java.util.StringJoiner;
 import static ch.epfl.javass.jass.PackedCardSet.*;
 
 
+/**
+ * Represents a set of cards of a Jass game.
+ * @author Lucas Meier (283726)
+ */
 public final class CardSet {
 
     private long pkCardSet;
@@ -15,7 +19,14 @@ public final class CardSet {
     }
 
 
+    /**
+     * Represents an empty card set.
+     */
     public static final CardSet EMPTY = new CardSet(PackedCardSet.EMPTY);
+
+    /**
+     * Represents every cards in a card set.
+     */
     public static final CardSet ALL_CARDS = new CardSet(PackedCardSet.ALL_CARDS);
 
     /**

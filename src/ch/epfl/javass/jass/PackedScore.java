@@ -8,7 +8,15 @@ import static ch.epfl.javass.jass.Jass.MATCH_ADDITIONAL_POINTS;
 import static ch.epfl.javass.jass.Jass.TRICKS_PER_TURN;
 import static ch.epfl.javass.jass.TeamId.*;
 
+/**
+ * Let one works with a Jass game score packed in a long type.
+ * @author Lucas Meier (283726)
+ */
 public final class PackedScore {
+
+    /**
+     * Represents the initial packed score when starting a game.
+     */
     public static final long INITIAL = 0L;
 
     private PackedScore() {
