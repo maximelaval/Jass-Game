@@ -6,6 +6,7 @@ import static ch.epfl.javass.bits.Bits64.*;
 /**
  *Let one works with card sets packed in a long type.
  * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
  */
 public final class PackedCardSet {
 

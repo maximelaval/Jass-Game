@@ -7,6 +7,7 @@ import java.util.List;
 /**
  * Represents a 36 cards game card.
  * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
  */
 public final class Card {
 

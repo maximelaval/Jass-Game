@@ -5,6 +5,7 @@ import ch.epfl.javass.bits.Bits32;
 /**
  * Let one works with cards packed in an int type.
  * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
  */
 public final class PackedCard {
 

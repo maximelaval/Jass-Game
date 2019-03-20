@@ -2,6 +2,11 @@ package ch.epfl.javass.jass;
 
 import java.util.Map;
 
+/**
+ * Represents a player.
+ * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
+ */
 public interface Player {
 
     abstract Card cardToPlay(TurnState state, CardSet hand);

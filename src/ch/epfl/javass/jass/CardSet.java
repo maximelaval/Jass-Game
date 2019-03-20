@@ -9,6 +9,7 @@ import static ch.epfl.javass.jass.PackedCardSet.*;
 /**
  * Represents a set of cards of a Jass game.
  * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
  */
 public final class CardSet {
 

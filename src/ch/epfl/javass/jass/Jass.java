@@ -4,6 +4,7 @@ package ch.epfl.javass.jass;
 /**
  * Contains some important constants.
  * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
  */
 public interface Jass {
 

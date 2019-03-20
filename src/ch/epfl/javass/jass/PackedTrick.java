@@ -17,6 +17,7 @@ import ch.epfl.javass.jass.CardSet.*;
 /**
  * Let one works with tricks packed in a int type.
  * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
  */
 public final class PackedTrick {
 
@@ -95,10 +96,11 @@ public final class PackedTrick {
     }
 
     /**
-     * Returns the next empty packed trick following the given trick with the same trump and
-     * the first player being the winning player of the given trick.
-     * @param pkTrick
-     * @return
+     * Returns the next empty packed trick following the given packed trick with the same trump and
+     * the first player being the winning player of the given packed trick.
+     * @param pkTrick the given packed trick.
+     * @return the next empty packed trick following the given trick with the same trump and
+     * the first player being the winning player of the given packed trick.
      */
     public static int nextEmpty(int pkTrick) {
         assert isFull(pkTrick);
@@ -284,7 +286,7 @@ public final class PackedTrick {
     /**
      * Returns the identity of the leading player in the given packed trick.
      * @param pkTrick the given packed trick.
-     * @return the 
+     * @return the identity of the leading player in the given packed trick.
      */
     public static PlayerId winningPlayer(int pkTrick) {
         int i = 0;
@@ -305,6 +307,11 @@ public final class PackedTrick {
     }
 
 
+    /**
+     * Returns a written representation of the given packed trick.
+     * @param pkTrick the given packed trick.
+     * @return a written representation of the given packed trick.
+     */
     public static String toString(int pkTrick) {
         assert(isValid(pkTrick));
 

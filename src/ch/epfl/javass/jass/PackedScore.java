@@ -11,6 +11,7 @@ import static ch.epfl.javass.jass.TeamId.*;
 /**
  * Let one works with a Jass game score packed in a long type.
  * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
  */
 public final class PackedScore {
 

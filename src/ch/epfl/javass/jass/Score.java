@@ -3,9 +3,15 @@ package ch.epfl.javass.jass;
 /**
  * Represents the scores of a Jass game.
  * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
  */
 public final class Score {
+
+    /**
+     * Represents the initial score at the beginning of a game.
+     */
     public static final Score INITIAL = new Score(0);
+
     private long pkScore;
 
     private Score(long i) {
