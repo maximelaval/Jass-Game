@@ -3,6 +3,7 @@ package ch.epfl.javass.jass;
 import java.util.*;
 
 import static ch.epfl.javass.jass.Jass.HAND_SIZE;
+import static java.util.Collections.unmodifiableMap;
 
 public final class JassGame {
 
@@ -11,18 +12,18 @@ public final class JassGame {
     private Random trumpRng;
     private Map<PlayerId, Player> players;
     private Map<PlayerId, String> playerNames;
-    private CardSet[] playerHands;
+    private Map<PlayerId, CardSet> playerHands;
 
 
     public JassGame(long rngSeed, Map<PlayerId, Player> players, Map<PlayerId, String> playerNames) {
 
-        this.players = java.util.Collections.unmodifiableMap(new EnumMap<>(players));
-        this.playerNames = java.util.Collections.unmodifiableMap(new EnumMap<>(playerNames));
+        this.players = unmodifiableMap(new EnumMap<>(players));
+        this.playerNames = unmodifiableMap(new EnumMap<>(playerNames));
         Random rng = new Random(rngSeed);
         this.shuffleRng = new Random(rng.nextLong());
         this.trumpRng = new Random(rng.nextLong());
         this.turnState = TurnState.initial(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)), Score.INITIAL, firstPlayer());
-        playerHands = new CardSet[4];
+        playerHands = unmodifiableMap(new EnumMap<>(playerHands));
 
     }
 
@@ -36,7 +37,16 @@ public final class JassGame {
         if (!isGameOver()) {
             if (turnState.trick().index() == 0) {
                 shuffleAndDistribute();
-                startTurn();
+
+
+
+
+                firstPlayerToPlay();
+                turnState = turnState.withNewCardPlayed(players.get(firstPlayer()).cardToPlay(turnState, playerHands.get(firstPlayer())));
+
+
+
+
             } else {
                 nextPlayerToPlay();
             }
@@ -48,17 +58,21 @@ public final class JassGame {
         Collections.shuffle(deck, shuffleRng);
         for (int i = 0; i < 4; ++i){
             players.get(i).updateHand(CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
-            playerHands[i] = CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8));
+            playerHands.put(PlayerId.values()[i], CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
         }
     }
 
-    private void startTurn() {
+
+    private void firstPlayerToPlay() {
+        players.get(firstPlayer()).cardToPlay(turnState, playerHands.get(firstPlayer().ordinal()));
 
     }
 
     private void nextPlayerToPlay() {
+        players.get(turnState.nextPlayer()).cardToPlay(turnState, playerHands.get(turnState.nextPlayer().ordinal()));
 
     }
+
 
     private List<Card> constructCardList() {
         List<Card> list = Collections.emptyList();
@@ -73,7 +87,7 @@ public final class JassGame {
     private PlayerId firstPlayer() {
         if (turnState.trick().index() == 0 && turnState.trick().isEmpty()) {
             for (int i = 0; i < 4; ++i) {
-                if (playerHands[i].contains(Card.of(Card.Color.DIAMOND, Card.Rank.SEVEN))) {
+                if (playerHands.get(i).contains(Card.of(Card.Color.DIAMOND, Card.Rank.SEVEN))) {
                     return PlayerId.values()[i];
                 }
             }
