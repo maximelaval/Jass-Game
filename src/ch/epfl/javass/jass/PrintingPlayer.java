@@ -2,27 +2,19 @@ package ch.epfl.javass.jass;
 
 import java.util.Map;
 
-public final class PacedPlayer implements Player {
+public final class PrintingPlayer implements Player {
+    private final Player underlyingPlayer;
 
-    private Player underlyingPlayer;
-    double minTime;
-
-    public PacedPlayer(Player underlyingPlayer, double minTime) {
+    public PrintingPlayer(Player underlyingPlayer) {
         this.underlyingPlayer = underlyingPlayer;
-        this.minTime = minTime;
     }
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        long startTime = System.currentTimeMillis();
-        Card card = underlyingPlayer.cardToPlay(state, hand);
-        long endTime = System.currentTimeMillis();
-        if (endTime - startTime < minTime) {
-            try {
-                Thread.sleep((long)minTime - (endTime - startTime));
-            } catch (InterruptedException e) {/* ignore */}
-        }
-        return card;
+        System.out.print("C'est à moi de jouer... Je joue : ");
+        Card c = underlyingPlayer.cardToPlay(state, hand);
+        System.out.println(c);
+        return c;
     }
 
     @Override
