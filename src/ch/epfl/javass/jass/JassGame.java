@@ -22,7 +22,6 @@ public final class JassGame {
         Random rng = new Random(rngSeed);
         this.shuffleRng = new Random(rng.nextLong());
         this.trumpRng = new Random(rng.nextLong());
-        this.turnState = TurnState.initial(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)), Score.INITIAL, firstPlayer());
         playerHands = unmodifiableMap(new EnumMap<>(playerHands));
 
     }
@@ -33,23 +32,49 @@ public final class JassGame {
     }
 
 
+    
+    private void start(){
+        shuffleAndDistribute();
+        turnState = TurnState.initial(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)), Score.INITIAL, firstPlayer());
+        firstPlayerToPlayTurn();
+        ;
+    }
     public void advanceToEndOfNextTrick() {
-        if (!isGameOver()) {
-            if (turnState.trick().index() == 0) {
-                shuffleAndDistribute();
-
-
-
-
-                firstPlayerToPlay();
-                turnState = turnState.withNewCardPlayed(players.get(firstPlayer()).cardToPlay(turnState, playerHands.get(firstPlayer())));
-
-
-
-
-            } else {
-                nextPlayerToPlay();
+       
+        if(isGameOver()) {
+            
+            return;
+        }
+        
+        
+        
+        
+        if(turnState== null) {
+            // broadcaster les noms des joueurs
+            turnState = TurnState.initial(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)), Score.INITIAL, firstPlayer());
+            start(); // celui qui a le 7 de carreau commence 
+        }
+        else {
+            turnState = turnState.withTrickCollected();
+            if(turnState.isTerminal()) {
+                newTurn(); // creeer un nouveau tour,redistribuer les cartes , choisir un nouveau  trump aleatoire, qui commence celui a droite du 7 de carreau
+                
             }
+            
+        }
+        
+        // broedcaster le score et le pli a tous les joueurs 
+        if(isGameOver()) {
+            // boradcaster l equipe gagnante a tlm 
+            return;
+        }
+        
+        while(!turnState.trick().isFull()) {
+           //quand il faut update trick 
+            play(); //  chercher le prochain joueur ( avec next player) , cherche la carte que ce joueur joura . puis enlever cette carte de la main du joueur , puis mettre a jour 
+            //cette main dans la map des mains 
+            //puis apeller la methode withNewCardPlayed du turn State avec la carte en argument.
+          //  player.get nextPlayer
         }
     }
 
@@ -57,19 +82,23 @@ public final class JassGame {
         List<Card> deck = constructCardList();
         Collections.shuffle(deck, shuffleRng);
         for (int i = 0; i < 4; ++i){
-            players.get(i).updateHand(CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
-            playerHands.put(PlayerId.values()[i], CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
+          PlayerId pl = PlayerId.values()[i];
+            players.get(pl).updateHand(CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
+            playerHands.put(pl, CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
         }
     }
 
+private void broadcastTrick() {
 
-    private void firstPlayerToPlay() {
-        players.get(firstPlayer()).cardToPlay(turnState, playerHands.get(firstPlayer().ordinal()));
+}
+    private Card firstPlayerToPlayTurn() {
+       return  players.get(firstPlayer()).cardToPlay(turnState, playerHands.get(firstPlayer()));
 
     }
 
-    private void nextPlayerToPlay() {
-        players.get(turnState.nextPlayer()).cardToPlay(turnState, playerHands.get(turnState.nextPlayer().ordinal()));
+
+    private Card nextPlayerToPlay() {
+        return  players.get(turnState.nextPlayer()).cardToPlay(turnState, playerHands.get(turnState.nextPlayer()));
 
     }
 
@@ -87,8 +116,9 @@ public final class JassGame {
     private PlayerId firstPlayer() {
         if (turnState.trick().index() == 0 && turnState.trick().isEmpty()) {
             for (int i = 0; i < 4; ++i) {
-                if (playerHands.get(i).contains(Card.of(Card.Color.DIAMOND, Card.Rank.SEVEN))) {
-                    return PlayerId.values()[i];
+                PlayerId pl=PlayerId.values()[i];
+                if (playerHands.get(pl). contains(Card.of(Card.Color.DIAMOND, Card.Rank.SEVEN))) {
+                    return pl;
                 }
             }
         }
