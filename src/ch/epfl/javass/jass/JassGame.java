@@ -32,7 +32,7 @@ public final class JassGame {
     }
 
 
-    
+
     private void start(){
         shuffleAndDistribute();
         turnState = TurnState.initial(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)), Score.INITIAL, firstPlayer());
@@ -40,68 +40,76 @@ public final class JassGame {
         ;
     }
     public void advanceToEndOfNextTrick() {
-       
+
         if(isGameOver()) {
-            
+
             return;
         }
-        
-        
-        
-        
-        if(turnState== null) {
+
+
+        if(turnState == null) {
             // broadcaster les noms des joueurs
-            turnState = TurnState.initial(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)), Score.INITIAL, firstPlayer());
-            start(); // celui qui a le 7 de carreau commence 
+            turnState = TurnState.initial(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)),
+                    Score.INITIAL, firstPlayer());
+            start(); // celui qui a le 7 de carreau commence
         }
         else {
             turnState = turnState.withTrickCollected();
             if(turnState.isTerminal()) {
-                newTurn(); // creeer un nouveau tour,redistribuer les cartes , choisir un nouveau  trump aleatoire, qui commence celui a droite du 7 de carreau
-                
+                newTurn(); // creeer un nouveau tour,redistribuer les cartes , choisir un nouveau  trump aleatoire, qui
+                // commence celui a droite du 7 de carreau
+
             }
-            
+
         }
-        
-        // broedcaster le score et le pli a tous les joueurs 
+
+        // broedcaster le score et le pli a tous les joueurs
         if(isGameOver()) {
-            // boradcaster l equipe gagnante a tlm 
+            // boradcaster l equipe gagnante a tlm
             return;
         }
-        
+
         while(!turnState.trick().isFull()) {
-           //quand il faut update trick 
-            play(); //  chercher le prochain joueur ( avec next player) , cherche la carte que ce joueur joura . puis enlever cette carte de la main du joueur , puis mettre a jour 
-            //cette main dans la map des mains 
+            //quand il faut update trick
+            play(); //  chercher le prochain joueur ( avec next player) , cherche la carte que ce joueur joura .
+            // puis enlever cette carte de la main du joueur , puis mettre a jour
+            //cette main dans la map des mains
             //puis apeller la methode withNewCardPlayed du turn State avec la carte en argument.
-          //  player.get nextPlayer
         }
+    }
+
+    private void newTurn() {
+        turnStat
+    }
+
+    private void play() {
+        playerHands.put(turnState.nextPlayer(), playerHands.get(turnState.nextPlayer()).remove( nextPlayerToPlay())) ;
+        turnState.withNewCardPlayed(nextPlayerToPlay());
     }
 
     private void shuffleAndDistribute() {
         List<Card> deck = constructCardList();
         Collections.shuffle(deck, shuffleRng);
         for (int i = 0; i < 4; ++i){
-          PlayerId pl = PlayerId.values()[i];
+            PlayerId pl = PlayerId.values()[i];
             players.get(pl).updateHand(CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
             playerHands.put(pl, CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
         }
     }
 
-private void broadcastTrick() {
-
-}
-    private Card firstPlayerToPlayTurn() {
-       return  players.get(firstPlayer()).cardToPlay(turnState, playerHands.get(firstPlayer()));
+    private void broadcastTrick() {
 
     }
 
+    private Card firstPlayerToPlayTurn() {
+        return  players.get(firstPlayer()).cardToPlay(turnState, playerHands.get(firstPlayer()));
+
+    }
 
     private Card nextPlayerToPlay() {
         return  players.get(turnState.nextPlayer()).cardToPlay(turnState, playerHands.get(turnState.nextPlayer()));
 
     }
-
 
     private List<Card> constructCardList() {
         List<Card> list = Collections.emptyList();

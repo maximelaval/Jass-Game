@@ -5,11 +5,11 @@ import java.util.Map;
 public final class PacedPlayer implements Player {
 
     private Player underlyingPlayer;
-    double minTime;
+    long minTime;
 
     public PacedPlayer(Player underlyingPlayer, double minTime) {
         this.underlyingPlayer = underlyingPlayer;
-        this.minTime = minTime;
+        this.minTime = (long)(minTime * 1000);
     }
 
     @Override
@@ -17,9 +17,10 @@ public final class PacedPlayer implements Player {
         long startTime = System.currentTimeMillis();
         Card card = underlyingPlayer.cardToPlay(state, hand);
         long endTime = System.currentTimeMillis();
-        if (endTime - startTime < minTime) {
+        long elapsedTime = endTime - startTime;
+        if (elapsedTime < minTime) {
             try {
-                Thread.sleep((long)minTime - (endTime - startTime));
+                Thread.sleep(minTime - (elapsedTime));
             } catch (InterruptedException e) {/* ignore */}
         }
         return card;
