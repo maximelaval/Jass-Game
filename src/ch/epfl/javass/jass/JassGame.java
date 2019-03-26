@@ -29,13 +29,9 @@ public final class JassGame {
     }
 
     public boolean isGameOver() {
-        //assert(turnState!=null);
-        if (turnState != null) {
-            return ((turnState.score().totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS) ||
-                    (turnState.score().totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS));
-        } else {
-            return false;
-        }
+        assert(turnState!=null);
+        return ((turnState.score().totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS) ||
+                (turnState.score().totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS)) ;
     }
 
 
@@ -45,83 +41,83 @@ public final class JassGame {
         shuffleAndDistribute();
         updateFirstPlayer();
         updateHand();
-        setTrump();
+          setTrump();
         turnState = TurnState.initial(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)), score, firstPlayerTurn);
         playerHands.put(firstPlayerTurn, playerHands.get(firstPlayerTurn).remove(firstPlayerCard())) ;
         players.get(firstPlayerTurn).updateHand(playerHands.get(firstPlayerTurn));
         turnState.withNewCardPlayed(firstPlayerCard());
-        updateTrick();
-
-
+     updateTrick();
+     
+          
     }
-
+    
     private void setTrump() {
         for (Player pl : players.values())  {
             pl.setTrump(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)));
-        }
+      } 
     }
     private void setWinningTeam() {
         for (Player pl : players.values())  {
             pl.setWinningTeam( winningTeam());
-        }
+      } 
     }
-
+    
     public void advanceToEndOfNextTrick() {
         if(isGameOver()) {
-
-            setWinningTeam();
+      
+  setWinningTeam();
             return;
         }
 
         if(turnState== null) {
             for (Map.Entry<PlayerId,Player> entry : players.entrySet())  {
                 entry.getValue().setPlayers(entry.getKey(), playerNames);
-
-            }
-
-            newTurn(Score.INITIAL);
+                             
+                }
+            
+            newTurn(Score.INITIAL); 
         }
         else {
             turnState = turnState.withTrickCollected();
             if(turnState.isTerminal()) {
-                newTurn(turnState.score());
+                newTurn(turnState.score()); 
 
             }
 
         }
-
+ 
         if(isGameOver()) {
-            setWinningTeam();
+          setWinningTeam();
             return;
         }
 
         while(!turnState.trick().isFull()) {
-            play();
+            play(); 
         }
     }
 
-
+    
     private void updateHand() {
         for (Map.Entry<PlayerId,Player> entry : players.entrySet())  {
-            entry.getValue().updateHand(playerHands.get(entry.getKey()));;
-
-        }
+          entry.getValue().updateHand(playerHands.get(entry.getKey()));;
+                         
+            }
     }
-
+    
     private void updateTrick() {
         for (Player pl : players.values())  {
             pl.updateTrick(turnState.trick());
-
-        }
+           
+      }
     }
-
-
+    
+ 
     private void updateScore() {
         for (Player pl : players.values())  {
             pl.updateScore(turnState.score());
-        }
+      }  
     }
-
+   
     private void shuffleAndDistribute() {
         List<Card> deck = constructCardList();
         Collections.shuffle(deck, shuffleRng);
@@ -132,19 +128,19 @@ public final class JassGame {
         }
     }
 
-
-
+  
+    
     private void play() {
         playerHands.put(turnState.nextPlayer(), playerHands.get(turnState.nextPlayer()).remove( nextPlayerCard()));
         players.get(turnState.nextPlayer()).updateHand(playerHands.get(turnState.nextPlayer()));
-
+  
         turnState.withNewCardPlayedAndTrickCollected(nextPlayerCard());
         if(turnState.trick().isEmpty()){
             updateTrick();
             updateScore();
         }
-
-
+        
+        
     }
 
     private Card firstPlayerCard() {
@@ -160,10 +156,9 @@ public final class JassGame {
 
 
     private List<Card> constructCardList() {
-        LinkedList<Card> list = new LinkedList<Card>();
-
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 9; ++j) {
+        List<Card> list = Collections.emptyList();
+        for (int i = 0; i < Card.Color.COUNT; i++) {
+            for (int j = 0; j < Card.Rank.COUNT; ++i) {
                 list.add(Card.of(Card.Color.values()[i], Card.Rank.values()[j]));
             }
         }
@@ -174,15 +169,15 @@ public final class JassGame {
         assert(isGameOver());
         TeamId T1=TeamId.TEAM_1;
         if (turnState.score().totalPoints(T1)==Jass.WINNING_POINTS ){
-            return T1;
+        return T1;
         }
         else {
             return T1.other();
         }
-
+        
     }
-
-
+    
+    
     private void updateFirstPlayer() {
         if (firstPlayerTurn==null ) {
 
