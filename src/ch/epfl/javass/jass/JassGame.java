@@ -4,7 +4,8 @@ import java.util.*;
 
 import static ch.epfl.javass.jass.Jass.HAND_SIZE;
 import static java.util.Collections.unmodifiableMap;
-
+import ch.epfl.javass.jass.Jass;
+import ch.epfl.javass.jass.TeamId;;
 public final class JassGame {
 
     private TurnState turnState;
@@ -13,6 +14,7 @@ public final class JassGame {
     private Map<PlayerId, Player> players;
     private Map<PlayerId, String> playerNames;
     private Map<PlayerId, CardSet> playerHands;
+    private PlayerId firstPlayerTurn;
 
 
     public JassGame(long rngSeed, Map<PlayerId, Player> players, Map<PlayerId, String> playerNames) {
@@ -22,69 +24,102 @@ public final class JassGame {
         Random rng = new Random(rngSeed);
         this.shuffleRng = new Random(rng.nextLong());
         this.trumpRng = new Random(rng.nextLong());
-        playerHands = unmodifiableMap(new EnumMap<>(playerHands));
+        this.playerHands =new HashMap<PlayerId,CardSet>();
 
     }
 
     public boolean isGameOver() {
-        return ((turnState.score().gamePoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS) ||
-                (turnState.score().gamePoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS)) ;
+        //assert(turnState!=null);
+        if (turnState != null) {
+            return ((turnState.score().totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS) ||
+                    (turnState.score().totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS));
+        } else {
+            return false;
+        }
     }
 
 
 
-    private void start(){
+    private void newTurn(Score score){
+        assert(turnState.isTerminal()||turnState==null);
         shuffleAndDistribute();
-        turnState = TurnState.initial(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)), Score.INITIAL, firstPlayer());
-        firstPlayerToPlayTurn();
-        ;
-    }
-    public void advanceToEndOfNextTrick() {
+        updateFirstPlayer();
+        updateHand();
+        setTrump();
+        turnState = TurnState.initial(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)), score, firstPlayerTurn);
+        playerHands.put(firstPlayerTurn, playerHands.get(firstPlayerTurn).remove(firstPlayerCard())) ;
+        players.get(firstPlayerTurn).updateHand(playerHands.get(firstPlayerTurn));
+        turnState.withNewCardPlayed(firstPlayerCard());
+        updateTrick();
 
+
+    }
+
+    private void setTrump() {
+        for (Player pl : players.values())  {
+            pl.setTrump(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)));
+        }
+    }
+    private void setWinningTeam() {
+        for (Player pl : players.values())  {
+            pl.setWinningTeam( winningTeam());
+        }
+    }
+
+    public void advanceToEndOfNextTrick() {
         if(isGameOver()) {
 
+            setWinningTeam();
             return;
         }
 
+        if(turnState== null) {
+            for (Map.Entry<PlayerId,Player> entry : players.entrySet())  {
+                entry.getValue().setPlayers(entry.getKey(), playerNames);
 
-        if(turnState == null) {
-            // broadcaster les noms des joueurs
-            turnState = TurnState.initial(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)),
-                    Score.INITIAL, firstPlayer());
-            start(); // celui qui a le 7 de carreau commence
+            }
+
+            newTurn(Score.INITIAL);
         }
         else {
             turnState = turnState.withTrickCollected();
             if(turnState.isTerminal()) {
-                newTurn(); // creeer un nouveau tour,redistribuer les cartes , choisir un nouveau  trump aleatoire, qui
-                // commence celui a droite du 7 de carreau
+                newTurn(turnState.score());
 
             }
 
         }
 
-        // broedcaster le score et le pli a tous les joueurs
         if(isGameOver()) {
-            // boradcaster l equipe gagnante a tlm
+            setWinningTeam();
             return;
         }
 
         while(!turnState.trick().isFull()) {
-            //quand il faut update trick
-            play(); //  chercher le prochain joueur ( avec next player) , cherche la carte que ce joueur joura .
-            // puis enlever cette carte de la main du joueur , puis mettre a jour
-            //cette main dans la map des mains
-            //puis apeller la methode withNewCardPlayed du turn State avec la carte en argument.
+            play();
         }
     }
 
-    private void newTurn() {
-        turnStat
+
+    private void updateHand() {
+        for (Map.Entry<PlayerId,Player> entry : players.entrySet())  {
+            entry.getValue().updateHand(playerHands.get(entry.getKey()));;
+
+        }
     }
 
-    private void play() {
-        playerHands.put(turnState.nextPlayer(), playerHands.get(turnState.nextPlayer()).remove( nextPlayerToPlay())) ;
-        turnState.withNewCardPlayed(nextPlayerToPlay());
+    private void updateTrick() {
+        for (Player pl : players.values())  {
+            pl.updateTrick(turnState.trick());
+
+        }
+    }
+
+
+    private void updateScore() {
+        for (Player pl : players.values())  {
+            pl.updateScore(turnState.score());
+        }
     }
 
     private void shuffleAndDistribute() {
@@ -97,39 +132,70 @@ public final class JassGame {
         }
     }
 
-    private void broadcastTrick() {
+
+
+    private void play() {
+        playerHands.put(turnState.nextPlayer(), playerHands.get(turnState.nextPlayer()).remove( nextPlayerCard()));
+        players.get(turnState.nextPlayer()).updateHand(playerHands.get(turnState.nextPlayer()));
+
+        turnState.withNewCardPlayedAndTrickCollected(nextPlayerCard());
+        if(turnState.trick().isEmpty()){
+            updateTrick();
+            updateScore();
+        }
+
 
     }
 
-    private Card firstPlayerToPlayTurn() {
-        return  players.get(firstPlayer()).cardToPlay(turnState, playerHands.get(firstPlayer()));
+    private Card firstPlayerCard() {
+        return  players.get(firstPlayerTurn).cardToPlay(turnState, playerHands.get(firstPlayerTurn));
 
     }
 
-    private Card nextPlayerToPlay() {
+
+    private Card nextPlayerCard() {
         return  players.get(turnState.nextPlayer()).cardToPlay(turnState, playerHands.get(turnState.nextPlayer()));
 
     }
 
+
     private List<Card> constructCardList() {
-        List<Card> list = Collections.emptyList();
-        for (int i = 0; i < Card.Color.COUNT; i++) {
-            for (int j = 0; j < Card.Rank.COUNT; ++i) {
+        LinkedList<Card> list = new LinkedList<Card>();
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 9; ++j) {
                 list.add(Card.of(Card.Color.values()[i], Card.Rank.values()[j]));
             }
         }
         return list;
     }
 
-    private PlayerId firstPlayer() {
-        if (turnState.trick().index() == 0 && turnState.trick().isEmpty()) {
+    private TeamId winningTeam(){
+        assert(isGameOver());
+        TeamId T1=TeamId.TEAM_1;
+        if (turnState.score().totalPoints(T1)==Jass.WINNING_POINTS ){
+            return T1;
+        }
+        else {
+            return T1.other();
+        }
+
+    }
+
+
+    private void updateFirstPlayer() {
+        if (firstPlayerTurn==null ) {
+
             for (int i = 0; i < 4; ++i) {
                 PlayerId pl=PlayerId.values()[i];
                 if (playerHands.get(pl). contains(Card.of(Card.Color.DIAMOND, Card.Rank.SEVEN))) {
-                    return pl;
+                    firstPlayerTurn =pl;
                 }
             }
+
         }
-        return null;
+        else {
+            firstPlayerTurn = PlayerId.values()[(firstPlayerTurn.ordinal()+1)%4];
+        }
     }
 }

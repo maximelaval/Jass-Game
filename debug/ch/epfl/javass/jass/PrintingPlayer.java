@@ -1,3 +1,8 @@
+/*
+ * Author :   Joseph E. Abboud.
+ * Date   :   18 Mar 2019
+ */
+
 package ch.epfl.javass.jass;
 
 import java.util.Map;
@@ -13,37 +18,48 @@ public final class PrintingPlayer implements Player {
     public Card cardToPlay(TurnState state, CardSet hand) {
         System.out.print("C'est à moi de jouer... Je joue : ");
         Card c = underlyingPlayer.cardToPlay(state, hand);
-        System.out.println(c);
+        System.out.println(c);        
+        System.out.println(state.trick().playableCards(hand));
         return c;
     }
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        underlyingPlayer.setPlayers(ownId, playerNames);
+        System.out.println("Les joueurs sont : ");
+        for (PlayerId pId : PlayerId.ALL) {
+            if (pId.equals(ownId)) {
+                System.out.println(ownId + " (moi)");
+            } else {
+                System.out.println(pId);
+            }
+        }
     }
 
     @Override
     public void updateHand(CardSet newHand) {
-        underlyingPlayer.updateHand(newHand);
+        System.out.println("Ma nouvelle main : " + newHand);
     }
 
     @Override
     public void setTrump(Card.Color trump) {
-        underlyingPlayer.setTrump(trump);
+        System.out.println("Atout : " + trump);
     }
 
     @Override
     public void updateTrick(Trick newTrick) {
-        underlyingPlayer.updateTrick(newTrick);
+        System.out.println("Pli " + newTrick.index() + ", commencé par "
+                + newTrick.player(0) + " : " + newTrick);
     }
 
     @Override
     public void updateScore(Score score) {
-        underlyingPlayer.updateScore(score);
+        System.out.println("Scores: " + score);
     }
 
     @Override
     public void setWinningTeam(TeamId winningTeam) {
-        underlyingPlayer.setWinningTeam(winningTeam);
+        System.out.println("L'équipe gagnante est : " + winningTeam);
+        System.out.println("--------------------Set Winning Team was called----------------------------");
+
     }
 }

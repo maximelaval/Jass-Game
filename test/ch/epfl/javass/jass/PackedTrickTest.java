@@ -383,12 +383,7 @@ public class PackedTrickTest {
             CardSet remainingCards = CardSet.ALL_CARDS;
             for (int j = 0; j < 9; ++j) {
                 int handSize = 9 - j;
-                for (int k = 0; k < 3; ++k) {
-                    int cardI = rng.nextInt(remainingCards.size());
-                    Card card = remainingCards.get(cardI);
-                    remainingCards = remainingCards.remove(card);
-                    pkTrick = PackedTrick.withAddedCard(pkTrick, card.packed());
-
+                for (int k = 0; k < 4; ++k) {
                     CardSet hand = remainingCards;
                     assert hand.size() >= handSize;
                     while (hand.size() > handSize) {
@@ -396,6 +391,11 @@ public class PackedTrickTest {
                         hand = hand.remove(hand.get(l));
                     }
                     assertTrue(! PackedCardSet.isEmpty(PackedTrick.playableCards(pkTrick, hand.packed())));
+
+                    int cardI = rng.nextInt(remainingCards.size());
+                    Card card = remainingCards.get(cardI);
+                    remainingCards = remainingCards.remove(card);
+                    pkTrick = PackedTrick.withAddedCard(pkTrick, card.packed());
                 }
                 pkTrick = PackedTrick.nextEmpty(pkTrick);
             }

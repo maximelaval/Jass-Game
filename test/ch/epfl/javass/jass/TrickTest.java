@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.Card.Rank;
 
-class TrickTest {
+public class TrickTest {
     private static Card c(Color color, Rank rank) {
         return Card.of(color, rank);
     }
