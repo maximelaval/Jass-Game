@@ -11,13 +11,26 @@ public final class MctsPlayer implements Player  {
 
         private TurnState turnState;
         private Node[] children;
+        private Node parent;
         private CardSet upcomingChildren;
         private int points;
         private int finishedRandomTurns;
 
-        private Node() {
+        private Node(TurnState turnState) {
 
         }
+
+
+
+        private double UCT(int points, double constant){
+            assert(finishedRandomTurns >= 0);
+            if (finishedRandomTurns > 0) {
+                return (points / finishedRandomTurns + constant * (Math.sqrt((2 * Math.log(finishedRandomTurns)) / parent.finishedRandomTurns)));
+            } else {
+                return Double.MAX_VALUE;
+            }
+        }
+
 
     }
 
@@ -32,6 +45,8 @@ public final class MctsPlayer implements Player  {
 
         }
     }
+
+
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
