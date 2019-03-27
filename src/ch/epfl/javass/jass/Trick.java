@@ -1,6 +1,6 @@
 package ch.epfl.javass.jass;
 
-import ch.epfl.javass.jass.Card.*;
+import ch.epfl.javass.jass.Card.Color;
 
 /**
  * Represents a trick of a Jass game.

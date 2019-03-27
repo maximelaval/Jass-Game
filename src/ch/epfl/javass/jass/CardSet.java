@@ -3,32 +3,30 @@ package ch.epfl.javass.jass;
 import java.util.List;
 import java.util.StringJoiner;
 
-import static ch.epfl.javass.jass.PackedCardSet.*;
+import static ch.epfl.javass.jass.PackedCardSet.isValid;
 
 
 /**
  * Represents a set of cards of a Jass game.
+ *
  * @author Lucas Meier (283726)
  * @author Maxime Laval (287323)
  */
 public final class CardSet {
 
+    /**
+     * Represents an empty card set.
+     */
+    public static final CardSet EMPTY = new CardSet(PackedCardSet.EMPTY);
+    /**
+     * Represents every cards in a card set.
+     */
+    public static final CardSet ALL_CARDS = new CardSet(PackedCardSet.ALL_CARDS);
     private long pkCardSet;
 
     private CardSet(long pkCardSet) {
         this.pkCardSet = pkCardSet;
     }
-
-
-    /**
-     * Represents an empty card set.
-     */
-    public static final CardSet EMPTY = new CardSet(PackedCardSet.EMPTY);
-
-    /**
-     * Represents every cards in a card set.
-     */
-    public static final CardSet ALL_CARDS = new CardSet(PackedCardSet.ALL_CARDS);
 
     /**
      * Returns the card set composed of all the cards contained in the given list of cards.
@@ -64,7 +62,7 @@ public final class CardSet {
      * @return the packed version of the given card set.
      */
     public long packed() {
-            return this.pkCardSet;
+        return this.pkCardSet;
     }
 
     /**
@@ -131,7 +129,7 @@ public final class CardSet {
      * @return the complement of the given card set.
      */
     public CardSet complement() {
-       return new CardSet(PackedCardSet.complement(pkCardSet));
+        return new CardSet(PackedCardSet.complement(pkCardSet));
     }
 
     /**
@@ -141,7 +139,8 @@ public final class CardSet {
      * @return the union of the two card sets.
      */
     public CardSet union(CardSet that) {
-        return new CardSet(PackedCardSet.union(pkCardSet, that.pkCardSet)); }
+        return new CardSet(PackedCardSet.union(pkCardSet, that.pkCardSet));
+    }
 
     /**
      * Returns the intersection of the two given card sets.
@@ -171,13 +170,13 @@ public final class CardSet {
      */
     public CardSet subsetOfColor(Card.Color color) {
 
-        return new CardSet( PackedCardSet.subsetOfColor(pkCardSet, color));
+        return new CardSet(PackedCardSet.subsetOfColor(pkCardSet, color));
     }
 
     @Override
     public boolean equals(Object that0) {
-        return ( that0 instanceof CardSet) && (((CardSet) that0).packed() == pkCardSet);
-        }
+        return (that0 instanceof CardSet) && (((CardSet) that0).packed() == pkCardSet);
+    }
 
 
     @Override
@@ -187,11 +186,12 @@ public final class CardSet {
 
     /**
      * Returns a written representation of the given packed card set.
+     *
      * @return the written representation.
      */
     @Override
-    public  String toString() {
-        assert(isValid(pkCardSet));
+    public String toString() {
+        assert (isValid(pkCardSet));
         StringJoiner j = new StringJoiner(",", "{", "}");
         for (int i = 0; i < PackedCardSet.size(pkCardSet); ++i) {
             j.add(Card.ofPacked(PackedCardSet.get(pkCardSet, i)).toString());

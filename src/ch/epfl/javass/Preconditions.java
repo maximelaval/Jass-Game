@@ -2,6 +2,7 @@ package ch.epfl.javass;
 
 /**
  * Define a few checking methods.
+ *
  * @author Lucas Meier (283726)
  * @author Maxime Laval (287323)
  */
@@ -12,9 +13,10 @@ public final class Preconditions {
 
     /**
      * Returns true if the given argument is valid.
+     *
      * @param b true if the given argument is valid.
      */
-    public static void checkArgument (boolean b) {
+    public static void checkArgument(boolean b) {
         if (!b) {
             throw new IllegalArgumentException("");
         }
@@ -22,8 +24,9 @@ public final class Preconditions {
 
     /**
      * Returns true if the index and size given are both valid.
+     *
      * @param index the given index.
-     * @param size the given size.
+     * @param size  the given size.
      * @return
      */
     public static int checkIndex(int index, int size) {

@@ -6,6 +6,7 @@ import java.util.List;
 
 /**
  * Represents the identity (the number) of a player.
+ *
  * @author Lucas Meier (283726)
  * @author Maxime Laval (287323)
  */
@@ -13,8 +14,7 @@ public enum PlayerId {
     PLAYER_1,
     PLAYER_2,
     PLAYER_3,
-    PLAYER_4
-    ;
+    PLAYER_4;
 
     /**
      * Represents all the differrent players.
@@ -24,6 +24,7 @@ public enum PlayerId {
 
     /**
      * Returns the team of the given player.
+     *
      * @return the team of the given player.
      */
     public TeamId team() {

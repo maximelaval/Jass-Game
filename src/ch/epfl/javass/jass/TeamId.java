@@ -6,13 +6,13 @@ import java.util.List;
 
 /**
  * Defines a team for the game.
+ *
  * @author Lucas Meier (283726)
  * @author Maxime Laval (287323)
  */
 public enum TeamId {
     TEAM_1,
-    TEAM_2
-    ;
+    TEAM_2;
 
     /**
      * Represents all different teams.
@@ -26,6 +26,7 @@ public enum TeamId {
 
     /**
      * Returns the opposite team of the given team.
+     *
      * @return the opposite team of the given team.
      */
     public TeamId other() {

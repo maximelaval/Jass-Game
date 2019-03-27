@@ -2,14 +2,24 @@ package ch.epfl.javass.jass;
 
 import java.util.Map;
 
+/**
+ * Represents a player that will wait a while before playing.
+ * <p>
+ * * @author Lucas Meier (283726)
+ * * @author Maxime Laval (287323)
+ */
 public final class PacedPlayer implements Player {
 
-    private Player underlyingPlayer;
     long minTime;
+    private Player underlyingPlayer;
 
+    /**
+     * @param underlyingPlayer the underlying player.
+     * @param minTime          the minimum time the player will have to wait before playing.
+     */
     public PacedPlayer(Player underlyingPlayer, double minTime) {
         this.underlyingPlayer = underlyingPlayer;
-        this.minTime = (long)(minTime * 1000);
+        this.minTime = (long) (minTime * 1000);
     }
 
     @Override

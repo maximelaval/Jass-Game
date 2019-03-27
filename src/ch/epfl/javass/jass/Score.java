@@ -2,6 +2,7 @@ package ch.epfl.javass.jass;
 
 /**
  * Represents the scores of a Jass game.
+ *
  * @author Lucas Meier (283726)
  * @author Maxime Laval (287323)
  */
@@ -20,6 +21,7 @@ public final class Score {
 
     /**
      * Returns the score corresponding to the packed score.
+     *
      * @param packed the packed score.
      * @return the score corresponding to the packed score.
      */
@@ -33,6 +35,7 @@ public final class Score {
 
     /**
      * Returns the packed score version of the score.
+     *
      * @return the packed score version of the score.
      */
     public long packed() {
@@ -41,6 +44,7 @@ public final class Score {
 
     /**
      * Returns the number of tricks won by the given team during the current turn, extracted from the score.
+     *
      * @param t the given team.
      * @return the number of tricks.
      */
@@ -50,6 +54,7 @@ public final class Score {
 
     /**
      * Returns the number of points won by the given team during the current turn, extracted from the score.
+     *
      * @param t the given team.
      * @return the number of points.
      */
@@ -59,6 +64,7 @@ public final class Score {
 
     /**
      * Returns the number of points won by the given team during the last turns, extracted from the score.
+     *
      * @param t the given team.
      * @return the number of points.
      */
@@ -68,6 +74,7 @@ public final class Score {
 
     /**
      * Returns the total points won by the given team during the current game, extracted from the score.
+     *
      * @param t the given team.
      * @return the total number of points.
      */
@@ -77,6 +84,7 @@ public final class Score {
 
     /**
      * Updates the score to take into consideration that the wining team won a trick worth "trickPoints".
+     *
      * @param winningTeam the winning team.
      * @param trickpoints the number of points of the tricks.
      * @return the updated score.
@@ -90,7 +98,8 @@ public final class Score {
     }
 
     /**
-     *  Updates the score to be ready for the next turn.
+     * Updates the score to be ready for the next turn.
+     *
      * @return the updated score.
      */
     public Score nextTurn() {
@@ -100,11 +109,7 @@ public final class Score {
 
     @Override
     public boolean equals(Object that0) {
-        if ((!(that0 == null)) && (this.hashCode() == that0.hashCode()) && (that0.getClass().equals(this.getClass())) && (((Score)that0).packed() == pkScore)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (!(that0 == null)) && (this.hashCode() == that0.hashCode()) && (that0.getClass().equals(this.getClass())) && (((Score) that0).packed() == pkScore);
     }
 
     @Override
