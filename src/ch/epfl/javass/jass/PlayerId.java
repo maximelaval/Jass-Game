@@ -17,7 +17,7 @@ public enum PlayerId {
     PLAYER_4;
 
     /**
-     * Represents all the differrent players.
+     * Represents all the different players.
      */
     public static final List<PlayerId> ALL = Collections.unmodifiableList(Arrays.asList(values()));
     public static final int COUNT = 4;

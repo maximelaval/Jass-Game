@@ -21,7 +21,8 @@ public final class Bits64 {
      * @return returns the mask.
      */
     public static long mask(long start, long size) {
-        checkArgument(((start >= 0) && (start <= Long.SIZE) && (size >= 0) && (start + size >= 0) && (start + size <= Long.SIZE)));
+        checkArgument(((start >= 0) && (start <= Long.SIZE) && (size >= 0) && (start + size >= 0) &&
+                (start + size <= Long.SIZE)));
         if ((size == Long.SIZE)) {
             return -1L;
         }
@@ -37,7 +38,8 @@ public final class Bits64 {
      * @return the extracted number.
      */
     public static long extract(long bits, int start, int size) {
-        checkArgument((start >= 0) && (size >= 0) && (start <= Long.SIZE) && (start + size >= 0) && (start + size <= Long.SIZE));
+        checkArgument((start >= 0) && (size >= 0) && (start <= Long.SIZE) && (start + size >= 0) &&
+                (start + size <= Long.SIZE));
 
         if (start == 0) {
             return (bits & mask(0, size));
@@ -49,10 +51,10 @@ public final class Bits64 {
     /**
      * packs "v1" and "v2" into an int.
      *
-     * @param v1
-     * @param s1
-     * @param v2
-     * @param s2
+     * @param v1 value 1.
+     * @param s1 size of v1.
+     * @param v2 value 2.
+     * @param s2 size of v2.
      * @return the packed int.
      */
     public static long pack(long v1, long s1, long v2, long s2) {
@@ -62,10 +64,10 @@ public final class Bits64 {
     }
 
     /**
-     * check check if value and size are valid arguments for pack methods.
+     * Checks if value and size are valid arguments for pack methods.
      *
-     * @param value
-     * @param size
+     * @param value the value to be checked.
+     * @param size the size to be checked.
      * @return whether the arguments are valid.
      */
     private static boolean checkPackArg(long value, long size) {

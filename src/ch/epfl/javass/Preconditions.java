@@ -27,7 +27,7 @@ public final class Preconditions {
      *
      * @param index the given index.
      * @param size  the given size.
-     * @return
+     * @return true if the index and size given are both valid.
      */
     public static int checkIndex(int index, int size) {
         if ((index < 0) || (index >= size)) {

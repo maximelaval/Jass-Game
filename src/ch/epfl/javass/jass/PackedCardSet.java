@@ -31,7 +31,7 @@ public final class PackedCardSet {
 
 
     /**
-     * Returs true if and only if the packed card set represents a valid value.
+     * Returns true if and only if the packed card set represents a valid value.
      *
      * @param pkCardSet the packed card set.
      * @return whether the packed card set has a valid value.
@@ -228,7 +228,7 @@ public final class PackedCardSet {
     }
 
     /**
-     * Compute a table made of some cards that will be used by subsetOfColor.
+     * Compute a table made of some cards that will be used by subsetOfColor().
      *
      * @return the computed table.
      */
@@ -239,7 +239,6 @@ public final class PackedCardSet {
         }
         return t;
     }
-
 
     /**
      * Returns a written representation of the given packed card set.

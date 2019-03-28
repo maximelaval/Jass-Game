@@ -10,8 +10,8 @@ import java.util.Map;
  */
 public final class PacedPlayer implements Player {
 
-    long minTime;
-    private Player underlyingPlayer;
+    private final long minTime;
+    private final Player underlyingPlayer;
 
     /**
      * @param underlyingPlayer the underlying player.

@@ -84,11 +84,11 @@ public final class PackedCard {
     }
 
     /**
-     * Returnd the value of the given packed card knowing the trump color.
+     * Returns the value of the given packed card knowing the trump color.
      *
      * @param trump  the trump color.
      * @param pkCard the packed card.
-     * @return the valuee of the packed card.
+     * @return the value of the packed card.
      */
     public static int points(Card.Color trump, int pkCard) {
         if (color(pkCard).equals(trump)) {

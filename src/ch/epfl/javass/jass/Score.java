@@ -13,7 +13,7 @@ public final class Score {
      */
     public static final Score INITIAL = new Score(0);
 
-    private long pkScore;
+    private final long pkScore;
 
     private Score(long i) {
         this.pkScore = i;

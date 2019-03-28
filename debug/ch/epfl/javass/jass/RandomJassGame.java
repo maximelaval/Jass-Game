@@ -7,7 +7,6 @@ package ch.epfl.javass.jass;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public final class RandomJassGame {
     public static void main(String[] args) {

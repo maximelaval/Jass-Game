@@ -22,6 +22,7 @@ public final class PackedTrick {
      */
     public static final int INVALID = mask(0, 32);
     private static final int CARD_SIZE = 6;
+    private static final int MAX_TRICK_SIZE = 4;
 
     private PackedTrick() {
 
@@ -36,8 +37,8 @@ public final class PackedTrick {
     public static boolean isValid(int pkTrick) {
         return (
                 (
-                        (extract(pkTrick, 24, 4) <= 8) &&
-                                (extract(pkTrick, 24, 4) >= 0)
+                        (extract(pkTrick, 24, MAX_TRICK_SIZE) <= 8) &&
+                                (extract(pkTrick, 24, MAX_TRICK_SIZE) >= 0)
 
                 ) && (
 
@@ -87,8 +88,9 @@ public final class PackedTrick {
      * @return the empty packed trick with the given trump and the given first player.
      */
     public static int firstEmpty(Color trump, PlayerId firstPlayer) {
-        return pack(PackedCard.INVALID, 6, PackedCard.INVALID, 6, PackedCard.INVALID,
-                6, PackedCard.INVALID, 6, 0, 4, firstPlayer.ordinal(), 2, trump.ordinal(), 2);
+        return pack(PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID,
+                CARD_SIZE, PackedCard.INVALID, CARD_SIZE, 0, MAX_TRICK_SIZE, firstPlayer.ordinal(),
+                2, trump.ordinal(), 2);
     }
 
     /**
@@ -100,16 +102,17 @@ public final class PackedTrick {
      * the first player being the winning player of the given packed trick.
      */
     public static int nextEmpty(int pkTrick) {
+        assert isValid(pkTrick);
         assert isFull(pkTrick);
         if (isLast(pkTrick)) {
             return INVALID;
         } else {
             return pack(
-                    PackedCard.INVALID, 6,
-                    PackedCard.INVALID, 6,
-                    PackedCard.INVALID, 6,
-                    PackedCard.INVALID, 6,
-                    index(pkTrick) + 1, 4,
+                    PackedCard.INVALID, CARD_SIZE,
+                    PackedCard.INVALID, CARD_SIZE,
+                    PackedCard.INVALID, CARD_SIZE,
+                    PackedCard.INVALID, CARD_SIZE,
+                    index(pkTrick) + 1, MAX_TRICK_SIZE,
                     winningPlayer(pkTrick).ordinal(), 2,
                     trump(pkTrick).ordinal(), 2);
         }
@@ -122,6 +125,7 @@ public final class PackedTrick {
      * @return whether the given packed trick is the last one of the turn.
      */
     public static boolean isLast(int pkTrick) {
+        assert isValid(pkTrick);
         return index(pkTrick) == 8;
     }
 
@@ -132,6 +136,7 @@ public final class PackedTrick {
      * @return whether the given packed trick is empty.
      */
     public static boolean isEmpty(int pkTrick) {
+        assert isValid(pkTrick);
         return size(pkTrick) == 0;
     }
 
@@ -142,7 +147,8 @@ public final class PackedTrick {
      * @return whether the given packed trick is the full.
      */
     public static boolean isFull(int pkTrick) {
-        return size(pkTrick) == 4;
+        assert isValid(pkTrick);
+        return size(pkTrick) == MAX_TRICK_SIZE;
     }
 
     /**
@@ -152,8 +158,8 @@ public final class PackedTrick {
      * @return the size of the given packed trick.
      */
     public static int size(int pkTrick) {
-
-        for (int i = 4; i > 0; --i) {
+        assert isValid(pkTrick);
+        for (int i = MAX_TRICK_SIZE; i > 0; --i) {
             if (PackedCard.isValid(card(pkTrick, i - 1))) {
                 return i;
             }
@@ -168,6 +174,7 @@ public final class PackedTrick {
      * @return the trump of the given packed trick.
      */
     public static Card.Color trump(int pkTrick) {
+        assert isValid(pkTrick);
         return Color.values()[extract(pkTrick, 30, 2)];
     }
 
@@ -179,8 +186,9 @@ public final class PackedTrick {
      * @return the identity of the player at the given index in the given packed trick.
      */
     public static PlayerId player(int pkTrick, int index) {
+        assert isValid(pkTrick);
         int firstPlayer = extract(pkTrick, 28, 2);
-        int player = (firstPlayer + index) % 4;
+        int player = (firstPlayer + index) % PlayerId.COUNT;
         return PlayerId.values()[player];
     }
 
@@ -191,7 +199,8 @@ public final class PackedTrick {
      * @return the index of the given packed trick.
      */
     public static int index(int pkTrick) {
-        return extract(pkTrick, 24, 4);
+        assert isValid(pkTrick);
+        return extract(pkTrick, 24, MAX_TRICK_SIZE);
     }
 
     /**
@@ -202,7 +211,8 @@ public final class PackedTrick {
      * @return the packed version of the card in the given packed trick at the given index.
      */
     public static int card(int pkTrick, int index) {
-        return extract(pkTrick, 6 * index, 6);
+        assert isValid(pkTrick);
+        return extract(pkTrick, CARD_SIZE * index, CARD_SIZE);
     }
 
     /**
@@ -213,9 +223,10 @@ public final class PackedTrick {
      * @return the given packed trick containing an additional given packed card.
      */
     public static int withAddedCard(int pkTrick, int pkCard) {
+        assert isValid(pkTrick);
         assert (!isFull(pkTrick));
-        int var = 6 * size(pkTrick);
-        return (~mask(var, 6) & pkTrick) | (pkCard << var);
+        int var = CARD_SIZE * size(pkTrick);
+        return (~mask(var, CARD_SIZE) & pkTrick) | (pkCard << var);
     }
 
     /**
@@ -225,6 +236,7 @@ public final class PackedTrick {
      * @return the base colour of the given packed trick.
      */
     public static Card.Color baseColor(int pkTrick) {
+        assert isValid(pkTrick);
         assert (!isEmpty(pkTrick));
         return color(card(pkTrick, 0));
     }
@@ -239,6 +251,7 @@ public final class PackedTrick {
      * in the given packed trick.
      */
     public static long playableCards(int pkTrick, long pkHand) {
+        assert isValid(pkTrick);
         assert isValid(pkTrick);
         assert !isFull(pkTrick);
 
@@ -277,13 +290,15 @@ public final class PackedTrick {
      * @return the value of the given packed trick.
      */
     public static int points(int pkTrick) {
+        assert isValid(pkTrick);
         int result = 0;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < MAX_TRICK_SIZE; i++) {
             if (card(pkTrick, i) != PackedCard.INVALID) {
                 result += PackedCard.points(trump(pkTrick), card(pkTrick, i));
             }
         }
         if (isLast(pkTrick)) {
+            assert isValid(pkTrick);
             result += LAST_TRICK_ADDITIONAL_POINTS;
         }
         return result;
@@ -296,21 +311,28 @@ public final class PackedTrick {
      * @return the identity of the leading player in the given packed trick.
      */
     public static PlayerId winningPlayer(int pkTrick) {
+        assert isValid(pkTrick);
         int i = 0;
         int j = card(pkTrick, 0);
 
-        if (card(pkTrick, 1) != PackedCard.INVALID && PackedCard.isBetter(Color.ALL.get(extract(pkTrick, 30, 2)), card(pkTrick, 1), j)) {
+        if (card(pkTrick, 1) != PackedCard.INVALID &&
+                PackedCard.isBetter(Color.ALL.get(extract(pkTrick, 30, 2)), card(pkTrick, 1), j)) {
             i = 1;
             j = card(pkTrick, 1);
         }
-        if (card(pkTrick, 2) != PackedCard.INVALID && PackedCard.isBetter(Color.ALL.get(extract(pkTrick, 30, 2)), card(pkTrick, 2), j)) {
+
+        if (card(pkTrick, 2) != PackedCard.INVALID &&
+                PackedCard.isBetter(Color.ALL.get(extract(pkTrick, 30, 2)), card(pkTrick, 2), j)) {
             i = 2;
             j = card(pkTrick, 2);
         }
-        if (card(pkTrick, 3) != PackedCard.INVALID && PackedCard.isBetter(Color.ALL.get(extract(pkTrick, 30, 2)), card(pkTrick, 3), j)) {
+
+        if (card(pkTrick, 3) != PackedCard.INVALID &&
+                PackedCard.isBetter(Color.ALL.get(extract(pkTrick, 30, 2)), card(pkTrick, 3), j)) {
             i = 3;
             j = card(pkTrick, 3);
         }
+
         return player(pkTrick, i);
     }
 

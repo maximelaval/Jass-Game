@@ -9,7 +9,7 @@ import ch.epfl.javass.jass.Card.Color;
  */
 public final class Trick {
 
-    private int pkTrick;
+    private final int pkTrick;
 
     private Trick(int pkTrick) {
         this.pkTrick = pkTrick;
@@ -92,7 +92,7 @@ public final class Trick {
 
     /**
      * Returns the size of the given trick.
-     * @return thte size of the given trick.
+     * @return the size of the given trick.
      */
     public int size() {
         return PackedTrick.size(pkTrick);

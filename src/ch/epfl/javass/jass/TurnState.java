@@ -9,9 +9,9 @@ import ch.epfl.javass.bits.Bits32;
  * @author Maxime Laval (287323)
  */
 public final class TurnState {
-    private long pkCurrentScore;
-    private long pkUnplayedCards;
-    private int pkCurrentTrick;
+    private final long pkCurrentScore;
+    private final long pkUnplayedCards;
+    private final int pkCurrentTrick;
 
     private TurnState(long pkScore, long pkUnplayedCards, int pkTrick) {
         this.pkCurrentTrick = pkTrick;
@@ -69,7 +69,7 @@ public final class TurnState {
     }
 
     /**
-     * Returns the packed verion of the current trick.
+     * Returns the packed version of the current trick.
      *
      * @return the packed verion of the current trick.
      */
@@ -78,7 +78,7 @@ public final class TurnState {
     }
 
     /**
-     * Retursn the current score.
+     * Returns the current score.
      *
      * @return the current score.
      */
@@ -96,7 +96,7 @@ public final class TurnState {
     }
 
     /**
-     * Retursn the current trick.
+     * Returns the current trick.
      *
      * @return the current trick.
      */
@@ -122,7 +122,7 @@ public final class TurnState {
         if (trick().isFull()) {
             throw new IllegalStateException();
         } else {
-            return PlayerId.values()[(Bits32.extract(pkCurrentTrick, 28, 2) + PackedTrick.size(pkCurrentTrick)) % 4];
+            return PlayerId.values()[(Bits32.extract(pkCurrentTrick, 28, 2) + PackedTrick.size(pkCurrentTrick)) % PlayerId.COUNT];
         }
     }
 

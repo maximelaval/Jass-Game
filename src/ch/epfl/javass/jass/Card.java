@@ -30,8 +30,7 @@ public final class Card {
      * @return the card of the given Color and given Rank.
      */
     public static Card of(Color c, Rank r) {
-        Card card = new Card(c, r);
-        return card;
+        return new Card(c, r);
     }
 
     /**
@@ -50,7 +49,7 @@ public final class Card {
     }
 
     /**
-     * Returs the packed version of the Card.
+     * Returns the packed version of the Card.
      *
      * @return the packed version of the Card.
      */
@@ -140,7 +139,7 @@ public final class Card {
          * The number of different colours.
          */
         public static final int COUNT = 4;
-        protected final String symbol;
+        public final String symbol;
 
         Color(String symbol) {
             this.symbol = symbol;
@@ -182,7 +181,7 @@ public final class Card {
          */
         public static final int COUNT = 9;
         private final String symbol;
-        private int trumpOrdinal;
+        private final int trumpOrdinal;
 
         Rank(String symbol, int trumpOrdinal) {
             this.symbol = symbol;

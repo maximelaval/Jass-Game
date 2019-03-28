@@ -14,11 +14,11 @@ import static java.util.Collections.unmodifiableMap;
 public final class JassGame {
 
     private TurnState turnState;
-    private Random shuffleRng;
-    private Random trumpRng;
-    private Map<PlayerId, Player> players;
-    private Map<PlayerId, String> playerNames;
-    private Map<PlayerId, CardSet> playerHands;
+    private final Random shuffleRng;
+    private final Random trumpRng;
+    private final Map<PlayerId, Player> players;
+    private final Map<PlayerId, String> playerNames;
+    private final Map<PlayerId, CardSet> playerHands;
     private PlayerId firstPlayerTurn;
 
     /**
@@ -33,7 +33,7 @@ public final class JassGame {
         Random rng = new Random(rngSeed);
         this.shuffleRng = new Random(rng.nextLong());
         this.trumpRng = new Random(rng.nextLong());
-        this.playerHands = new HashMap<PlayerId, CardSet>();
+        this.playerHands = new HashMap<>();
     }
 
     /**
@@ -132,10 +132,10 @@ public final class JassGame {
     private void shuffleAndDistribute() {
         List<Card> deck = constructCardList();
         Collections.shuffle(deck, shuffleRng);
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < PlayerId.COUNT; ++i) {
             PlayerId pl = PlayerId.values()[i];
-            players.get(pl).updateHand(CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
-            playerHands.put(pl, CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
+            players.get(pl).updateHand(CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));   //8888888888888888
+            playerHands.put(pl, CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));    //??????????????????????????????????????????????   8888888888
         }
     }
 
@@ -160,7 +160,7 @@ public final class JassGame {
     }
 
     private List<Card> constructCardList() {
-        LinkedList<Card> list = new LinkedList<Card>();
+        LinkedList<Card> list = new LinkedList<>();
 
         for (int i = 0; i < Card.Color.COUNT; i++) {
             for (int j = 0; j < Card.Rank.COUNT; j++) {
@@ -183,7 +183,7 @@ public final class JassGame {
     private void updateFirstPlayer() {
         if (firstPlayerTurn == null) {
 
-            for (int i = 0; i < 4; ++i) {
+            for (int i = 0; i < PlayerId.COUNT; ++i) {
                 PlayerId pl = PlayerId.values()[i];
                 if (playerHands.get(pl).contains(Card.of(Card.Color.DIAMOND, Card.Rank.SEVEN))) {
                     firstPlayerTurn = pl;
@@ -191,7 +191,7 @@ public final class JassGame {
             }
 
         } else {
-            firstPlayerTurn = PlayerId.values()[(firstPlayerTurn.ordinal() + 1) % 4];
+            firstPlayerTurn = PlayerId.values()[(firstPlayerTurn.ordinal() + 1) % PlayerId.COUNT];
         }
     }
 }

@@ -22,7 +22,7 @@ public final class CardSet {
      * Represents every cards in a card set.
      */
     public static final CardSet ALL_CARDS = new CardSet(PackedCardSet.ALL_CARDS);
-    private long pkCardSet;
+     private final long pkCardSet;
 
     private CardSet(long pkCardSet) {
         this.pkCardSet = pkCardSet;
@@ -169,7 +169,6 @@ public final class CardSet {
      * @return the computed subset of cards.
      */
     public CardSet subsetOfColor(Card.Color color) {
-
         return new CardSet(PackedCardSet.subsetOfColor(pkCardSet, color));
     }
 
@@ -178,17 +177,11 @@ public final class CardSet {
         return (that0 instanceof CardSet) && (((CardSet) that0).packed() == pkCardSet);
     }
 
-
     @Override
     public int hashCode() {
         return Long.hashCode(pkCardSet);
     }
 
-    /**
-     * Returns a written representation of the given packed card set.
-     *
-     * @return the written representation.
-     */
     @Override
     public String toString() {
         assert (isValid(pkCardSet));

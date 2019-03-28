@@ -139,8 +139,7 @@ public final class PackedScore {
             }
             return pkScoreUpdated;
         } else {
-            long i = trickPoints;
-            long pkScoreUpdated = pkScore + (1L << 32L) + (i << 36L);
+            long pkScoreUpdated = pkScore + (1L << 32L) + ((long) trickPoints << 36L);
             if (turnTricks(pkScoreUpdated, TEAM_2) == TRICKS_PER_TURN) {
                 pkScoreUpdated += (long) MATCH_ADDITIONAL_POINTS << 36L;
             }
@@ -175,7 +174,8 @@ public final class PackedScore {
      */
     public static String toString(long pkScore) {
         assert (isValid(pkScore));
-        return ("(" + turnTricks(pkScore, TEAM_1) + "," + turnPoints(pkScore, TEAM_1) + "," + gamePoints(pkScore, TEAM_1) +
-                ")/(" + turnTricks(pkScore, TEAM_2) + "," + turnPoints(pkScore, TEAM_2) + "," + gamePoints(pkScore, TEAM_2) + ")");
+        return ("(" + turnTricks(pkScore, TEAM_1) + "," + turnPoints(pkScore, TEAM_1) +
+                "," + gamePoints(pkScore, TEAM_1) + ")/(" + turnTricks(pkScore, TEAM_2) +
+                "," + turnPoints(pkScore, TEAM_2) + "," + gamePoints(pkScore, TEAM_2) + ")");
     }
 }
