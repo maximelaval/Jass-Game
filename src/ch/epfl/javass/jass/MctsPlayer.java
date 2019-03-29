@@ -25,11 +25,24 @@ public final class MctsPlayer implements Player {
         }
     }
 
-    // private List<Card> expandTree(Node node){
-    //
-    // }
+  
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
+        
+        
+        CardSet playableCards = state.trick().playableCards(hand);
+        if (playableCards.size()==1) {
+            return playableCards.get(0);
+        } else {
+            
+            Node root = new Node(state,hand.packed());
+            for (int i=0;i < iterations;++i) {
+                List<Node> path = promisingPath(root,hand.packed());
+                
+            }
+            
+        }
+    }
         
         /*
          * cardset playablacards = state.trick.playablecards(ownHand)
@@ -56,7 +69,7 @@ public final class MctsPlayer implements Player {
          * 
          * ...après les iterations
          * retourner la meilleure carte parmi les enfants de la racine
-         * return root.children ( retour playable.get(root.V(c = 0))
+         * return root.children ( retour playable.get(root.bestChild(c = 0))
          */
         
         
@@ -64,12 +77,21 @@ public final class MctsPlayer implements Player {
         
         
 
-    }
-    private List<Node> promisingPath(Node root, long pkOwnHand){
+    
+    private List<Node> promisingPath(Node root, long mctsPlayerHand){
         List<Node> p = new ArrayList<Node>();
-        // Node n = root
-        //p.add(root)
+         Node n = root;
+        p.add(root);
+        while (!n.hasNoChild()&&n.isFullyExpanded()) {
+            n = n.bestChild(40);
+            p.add(n);
+        } 
+      n=  n.addChild(mctsPlayerHand, playerId);
+       p.add(n);
+       return p;
         
+        
+       
         /*while (not expanded && ! isLeaf){
          *  rootNode = bestChild(c)
          *  path.add(rootNode)
@@ -84,44 +106,51 @@ public final class MctsPlayer implements Player {
         */
         
     }
+   
+  
 
     private static class Node {
 
         private TurnState turnState;
         private Node[] children;
         private Node parent;
-        private CardSet upcomingChildren;
-        private Card nodeCard;
+        private long upcomingChildrenCards;
         private int points;
         private int finishedRandomTurns;
 
-        private Node(TurnState turnState, long pkCardsToExpand) {
+        private Node(TurnState turnState, long upcomingChildrenCards) {
             this.turnState = turnState;
-            this.children = new Node [PackedCardSet.size(pkCardsToExpand)];
-            
-
+            this.children = new Node [PackedCardSet.size(upcomingChildrenCards)];
+            this.upcomingChildrenCards =upcomingChildrenCards;
+            if(parent==null) {
+                finishedRandomTurns =0;
+            }
+            else {
+                finishedRandomTurns=1;
+            }
+           
         }
-        private Node addMissingChild() {
-            
-        }
+      
 
-        private CardSet potentialCards(CardSet playerHands,PlayerId Id) {
+     
+        private long potentialCards(long mctsPlayerHand,PlayerId mctsPlayerId,TurnState turnState) {
             
-            if state.isTerminal return PackedCardSet.EMPTY;
+            if (turnState.isTerminal()) 
+                return PackedCardSet.EMPTY; 
             
-            if (Id==playerId) {
- 
-            return turnState.unplayedCards().intersection(playerHands);
+            if (mctsPlayerId==playerId) {
+
+            return PackedCardSet.intersection(turnState.packedUnplayedCards(), mctsPlayerHand);
         }
             else {
-                return turnState.unplayedCards().difference(playerHands);
+                return PackedCardSet.difference(turnState.packedUnplayedCards(), mctsPlayerHand);
+               
             }
         }
-
-        private Score scoreOfRandomTurnState(CardSet hand, PlayerId Id) {
+        private Score scoreOfRandomTurnState(long mctsPlayerHand, PlayerId  mctsPlayerId,TurnState turnState) {
 
             while (!turnState.isTerminal()) {
-                long pkCardSet = potentialCards(hand,Id).packed();
+                long pkCardSet = potentialCards(mctsPlayerHand, mctsPlayerId,turnState);
                 int size = PackedCardSet.size(pkCardSet);
                 int pkCardRandom = PackedCardSet.get(pkCardSet,
                         mctsRng.nextInt(size));
@@ -132,21 +161,40 @@ public final class MctsPlayer implements Player {
             return turnState.score();
         }
 
-        private int promisingNodeIndex() {
+        private int promisingNodeIndex(int c) {
             int index = 0;
             double v = 0;
             for (int i = 0; i < children.length; i++) {
-                if (children[i].V( 40) > v) {
-                    v = children[i].V(40);
+                if (children[i].V( c) > v) {
+                    v = children[i].V(c);
                     index = i;
                 }
             }
             return index;
         }
         
-        Node addpromisingchild (id,hand) {
-         
-            /*
+        private Node bestChild(int c) {
+            return children[promisingNodeIndex(c)];
+        }
+        
+        
+        
+        private TeamId nextTeamToPlay() {
+            return turnState.nextPlayer().team();
+       }
+        
+        private Node addChild (long mctsPlayerHand,PlayerId mctsPlayerId) {
+       
+       int promisingCard =  PackedCardSet.get(upcomingChildrenCards, 0);
+        TurnState turnStateChildren =turnState.withNewCardPlayedAndTrickCollected(Card.ofPacked(promisingCard));
+         Node childrenNode = new Node (turnStateChildren,potentialCards(mctsPlayerHand,mctsPlayerId,turnStateChildren));
+         childrenNode.points = scoreOfRandomTurnState(mctsPlayerHand,mctsPlayerId,turnStateChildren).turnPoints(nextTeamToPlay());
+         children[children.length-1] = childrenNode;
+         PackedCardSet.remove(upcomingChildrenCards,promisingCard);
+         childrenNode.parent =this;
+         return childrenNode;
+            //private void addChild (id , long pkCardSet)
+         /*
              * choisir la premiere carte disponible
              * creer le turnstate de k enfant avec state.withnewcardandtrickcollected
              * creer l enfant avec le turnstate
@@ -156,9 +204,24 @@ public final class MctsPlayer implements Player {
              */
         }
 
-        is terminal vérifie return children.length=0;
-        isfullxexpand return PackedCardCard.isEmpty(pkCardstoExpand);
         
+        private void updateFinishedRandomTurn() {
+            
+        }
+        
+        private void updatePoints() {
+            
+        }
+        
+      private boolean  hasNoChild() {
+          return children.length==0 ;
+      }
+      
+        
+     private boolean isFullyExpanded() {
+         return PackedCardSet.isEmpty(upcomingChildrenCards);
+     }
+      
         private double V( double constant) {
             assert (finishedRandomTurns >= 0);
             if (finishedRandomTurns > 0) {
