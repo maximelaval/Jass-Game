@@ -21,7 +21,7 @@ public final class MctsPlayer implements Player {
             mctsRng = new SplittableRandom(rng.nextLong());
 
             this.iterations = iterations;
-       playerId=ownId;
+             playerId=ownId;
         }
     }
 
@@ -42,6 +42,7 @@ public final class MctsPlayer implements Player {
             }
             
         }
+        return null;
     }
         
         /*
@@ -225,7 +226,7 @@ public final class MctsPlayer implements Player {
         private double V( double constant) {
             assert (finishedRandomTurns >= 0);
             if (finishedRandomTurns > 0) {
-                return (points / finishedRandomTurns + constant
+                return ((double)points / (double)finishedRandomTurns + constant //                      ADD DOUBLE CAST
                         * (Math.sqrt((2 * Math.log(finishedRandomTurns))
                                 / parent.finishedRandomTurns)));
             } else {
