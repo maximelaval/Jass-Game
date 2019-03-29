@@ -5,7 +5,8 @@ import java.util.*;
 import static ch.epfl.javass.jass.Jass.HAND_SIZE;
 import static java.util.Collections.unmodifiableMap;
 import ch.epfl.javass.jass.Jass;
-import ch.epfl.javass.jass.TeamId;;
+import ch.epfl.javass.jass.TeamId;
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;;
 
 public final class JassGame {
 
@@ -99,7 +100,7 @@ public final class JassGame {
             return;
         }
 
-        while (!turnState.trick().isFull()) {
+        while ( turnState.packedTrick() == (PackedTrick.INVALID)) {
             play();
         }
     }
@@ -140,6 +141,12 @@ public final class JassGame {
         players.get(turnState.nextPlayer()).updateHand(playerHands.get(turnState.nextPlayer()));
 
         turnState =  turnState.withNewCardPlayedAndTrickCollected(card);
+        System.out.println(Integer.toBinaryString(turnState.packedTrick()));
+        if (turnState.packedTrick() == (PackedTrick.INVALID)) {
+            System.out.println("return invalid");
+            return;
+        }
+
         if (turnState.trick().isEmpty()) {
             updateTrick();
             updateScore();

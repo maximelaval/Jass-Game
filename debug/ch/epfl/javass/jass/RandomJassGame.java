@@ -26,7 +26,7 @@ public final class RandomJassGame {
         }
 
         JassGame g = new JassGame(2019, players, playerNames);
-      //  g.advanceToEndOfNextTrick();
+       //g.advanceToEndOfNextTrick();
 
         while (! g.isGameOver()) {
           g.advanceToEndOfNextTrick();
