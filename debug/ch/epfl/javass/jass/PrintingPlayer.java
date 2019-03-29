@@ -16,10 +16,11 @@ public final class PrintingPlayer implements Player {
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
+        System.out.println("Cartes jouables de ma main : " + state.trick().playableCards(hand));
         System.out.print("C'est à moi de jouer... Je joue : ");
         Card c = underlyingPlayer.cardToPlay(state, hand);
         System.out.println(c);        
-        System.out.println(state.trick().playableCards(hand));
+
         return c;
     }
 
@@ -47,8 +48,7 @@ public final class PrintingPlayer implements Player {
 
     @Override
     public void updateTrick(Trick newTrick) {
-        System.out.println("Pli " + newTrick.index() + ", commencé par "
-                + newTrick.player(0) + " : " + newTrick);
+        System.out.println("Pli " + newTrick.index() + ", commencé par " + newTrick.player(0) + " : " + newTrick);
     }
 
     @Override

@@ -129,20 +129,17 @@ public final class JassGame {
         Collections.shuffle(deck, shuffleRng);
         for (int i = 0; i < 4; ++i) {
             PlayerId pl = PlayerId.values()[i];
-            players.get(pl).updateHand(
-                    CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
-            playerHands.put(pl,
-                    CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
+          //  players.get(pl).updateHand(CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + 8)));
+            playerHands.put(pl, CardSet.of(deck.subList(i * HAND_SIZE, i * HAND_SIZE + HAND_SIZE)));
         }
     }
 
     private void play() {
-        playerHands.put(turnState.nextPlayer(), playerHands
-                .get(turnState.nextPlayer()).remove(nextPlayerCard()));
-        players.get(turnState.nextPlayer())
-                .updateHand(playerHands.get(turnState.nextPlayer()));
+        Card card = nextPlayerCard();
+        playerHands.put(turnState.nextPlayer(), playerHands.get(turnState.nextPlayer()).remove(card));
+        players.get(turnState.nextPlayer()).updateHand(playerHands.get(turnState.nextPlayer()));
 
-        turnState =turnState.withNewCardPlayedAndTrickCollected(nextPlayerCard());
+        turnState =  turnState.withNewCardPlayedAndTrickCollected(card);
         if (turnState.trick().isEmpty()) {
             updateTrick();
             updateScore();
@@ -152,8 +149,6 @@ public final class JassGame {
 
     private Card firstPlayerCard() {
         CardSet S = turnState.trick().playableCards(playerHands.get(firstPlayerTurn));
-
-
         return players.get(firstPlayerTurn).cardToPlay(turnState,S);
 
     }
