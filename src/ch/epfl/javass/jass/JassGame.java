@@ -13,13 +13,12 @@ public final class JassGame {
     private TurnState turnState;
     private Random shuffleRng;
     private Random trumpRng;
-    private Map<PlayerId, Player> players;
+    private final Map<PlayerId, Player> players;
     private Map<PlayerId, String> playerNames;
     private Map<PlayerId, CardSet> playerHands;
     private PlayerId firstPlayerTurn;
 
-    public JassGame(long rngSeed, Map<PlayerId, Player> players,
-                    Map<PlayerId, String> playerNames) {
+    public JassGame(long rngSeed, Map<PlayerId, Player> players, Map<PlayerId, String> playerNames) {
 
         this.players = unmodifiableMap(new EnumMap<>(players));
         this.playerNames = unmodifiableMap(new EnumMap<>(playerNames));
@@ -54,11 +53,9 @@ public final class JassGame {
         turnState = TurnState.initial(
                 Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)), score,
                 firstPlayerTurn);
-        playerHands.put(firstPlayerTurn,
-                playerHands.get(firstPlayerTurn).remove(firstPlayerCard()));
-        players.get(firstPlayerTurn)
-                .updateHand(playerHands.get(firstPlayerTurn));
-        turnState= turnState.withNewCardPlayed(firstPlayerCard());
+        playerHands.put(firstPlayerTurn, playerHands.get(firstPlayerTurn).remove(firstPlayerCard()));
+        players.get(firstPlayerTurn).updateHand(playerHands.get(firstPlayerTurn));
+       // turnState= turnState.withNewCardPlayed(firstPlayerCard());
         updateTrick();
 
     }
@@ -100,7 +97,7 @@ public final class JassGame {
             return;
         }
 
-        while ( turnState.packedTrick() == (PackedTrick.INVALID)) {
+        while ( !PackedTrick.isFull(turnState.packedTrick())) {
             play();
         }
     }
@@ -140,7 +137,7 @@ public final class JassGame {
         playerHands.put(turnState.nextPlayer(), playerHands.get(turnState.nextPlayer()).remove(card));
         players.get(turnState.nextPlayer()).updateHand(playerHands.get(turnState.nextPlayer()));
 
-        turnState =  turnState.withNewCardPlayedAndTrickCollected(card);
+        turnState =  turnState.withNewCardPlayed(card);
         System.out.println(Integer.toBinaryString(turnState.packedTrick()));
         if (turnState.packedTrick() == (PackedTrick.INVALID)) {
             System.out.println("return invalid");
@@ -194,15 +191,13 @@ public final class JassGame {
 
             for (int i = 0; i < 4; ++i) {
                 PlayerId pl = PlayerId.values()[i];
-                if (playerHands.get(pl).contains(
-                        Card.of(Card.Color.DIAMOND, Card.Rank.SEVEN))) {
+                if (playerHands.get(pl).contains(Card.of(Card.Color.DIAMOND, Card.Rank.SEVEN))) {
                     firstPlayerTurn = pl;
                 }
             }
 
         } else {
-            firstPlayerTurn = PlayerId.values()[(firstPlayerTurn.ordinal() + 1)
-                    % 4];
+            firstPlayerTurn = PlayerId.values()[(firstPlayerTurn.ordinal() + 1) % 4];
         }
     }
 }
