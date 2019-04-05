@@ -30,7 +30,7 @@ public final class RandomJassGame {
 
         while (! g.isGameOver()) {
           g.advanceToEndOfNextTrick();
-          System.out.println("----");
+          //System.out.println("----");
         }
       }
 }

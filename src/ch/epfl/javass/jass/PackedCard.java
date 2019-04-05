@@ -10,6 +10,18 @@ import ch.epfl.javass.bits.Bits32;
  */
 public final class PackedCard {
 
+    private static final int PACKED_RANK_START = 0;
+    private static final int PACKED_RANK_END = 3;
+    private static final int PACKED_RANK_SIZE = 4;
+    private static final int MIN_PACKED_RANK = 0;
+    private static final int MAX_PACKED_RANK = 8;
+
+    private static final int PACKED_COLOR_START = 4;
+    private static final int PACKED_COLOR_SIZE = 2;
+
+    private static final int PACKED_INVALID_START = 6;
+    private static final int PACKED_INVALID_SIZE = 26;
+
     /**
      * Represents an invalid packed card.
      */
@@ -22,8 +34,10 @@ public final class PackedCard {
      * @return whether the packed card is valid or not.
      */
     public static boolean isValid(int pkCard) {
-        return ((pkCard & Bits32.mask(0, 4)) >= 0) && ((pkCard & Bits32.mask(0, 4)) <= 8)
-                && (((pkCard & Bits32.mask(6, 26)) == 0) && (pkCard != INVALID));
+        return ((pkCard & Bits32.mask(PACKED_RANK_START, PACKED_RANK_SIZE)) >= MIN_PACKED_RANK) &&
+                ((pkCard & Bits32.mask(PACKED_RANK_START, PACKED_RANK_SIZE)) <= MAX_PACKED_RANK) &&
+                (((pkCard & Bits32.mask(PACKED_INVALID_START, PACKED_INVALID_SIZE)) == 0) && (pkCard != INVALID));
+        // && add check of min and max of color
     }
 
     /**
@@ -34,7 +48,7 @@ public final class PackedCard {
      * @return the packed card.
      */
     public static int pack(Card.Color c, Card.Rank r) {
-        return Bits32.pack(r.ordinal(), 4, c.ordinal(), 2);
+        return Bits32.pack(r.ordinal(), PACKED_RANK_SIZE, c.ordinal(), PACKED_COLOR_SIZE);
     }
 
     /**
@@ -45,7 +59,7 @@ public final class PackedCard {
      */
     public static Card.Color color(int pkCard) {
         assert isValid(pkCard);
-        int colorInt = Bits32.extract(pkCard, 4, 2);
+        int colorInt = Bits32.extract(pkCard, PACKED_COLOR_START, PACKED_COLOR_SIZE);
         return Card.Color.values()[colorInt];
     }
 
@@ -57,7 +71,7 @@ public final class PackedCard {
      */
     public static Card.Rank rank(int pkCard) {
         assert isValid(pkCard);
-        int rankInt = Bits32.extract(pkCard, 0, 4);
+        int rankInt = Bits32.extract(pkCard, PACKED_RANK_START, PACKED_RANK_SIZE);
         return Card.Rank.values()[rankInt];
     }
 

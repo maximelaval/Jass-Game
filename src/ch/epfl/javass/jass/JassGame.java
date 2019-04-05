@@ -50,9 +50,7 @@ public final class JassGame {
         updateFirstPlayer();
         updateHand();
         setTrump();
-        turnState = TurnState.initial(
-                Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)), score,
-                firstPlayerTurn);
+        turnState = TurnState.initial(Card.Color.ALL.get(trumpRng.nextInt(Card.Color.COUNT)), score, firstPlayerTurn);
         playerHands.put(firstPlayerTurn, playerHands.get(firstPlayerTurn).remove(firstPlayerCard()));
         players.get(firstPlayerTurn).updateHand(playerHands.get(firstPlayerTurn));
        // turnState= turnState.withNewCardPlayed(firstPlayerCard());
@@ -133,12 +131,14 @@ public final class JassGame {
     }
 
     private void play() {
+
         Card card = nextPlayerCard();
+
         playerHands.put(turnState.nextPlayer(), playerHands.get(turnState.nextPlayer()).remove(card));
         players.get(turnState.nextPlayer()).updateHand(playerHands.get(turnState.nextPlayer()));
 
         turnState =  turnState.withNewCardPlayed(card);
-        System.out.println(Integer.toBinaryString(turnState.packedTrick()));
+        //System.out.println(Integer.toBinaryString(turnState.packedTrick()));
         if (turnState.packedTrick() == (PackedTrick.INVALID)) {
             System.out.println("return invalid");
             return;
@@ -164,7 +164,7 @@ public final class JassGame {
     }
 
     private List<Card> constructCardList() {
-        LinkedList<Card> list = new LinkedList<Card>();
+        LinkedList<Card> list = new LinkedList<>();
 
         for (int i = 0; i < Card.Color.COUNT; i++) {
             for (int j = 0; j < Card.Rank.COUNT; ++j) {
