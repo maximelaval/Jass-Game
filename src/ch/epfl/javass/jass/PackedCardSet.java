@@ -13,6 +13,16 @@ import static ch.epfl.javass.bits.Bits64.mask;
  */
 public final class PackedCardSet {
 
+    private static final int NUMBER_OF_RANKS = 9;
+    private static final int BINARY_SIZE_OF_A_COLOR = 16;
+    private static final int FST_INVALID_BITS_START = 9;
+    private static final int SND_INVALID_BITS_START = 25;
+    private static final int TRD_INVALID_BITS_START = 41;
+    private static final int FTH_INVALID_BITS_START = 57;
+    private static final int INVALID_BITS_SIZE = 7;
+
+    private static final int NUMBER_OF_COLORS = 4;
+
     /**
      * Represents an empty packed card set.
      */
@@ -37,10 +47,10 @@ public final class PackedCardSet {
      * @return whether the packed card set has a valid value.
      */
     public static boolean isValid(long pkCardSet) {
-        return (extract(pkCardSet, 9, 7) == 0) &&
-                (extract(pkCardSet, 25, 7) == 0) &&
-                (extract(pkCardSet, 41, 7) == 0) &&
-                (extract(pkCardSet, 57, 7) == 0);
+        return (extract(pkCardSet, FST_INVALID_BITS_START, INVALID_BITS_SIZE) == 0) &&
+                (extract(pkCardSet, SND_INVALID_BITS_START, INVALID_BITS_SIZE) == 0) &&
+                (extract(pkCardSet, TRD_INVALID_BITS_START, INVALID_BITS_SIZE) == 0) &&
+                (extract(pkCardSet, FTH_INVALID_BITS_START, INVALID_BITS_SIZE) == 0);
     }
 
     /**
@@ -233,9 +243,9 @@ public final class PackedCardSet {
      * @return the computed table.
      */
     private static long[] computeSubColor() {
-        long[] t = new long[4];
+        long[] t = new long[NUMBER_OF_COLORS];
         for (int i = 0; i < t.length; ++i) {
-            t[i] = mask(i * 16, 9);
+            t[i] = mask(i * BINARY_SIZE_OF_A_COLOR, NUMBER_OF_RANKS);
         }
         return t;
     }

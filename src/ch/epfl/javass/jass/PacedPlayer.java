@@ -10,6 +10,8 @@ import java.util.Map;
  */
 public final class PacedPlayer implements Player {
 
+    private static final int NB_OF_MILISEC_IN_ONE_SEC = 1_000;
+
     private final long minTime;
     private final Player underlyingPlayer;
 
@@ -19,7 +21,7 @@ public final class PacedPlayer implements Player {
      */
     public PacedPlayer(Player underlyingPlayer, double minTime) {
         this.underlyingPlayer = underlyingPlayer;
-        this.minTime = (long) (minTime * 1000);
+        this.minTime = (long) (minTime * NB_OF_MILISEC_IN_ONE_SEC);
     }
 
     @Override
