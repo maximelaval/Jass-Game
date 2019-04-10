@@ -10,22 +10,18 @@ import ch.epfl.javass.bits.Bits32;
  */
 public final class PackedCard {
 
-    private static final int PACKED_RANK_START = 0;
-    private static final int PACKED_RANK_END = 3;
-    private static final int PACKED_RANK_SIZE = 4;
-    private static final int MIN_PACKED_RANK = 0;
-    private static final int MAX_PACKED_RANK = 8;
-
-    private static final int PACKED_COLOR_START = 4;
-    private static final int PACKED_COLOR_SIZE = 2;
-
-    private static final int PACKED_INVALID_START = 6;
-    private static final int PACKED_INVALID_SIZE = 26;
-
     /**
      * Represents an invalid packed card.
      */
     public final static int INVALID = 0b111111;
+    private static final int PACKED_RANK_START = 0;
+    private static final int PACKED_RANK_SIZE = 4;
+    private static final int MIN_PACKED_RANK = 0;
+    private static final int MAX_PACKED_RANK = 8;
+    private static final int PACKED_COLOR_START = 4;
+    private static final int PACKED_COLOR_SIZE = 2;
+    private static final int PACKED_INVALID_START = 6;
+    private static final int PACKED_INVALID_SIZE = 26;
 
     /**
      * Returns true if and only if the packed card has a valid value.
@@ -36,8 +32,8 @@ public final class PackedCard {
     public static boolean isValid(int pkCard) {
         return ((pkCard & Bits32.mask(PACKED_RANK_START, PACKED_RANK_SIZE)) >= MIN_PACKED_RANK) &&
                 ((pkCard & Bits32.mask(PACKED_RANK_START, PACKED_RANK_SIZE)) <= MAX_PACKED_RANK) &&
-                (((pkCard & Bits32.mask(PACKED_INVALID_START, PACKED_INVALID_SIZE)) == 0) && (pkCard != INVALID));
-        // && add check of min and max of color
+                (((pkCard & Bits32.mask(PACKED_INVALID_START, PACKED_INVALID_SIZE)) == 0)) &&
+                (pkCard != INVALID);
     }
 
     /**

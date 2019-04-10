@@ -22,6 +22,18 @@ public final class PackedScore {
      * Represents the initial packed score when starting a game.
      */
     public static final long INITIAL = 0L;
+    private static final int BIT_SHIFT_FOR_T2 = Integer.SIZE;
+    private static final int NUMBER_OF_TRICKS_START = 0;
+    private static final int NUMBER_OF_TRICKS_SIZE = 4;
+    private static final int MAX_NUMBER_OF_TRICKS = 9;
+    private static final int POINTS_OF_TURN_START = 4;
+    private static final int POINTS_OF_TURN_SIZE = 9;
+    private static final int MAX_POINTS_OF_TURN = 257;
+    private static final int POINTS_OF_GAME_START = 13;
+    private static final int POINTS_OF_GAME_SIZE = 11;
+    private static final int MAX_POINTS_OF_GAME = 2000;
+    private static final int INVALID_BITS_START = 24;
+    private static final int INVALID_BITS_SIZE = 8;
 
     private PackedScore() {
     }
@@ -33,14 +45,27 @@ public final class PackedScore {
      * @return whether the score has a valid value.
      */
     public static boolean isValid(long pkScore) {
-        return (extract(pkScore, 0, 4) >= 0) && (extract(pkScore, 4, 9) >= 0) &&
-                (extract(pkScore, 13, 11) >= 0) && (extract(pkScore, 0, 4) <= 9) &&
-                (extract(pkScore, 4, 9) <= 257) && (extract(pkScore, 13, 11) <= 2000) &&
-                (extract(pkScore, 24, 8) == 0) && (extract(pkScore, 32, 4) >= 0) &&
-                (extract(pkScore, 36, 9) >= 0) && (extract(pkScore, 45, 11) >= 0) &&
-                (extract(pkScore, 32, 4) <= 9) && (extract(pkScore, 36, 9) <= 257) &&
-                (extract(pkScore, 45, 11) <= 2000) &&
-                (extract(pkScore, 56, 8) == 0);
+        boolean result = true;
+        for (int i = 0; i <= 1; ++i) {
+
+            long numberOfTricks =
+                    extract(pkScore, NUMBER_OF_TRICKS_START + i * BIT_SHIFT_FOR_T2, NUMBER_OF_TRICKS_SIZE);
+            long pointsOfTurn =
+                    extract(pkScore, POINTS_OF_TURN_START + i * BIT_SHIFT_FOR_T2, POINTS_OF_TURN_SIZE);
+            long pointsOfGame =
+                    extract(pkScore, POINTS_OF_GAME_START + i * BIT_SHIFT_FOR_T2, POINTS_OF_GAME_SIZE);
+
+            result &= (numberOfTricks >= 0) &&
+                    (pointsOfTurn >= 0) &&
+                    (pointsOfGame >= 0) &&
+
+                    (numberOfTricks <= MAX_NUMBER_OF_TRICKS) &&
+                    (pointsOfTurn <= MAX_POINTS_OF_TURN) &&
+                    (pointsOfGame <= MAX_POINTS_OF_GAME) &&
+
+                    (extract(pkScore, INVALID_BITS_START + i * 32, INVALID_BITS_SIZE) == 0);
+        }
+        return result;
     }
 
     /**
@@ -57,9 +82,9 @@ public final class PackedScore {
     public static long pack(int turnTricks1, int turnPoints1, int gamePoints1,
                             int turnTricks2, int turnPoints2, int gamePoints2) {
 
-        int team1Score = Bits32.pack(turnTricks1, 4, turnPoints1, 9, gamePoints1, 11);
-        int team2Score = Bits32.pack(turnTricks2, 4, turnPoints2, 9, gamePoints2, 11);
-        return Bits64.pack(team1Score, 32, team2Score, 32);
+        int team1Score = Bits32.pack(turnTricks1, NUMBER_OF_TRICKS_SIZE, turnPoints1, POINTS_OF_TURN_SIZE, gamePoints1, POINTS_OF_GAME_SIZE);
+        int team2Score = Bits32.pack(turnTricks2, NUMBER_OF_TRICKS_SIZE, turnPoints2, POINTS_OF_TURN_SIZE, gamePoints2, POINTS_OF_GAME_SIZE);
+        return Bits64.pack(team1Score, BIT_SHIFT_FOR_T2, team2Score, BIT_SHIFT_FOR_T2);
     }
 
     /**
@@ -72,9 +97,9 @@ public final class PackedScore {
     public static int turnTricks(long pkScore, TeamId t) {
         assert (isValid(pkScore));
         if (t.equals(TEAM_1)) {
-            return (int) extract(pkScore, 0, 4);
+            return (int) extract(pkScore, NUMBER_OF_TRICKS_START, NUMBER_OF_TRICKS_SIZE);
         } else {
-            return (int) extract(pkScore, 32, 4);
+            return (int) extract(pkScore, BIT_SHIFT_FOR_T2, NUMBER_OF_TRICKS_SIZE);
         }
     }
 
@@ -88,9 +113,9 @@ public final class PackedScore {
     public static int turnPoints(long pkScore, TeamId t) {
         assert (isValid(pkScore));
         if (t.equals(TEAM_1)) {
-            return (int) extract(pkScore, 4, 9);
+            return (int) extract(pkScore, POINTS_OF_TURN_START, POINTS_OF_TURN_SIZE);
         } else {
-            return (int) extract(pkScore, 36, 9);
+            return (int) extract(pkScore, POINTS_OF_TURN_START + BIT_SHIFT_FOR_T2, POINTS_OF_TURN_SIZE);
         }
     }
 
@@ -104,9 +129,9 @@ public final class PackedScore {
     public static int gamePoints(long pkScore, TeamId t) {
         assert (isValid(pkScore));
         if (t.equals(TEAM_1)) {
-            return (int) extract(pkScore, 13, 11);
+            return (int) extract(pkScore, POINTS_OF_GAME_START, POINTS_OF_GAME_SIZE);
         } else {
-            return (int) extract(pkScore, 45, 11);
+            return (int) extract(pkScore, POINTS_OF_GAME_START + BIT_SHIFT_FOR_T2, POINTS_OF_GAME_SIZE);
         }
     }
 
@@ -133,15 +158,16 @@ public final class PackedScore {
     public static long withAdditionalTrick(long pkScore, TeamId winningTeam, int trickPoints) {
         assert (isValid(pkScore));
         if (winningTeam.equals(TEAM_1)) {
-            long pkScoreUpdated = pkScore + 1L + (trickPoints << 4L);
+            long pkScoreUpdated = pkScore + 1L + (trickPoints << (long)NUMBER_OF_TRICKS_SIZE);
             if (turnTricks(pkScoreUpdated, TEAM_1) == TRICKS_PER_TURN) {
-                pkScoreUpdated += (long) MATCH_ADDITIONAL_POINTS << 4L;
+                pkScoreUpdated += (long) MATCH_ADDITIONAL_POINTS << (long)NUMBER_OF_TRICKS_SIZE;
             }
             return pkScoreUpdated;
         } else {
-            long pkScoreUpdated = pkScore + (1L << 32L) + ((long) trickPoints << 36L);
+            long pkScoreUpdated = pkScore + (1L << (long)BIT_SHIFT_FOR_T2) +
+                    ((long) trickPoints << (long)NUMBER_OF_TRICKS_SIZE + BIT_SHIFT_FOR_T2);
             if (turnTricks(pkScoreUpdated, TEAM_2) == TRICKS_PER_TURN) {
-                pkScoreUpdated += (long) MATCH_ADDITIONAL_POINTS << 36L;
+                pkScoreUpdated += (long) MATCH_ADDITIONAL_POINTS << (long)NUMBER_OF_TRICKS_SIZE + BIT_SHIFT_FOR_T2;
             }
             return pkScoreUpdated;
         }
@@ -159,9 +185,10 @@ public final class PackedScore {
         assert (isValid(pkScore));
         long extractedGamePoints1 = turnPoints(pkScore, TEAM_1);
         long extractedGamePoints2 = turnPoints(pkScore, TEAM_2);
-        long pkScoreUpdated = pkScore & (mask(13, 19) | mask(45, 19));
-        pkScoreUpdated += extractedGamePoints1 << 13L;
-        pkScoreUpdated += extractedGamePoints2 << 45L;
+        long pkScoreUpdated = pkScore & (mask(POINTS_OF_GAME_START, POINTS_OF_GAME_SIZE + INVALID_BITS_SIZE) |
+                mask(POINTS_OF_GAME_START + BIT_SHIFT_FOR_T2, POINTS_OF_GAME_SIZE + INVALID_BITS_SIZE));
+        pkScoreUpdated += extractedGamePoints1 << (long) POINTS_OF_GAME_START;
+        pkScoreUpdated += extractedGamePoints2 << (long) POINTS_OF_GAME_START + BIT_SHIFT_FOR_T2;
 
         return pkScoreUpdated;
     }

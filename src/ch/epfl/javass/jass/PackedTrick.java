@@ -20,10 +20,14 @@ public final class PackedTrick {
     /**
      * Represents an invalid packed trick.
      */
-    public static final int INVALID = mask(0, 32);
+    public static final int INVALID = mask(0, Integer.SIZE);
+    private static final int LAST_TRICK = 8;
     private static final int CARD_SIZE = 6;
     private static final int MAX_TRICK_SIZE = 4;
-
+    private static final int INDEX_START = 24;
+    private static final int PLAYER_AND_TRUMP_SIZE = 2;
+    private static final int TRUMP_START = 30;
+    private static final int PLAYER_START = 28;
     private PackedTrick() {
 
     }
@@ -35,49 +39,40 @@ public final class PackedTrick {
      * @return whether the packed trick is valid.
      */
     public static boolean isValid(int pkTrick) {
+
+        final int index = extract(pkTrick, INDEX_START, MAX_TRICK_SIZE);
+
+        final int ZTH_CARD = extract(pkTrick, 0, 6);
+        final int FST_CARD = extract(pkTrick, 6, 6);
+        final int SND_CARD = extract(pkTrick, 12, 6);
+        final int TRD_CARD = extract(pkTrick, 18, 6);
+
         return (
-                (
-                        (extract(pkTrick, 24, MAX_TRICK_SIZE) <= 8) &&
-                                (extract(pkTrick, 24, MAX_TRICK_SIZE) >= 0)
+                ((index <= LAST_TRICK) && (index >= 0)) &&
+                        (((TRD_CARD != PackedCard.INVALID) &&
+                                (SND_CARD != PackedCard.INVALID) &&
+                                (FST_CARD != PackedCard.INVALID) &&
+                                (ZTH_CARD != PackedCard.INVALID)) ||
 
-                ) && (
+                                ((TRD_CARD == PackedCard.INVALID) &&
+                                        (SND_CARD != PackedCard.INVALID) &&
+                                        (FST_CARD != PackedCard.INVALID) &&
+                                        (ZTH_CARD != PackedCard.INVALID)) ||
 
-                        ((extract(pkTrick, 18, 6) != PackedCard.INVALID) &&
-                                (extract(pkTrick, 12, 6) != PackedCard.INVALID)
+                                ((TRD_CARD == PackedCard.INVALID) &&
+                                        (SND_CARD == PackedCard.INVALID) &&
+                                        (FST_CARD != PackedCard.INVALID) &&
+                                        (ZTH_CARD != PackedCard.INVALID)) ||
 
-                                && (extract(pkTrick, 6, 6) != PackedCard.INVALID) &&
-                                (extract(pkTrick, 0, 6) != PackedCard.INVALID)
+                                ((TRD_CARD == PackedCard.INVALID) &&
+                                        (SND_CARD == PackedCard.INVALID) &&
+                                        (FST_CARD == PackedCard.INVALID) &&
+                                        (ZTH_CARD != PackedCard.INVALID)) ||
 
-                        ) ||
-
-                                ((extract(pkTrick, 18, 6) == PackedCard.INVALID) &&
-                                        (extract(pkTrick, 12, 6) != PackedCard.INVALID)
-                                        && (extract(pkTrick, 6, 6) != PackedCard.INVALID) &&
-                                        (extract(pkTrick, 0, 6) != PackedCard.INVALID)
-
-                                ) ||
-
-                                ((extract(pkTrick, 18, 6) == PackedCard.INVALID) &&
-                                        (extract(pkTrick, 12, 6) == PackedCard.INVALID)
-                                        && (extract(pkTrick, 6, 6) != PackedCard.INVALID) &&
-                                        (extract(pkTrick, 0, 6) != PackedCard.INVALID)
-
-                                ) ||
-
-                                ((extract(pkTrick, 18, 6) == PackedCard.INVALID) &&
-                                        (extract(pkTrick, 12, 6) == PackedCard.INVALID)
-                                        && (extract(pkTrick, 6, 6) == PackedCard.INVALID) &&
-                                        (extract(pkTrick, 0, 6) != PackedCard.INVALID)
-
-                                ) ||
-
-                                ((extract(pkTrick, 18, 6) == PackedCard.INVALID) &&
-                                        (extract(pkTrick, 12, 6) == PackedCard.INVALID)
-                                        && (extract(pkTrick, 6, 6) == PackedCard.INVALID) &&
-                                        (extract(pkTrick, 0, 6) == PackedCard.INVALID)
-                                )
-                )
-        );
+                                ((TRD_CARD == PackedCard.INVALID) &&
+                                        (SND_CARD == PackedCard.INVALID) &&
+                                        (FST_CARD == PackedCard.INVALID) &&
+                                        (ZTH_CARD == PackedCard.INVALID))));
     }
 
     /**
@@ -90,7 +85,7 @@ public final class PackedTrick {
     public static int firstEmpty(Color trump, PlayerId firstPlayer) {
         return pack(PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID,
                 CARD_SIZE, PackedCard.INVALID, CARD_SIZE, 0, MAX_TRICK_SIZE, firstPlayer.ordinal(),
-                2, trump.ordinal(), 2);
+                PLAYER_AND_TRUMP_SIZE, trump.ordinal(), PLAYER_AND_TRUMP_SIZE);
     }
 
     /**
@@ -113,8 +108,8 @@ public final class PackedTrick {
                     PackedCard.INVALID, CARD_SIZE,
                     PackedCard.INVALID, CARD_SIZE,
                     index(pkTrick) + 1, MAX_TRICK_SIZE,
-                    winningPlayer(pkTrick).ordinal(), 2,
-                    trump(pkTrick).ordinal(), 2);
+                    winningPlayer(pkTrick).ordinal(), PLAYER_AND_TRUMP_SIZE,
+                    trump(pkTrick).ordinal(), PLAYER_AND_TRUMP_SIZE);
         }
     }
 
@@ -126,7 +121,7 @@ public final class PackedTrick {
      */
     public static boolean isLast(int pkTrick) {
         assert isValid(pkTrick);
-        return index(pkTrick) == 8;
+        return index(pkTrick) == LAST_TRICK;
     }
 
     /**
@@ -175,7 +170,7 @@ public final class PackedTrick {
      */
     public static Card.Color trump(int pkTrick) {
         assert isValid(pkTrick);
-        return Color.values()[extract(pkTrick, 30, 2)];
+        return Color.values()[extract(pkTrick, TRUMP_START, PLAYER_AND_TRUMP_SIZE)];
     }
 
     /**
@@ -187,7 +182,7 @@ public final class PackedTrick {
      */
     public static PlayerId player(int pkTrick, int index) {
         assert isValid(pkTrick);
-        int firstPlayer = extract(pkTrick, 28, 2);
+        int firstPlayer = extract(pkTrick, PLAYER_START, PLAYER_AND_TRUMP_SIZE);
         int player = (firstPlayer + index) % PlayerId.COUNT;
         return PlayerId.values()[player];
     }
@@ -200,7 +195,7 @@ public final class PackedTrick {
      */
     public static int index(int pkTrick) {
         assert isValid(pkTrick);
-        return extract(pkTrick, 24, MAX_TRICK_SIZE);
+        return extract(pkTrick, INDEX_START, MAX_TRICK_SIZE);
     }
 
     /**
@@ -316,21 +311,24 @@ public final class PackedTrick {
         int j = card(pkTrick, 0);
 
         if (card(pkTrick, 1) != PackedCard.INVALID &&
-                PackedCard.isBetter(Color.ALL.get(extract(pkTrick, 30, 2)), card(pkTrick, 1), j)) {
+                PackedCard.isBetter(Color.ALL.get(extract(pkTrick, TRUMP_START, PLAYER_AND_TRUMP_SIZE)),
+                        card(pkTrick, 1), j)) {
             i = 1;
             j = card(pkTrick, 1);
         }
 
         if (card(pkTrick, 2) != PackedCard.INVALID &&
-                PackedCard.isBetter(Color.ALL.get(extract(pkTrick, 30, 2)), card(pkTrick, 2), j)) {
+                PackedCard.isBetter(Color.ALL.get(extract(pkTrick, TRUMP_START, PLAYER_AND_TRUMP_SIZE)),
+                        card(pkTrick, 2), j)) {
             i = 2;
             j = card(pkTrick, 2);
         }
 
         if (card(pkTrick, 3) != PackedCard.INVALID &&
-                PackedCard.isBetter(Color.ALL.get(extract(pkTrick, 30, 2)), card(pkTrick, 3), j)) {
+                PackedCard.isBetter(Color.ALL.get(extract(pkTrick, TRUMP_START, PLAYER_AND_TRUMP_SIZE)),
+                        card(pkTrick, 3), j)) {
             i = 3;
-            j = card(pkTrick, 3);
+            //j = card(pkTrick, 3);
         }
 
         return player(pkTrick, i);

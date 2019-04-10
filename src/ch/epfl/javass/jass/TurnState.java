@@ -122,7 +122,8 @@ public final class TurnState {
         if (trick().isFull()) {
             throw new IllegalStateException();
         } else {
-            return PlayerId.values()[(Bits32.extract(pkCurrentTrick, 28, 2) + PackedTrick.size(pkCurrentTrick)) % PlayerId.COUNT];
+            return PlayerId.values()[(trick().player(0).ordinal() +
+                    PackedTrick.size(pkCurrentTrick)) % PlayerId.COUNT];
         }
     }
 
@@ -137,8 +138,8 @@ public final class TurnState {
             throw new IllegalStateException();
         } else {
             long updatedPkUnplayed = PackedCardSet.remove(pkUnplayedCards, card.packed());
-            int pktrick = PackedTrick.withAddedCard(pkCurrentTrick, card.packed());
-            return new TurnState(pkCurrentScore, updatedPkUnplayed, pktrick);
+            int pkTrick = PackedTrick.withAddedCard(pkCurrentTrick, card.packed());
+            return new TurnState(pkCurrentScore, updatedPkUnplayed, pkTrick);
         }
     }
 
