@@ -15,9 +15,9 @@ public final class JassGame {
 
     private final Map<PlayerId, Player> players;
     private TurnState turnState;
-    private Random shuffleRng;
-    private Random trumpRng;
-    private Map<PlayerId, String> playerNames;
+    private final Random shuffleRng;
+    private final Random trumpRng;
+    private final Map<PlayerId, String> playerNames;
     private Map<PlayerId, CardSet> playerHands;
     private PlayerId firstPlayerTurn;
 
@@ -212,7 +212,7 @@ public final class JassGame {
     }
 
     private List<Card> constructCardList() {
-        LinkedList<Card> list = new LinkedList<Card>();
+        LinkedList<Card> list = new LinkedList<>();
 
         for (int i = 0; i < Card.Color.COUNT; i++) {
             for (int j = 0; j < Card.Rank.COUNT; ++j) {

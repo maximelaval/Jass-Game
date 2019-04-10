@@ -86,14 +86,14 @@ public final class Score {
      * Updates the score to take into consideration that the wining team won a trick worth "trickPoints".
      *
      * @param winningTeam the winning team.
-     * @param trickpoints the number of points of the tricks.
+     * @param trickPoints the number of points of the tricks.
      * @return the updated score.
      */
-    public Score withAdditionalTrick(TeamId winningTeam, int trickpoints) {
-        if (trickpoints < 0) {
+    public Score withAdditionalTrick(TeamId winningTeam, int trickPoints) {
+        if (trickPoints < 0) {
             throw new IllegalArgumentException();
         } else {
-            return new Score(PackedScore.withAdditionalTrick(pkScore, winningTeam, trickpoints));
+            return new Score(PackedScore.withAdditionalTrick(pkScore, winningTeam, trickPoints));
         }
     }
 

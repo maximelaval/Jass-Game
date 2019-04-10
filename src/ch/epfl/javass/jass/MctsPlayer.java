@@ -74,7 +74,7 @@ public final class MctsPlayer implements Player {
     }
 
     private List<Node> promisingPath(Node root, long mctsPlayerHand) {
-        List<Node> p = new ArrayList<Node>();
+        List<Node> p = new ArrayList<>();
         Node n = root;
         p.add(root);
         while (!n.hasNoChild() && n.isFullyExpanded()) {

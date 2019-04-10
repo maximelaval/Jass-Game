@@ -1,7 +1,5 @@
 package ch.epfl.javass.jass;
 
-import ch.epfl.javass.bits.Bits32;
-
 /**
  * Represents the state of a turn of a Jass game.
  *
@@ -71,7 +69,7 @@ public final class TurnState {
     /**
      * Returns the packed version of the current trick.
      *
-     * @return the packed verion of the current trick.
+     * @return the packed version of the current trick.
      */
     public int packedTrick() {
         return pkCurrentTrick;
