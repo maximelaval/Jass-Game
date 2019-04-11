@@ -1,5 +1,7 @@
 package ch.epfl.javass.jass;
 
+import ch.epfl.javass.Preconditions;
+
 /**
  * Represents the scores of a Jass game.
  *
@@ -12,7 +14,6 @@ public final class Score {
      * Represents the initial score at the beginning of a game.
      */
     public static final Score INITIAL = new Score(0);
-
     private final long pkScore;
 
     private Score(long i) {
@@ -26,11 +27,8 @@ public final class Score {
      * @return the score corresponding to the packed score.
      */
     public static Score ofPacked(long packed) {
-        if (PackedScore.isValid(packed)) {
-            return new Score(packed);
-        } else {
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgument(PackedScore.isValid(packed));
+        return new Score(packed);
     }
 
     /**
@@ -90,11 +88,8 @@ public final class Score {
      * @return the updated score.
      */
     public Score withAdditionalTrick(TeamId winningTeam, int trickPoints) {
-        if (trickPoints < 0) {
-            throw new IllegalArgumentException();
-        } else {
-            return new Score(PackedScore.withAdditionalTrick(pkScore, winningTeam, trickPoints));
-        }
+        Preconditions.checkArgument(trickPoints < 0);
+        return new Score(PackedScore.withAdditionalTrick(pkScore, winningTeam, trickPoints));
     }
 
     /**

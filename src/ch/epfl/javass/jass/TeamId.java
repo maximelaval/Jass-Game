@@ -30,10 +30,6 @@ public enum TeamId {
      * @return the opposite team of the given team.
      */
     public TeamId other() {
-        if (this.equals(TEAM_1)) {
-            return TEAM_2;
-        } else {
-            return TEAM_1;
-        }
+        return this.equals(TEAM_1) ? TEAM_2 : TEAM_1;
     }
 }

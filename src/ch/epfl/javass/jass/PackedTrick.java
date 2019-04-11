@@ -99,18 +99,14 @@ public final class PackedTrick {
     public static int nextEmpty(int pkTrick) {
         assert isValid(pkTrick);
         assert isFull(pkTrick);
-        if (isLast(pkTrick)) {
-            return INVALID;
-        } else {
-            return pack(
-                    PackedCard.INVALID, CARD_SIZE,
-                    PackedCard.INVALID, CARD_SIZE,
-                    PackedCard.INVALID, CARD_SIZE,
-                    PackedCard.INVALID, CARD_SIZE,
-                    index(pkTrick) + 1, MAX_TRICK_SIZE,
-                    winningPlayer(pkTrick).ordinal(), PLAYER_AND_TRUMP_SIZE,
-                    trump(pkTrick).ordinal(), PLAYER_AND_TRUMP_SIZE);
-        }
+        return isLast(pkTrick) ? INVALID : pack(
+                PackedCard.INVALID, CARD_SIZE,
+                PackedCard.INVALID, CARD_SIZE,
+                PackedCard.INVALID, CARD_SIZE,
+                PackedCard.INVALID, CARD_SIZE,
+                index(pkTrick) + 1, MAX_TRICK_SIZE,
+                winningPlayer(pkTrick).ordinal(), PLAYER_AND_TRUMP_SIZE,
+                trump(pkTrick).ordinal(), PLAYER_AND_TRUMP_SIZE);
     }
 
     /**
@@ -328,7 +324,6 @@ public final class PackedTrick {
                 PackedCard.isBetter(Color.ALL.get(extract(pkTrick, TRUMP_START, PLAYER_AND_TRUMP_SIZE)),
                         card(pkTrick, 3), j)) {
             i = 3;
-            //j = card(pkTrick, 3);
         }
 
         return player(pkTrick, i);

@@ -1,5 +1,7 @@
 package ch.epfl.javass.jass;
 
+import static ch.epfl.javass.Preconditions.checkArgument;
+
 /**
  * Represents the state of a turn of a Jass game.
  *
@@ -41,11 +43,8 @@ public final class TurnState {
      * @return the state given its different components.
      */
     public static TurnState ofPackedComponents(long pkScore, long pkUnplayedCards, int pkTrick) {
-        if (PackedScore.isValid(pkScore) && PackedCardSet.isValid(pkUnplayedCards) && PackedTrick.isValid(pkTrick)) {
-            return new TurnState(pkScore, pkUnplayedCards, pkTrick);
-        } else {
-            throw new IllegalArgumentException();
-        }
+        checkArgument(PackedScore.isValid(pkScore) && PackedCardSet.isValid(pkUnplayedCards) && PackedTrick.isValid(pkTrick));
+        return new TurnState(pkScore, pkUnplayedCards, pkTrick);
     }
 
     /**

@@ -16,6 +16,7 @@ public final class PacedPlayer implements Player {
     private final Player underlyingPlayer;
 
     /**
+     * Constructs a paced player with the minimum time that he / she will have to wait.
      * @param underlyingPlayer the underlying player.
      * @param minTime          the minimum time the player will have to wait before playing.
      */

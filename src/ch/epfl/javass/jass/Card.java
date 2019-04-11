@@ -3,6 +3,7 @@ package ch.epfl.javass.jass;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import static ch.epfl.javass.Preconditions.checkArgument;
 
 /**
  * Represents a 36 cards game card.
@@ -25,8 +26,10 @@ public final class Card {
     /**
      * Returns the card of the given Color and given Rank.
      *
-     * @param c the given Color.
-     * @param r the given Rank.
+     * @param c
+     *            the given Color.
+     * @param r
+     *            the given Rank.
      * @return the card of the given Color and given Rank.
      */
     public static Card of(Color c, Rank r) {
@@ -34,18 +37,18 @@ public final class Card {
     }
 
     /**
-     * Returns the Card of the given packed version of the same Card.
-     * Throws IllegalArgument Exception if packed is not valid.
+     * Returns the Card of the given packed version of the same Card. Throws
+     * IllegalArgument Exception if packed is not valid.
      *
-     * @param packed the packed version of the card.
+     * @param packed
+     *            the packed version of the card.
      * @return the Card of the given packed version of the same Card.
      */
     public static Card ofPacked(int packed) {
-        if (PackedCard.isValid(packed)) {
-            return new Card(packed);
-        } else {
-            throw new IllegalArgumentException();
-        }
+        checkArgument(PackedCard.isValid(packed));
+
+        return new Card(packed);
+
     }
 
     /**
@@ -76,19 +79,22 @@ public final class Card {
     }
 
     /**
-     * Returns true if and only if "this" is a better Card than "that" knowing that the trump color is "trump".
+     * Returns true if and only if "this" is a better Card than "that" knowing
+     * that the trump color is "trump".
      *
-     * @param trump the trump color.
-     * @param that  the card to be compared with "this".
-     * @return whether the card the method is applied to is better than the card in argument.
+     * @param trump
+     *            the trump color.
+     * @param that
+     *            the card to be compared with "this".
+     * @return whether the card the method is applied to is better than the card
+     *         in argument.
      */
     public boolean isBetter(Color trump, Card that) {
         if (this.color().equals(that.color())) {
-            if (this.color().equals(trump)) {
-                return this.rank().trumpOrdinal() > that.rank().trumpOrdinal();
-            } else {
-                return this.rank().ordinal() > that.rank().ordinal();
-            }
+            return this.color().equals(trump)
+                    ? this.rank().trumpOrdinal() > that.rank().trumpOrdinal()
+                    : this.rank().ordinal() > that.rank().ordinal();
+
         } else {
             return this.color().equals(trump);
         }
@@ -97,7 +103,8 @@ public final class Card {
     /**
      * Returns the points of the card knowing that the trump color is trump.
      *
-     * @param trump the trump color.
+     * @param trump
+     *            the trump color.
      * @return the points of the card.
      */
     public int points(Color trump) {
@@ -106,7 +113,8 @@ public final class Card {
 
     @Override
     public boolean equals(Object that0) {
-        return (this.hashCode() == that0.hashCode()) && (that0 instanceof Card) && (((Card) that0).pkCard == this.pkCard);
+        return (this.hashCode() == that0.hashCode()) && (that0 instanceof Card)
+                && (((Card) that0).pkCard == this.pkCard);
     }
 
     @Override
@@ -125,16 +133,13 @@ public final class Card {
      * @author Lucas Meier (283726)
      */
     public enum Color {
-        SPADE("\u2660"),
-        HEART("\u2661"),
-        DIAMOND("\u2662"),
-        CLUB("\u2663");
+        SPADE("\u2660"), HEART("\u2661"), DIAMOND("\u2662"), CLUB("\u2663");
 
         /**
          * Represents all colours.
          */
-        public static final List<Color> ALL =
-                Collections.unmodifiableList(Arrays.asList(values()));
+        public static final List<Color> ALL = Collections
+                .unmodifiableList(Arrays.asList(values()));
         /**
          * The number of different colours.
          */
@@ -174,8 +179,8 @@ public final class Card {
         /**
          * Represents all ranks.
          */
-        public static final List<Rank> ALL =
-                Collections.unmodifiableList(Arrays.asList(values()));
+        public static final List<Rank> ALL = Collections
+                .unmodifiableList(Arrays.asList(values()));
         /**
          * The number of different ranks.
          */
