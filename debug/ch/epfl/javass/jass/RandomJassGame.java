@@ -5,6 +5,8 @@
 
 package ch.epfl.javass.jass;
 
+import ch.epfl.javass.net.JassCommand;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +32,9 @@ public final class RandomJassGame {
 
         while (! g.isGameOver()) {
           g.advanceToEndOfNextTrick();
+            System.out.println(Card.Rank.valueOf("SIX"));
+            System.out.println(JassCommand.valueOf("PLRS"));
+            System.out.println(Card.Rank.SIX.name());
           //System.out.println("----");
         }
       }

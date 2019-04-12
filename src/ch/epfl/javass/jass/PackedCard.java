@@ -83,11 +83,8 @@ public final class PackedCard {
     public static boolean isBetter(Card.Color trump, int pkCardL, int pkCardR) {
         assert isValid(pkCardL) && isValid(pkCardR);
         if (color(pkCardL).equals(color(pkCardR))) {
-            if (color(pkCardL).equals(trump)) {
-                return rank(pkCardL).trumpOrdinal() > rank(pkCardR).trumpOrdinal();
-            } else {
-                return rank(pkCardL).ordinal() > rank(pkCardR).ordinal();
-            }
+            return color(pkCardL).equals(trump) ? rank(pkCardL).trumpOrdinal() > rank(pkCardR).trumpOrdinal() :
+                    rank(pkCardL).ordinal() > rank(pkCardR).ordinal();
         } else {
             return color(pkCardL).equals(trump);
         }

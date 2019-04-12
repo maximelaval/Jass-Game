@@ -31,7 +31,7 @@ public final class PackedCardSet {
     /**
      * Represents a card set containing every cards.
      */
-    public static final long ALL_CARDS = 0b111111111000000011111111100000001111111110000000111111111L;
+    public static final long ALL_CARDS = 0x1FF01FF01FF01FFL;
 
     final private static long[][] trumpTable = computeTrump();
     final private static long[] subColorTable = computeSubColor();
