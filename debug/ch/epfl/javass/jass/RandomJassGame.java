@@ -34,6 +34,7 @@ public final class RandomJassGame {
           g.advanceToEndOfNextTrick();
             System.out.println(Card.Rank.valueOf("SIX"));
             System.out.println(JassCommand.valueOf("PLRS"));
+            JassCommand jasscomm = JassCommand.valueOf("PLRS");
             System.out.println(Card.Rank.SIX.name());
           //System.out.println("----");
         }

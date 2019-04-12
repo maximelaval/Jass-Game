@@ -1,5 +1,6 @@
 package ch.epfl.javass.jass;
 
+import ch.epfl.javass.Preconditions;
 import ch.epfl.javass.jass.Card.Color;
 
 import static ch.epfl.javass.Preconditions.checkArgument;
@@ -129,11 +130,7 @@ public final class Trick {
      * @return the identity of the player at the given index in the trick.
      */
     public PlayerId player(int index) {
-        if ((index >= 0) && (index < 4)) {
-            return PackedTrick.player(pkTrick, index);
-        } else {
-            throw new IndexOutOfBoundsException();
-        }
+        return PackedTrick.player(pkTrick, Preconditions.checkIndex(index, PlayerId.COUNT));
     }
 
     /**
@@ -143,11 +140,7 @@ public final class Trick {
      * @return the card in the given trick at the given index.
      */
     public Card card(int index) {
-        if ((index >= 0) && (index < this.size())) {
-            return Card.ofPacked(PackedTrick.card(pkTrick, index));
-        } else {
-            throw new IndexOutOfBoundsException();
-        }
+            return Card.ofPacked(PackedTrick.card(pkTrick, Preconditions.checkIndex(index, this.size())));
     }
 
     /**

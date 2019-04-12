@@ -4,6 +4,7 @@ import java.util.List;
 import static ch.epfl.javass.Preconditions.checkArgument;
 import java.util.StringJoiner;
 
+import static ch.epfl.javass.Preconditions.checkIndex;
 import static ch.epfl.javass.jass.PackedCardSet.isValid;
 
 /**
@@ -91,6 +92,7 @@ public final class CardSet {
      * @return the card of the given card set at the given index.
      */
     public Card get(int index) {
+        checkIndex(index, PackedCardSet.size(this.pkCardSet));
         return Card.ofPacked(PackedCardSet.get(pkCardSet, index));
     }
 

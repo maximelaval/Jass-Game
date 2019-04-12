@@ -122,7 +122,7 @@ public final class CardSetTest {
     }
 
     @Test
-    @Disabled  // This was unfortunately not specified.
+   // @Disabled  // This was unfortunately not specified.
     void getFailsWithInvalidIndex() {
         SplittableRandom rng = newRandom();
         List<Card> cs = new ArrayList<>(listOfAllCards());
