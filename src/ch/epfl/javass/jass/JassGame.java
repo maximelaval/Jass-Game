@@ -20,16 +20,14 @@ public final class JassGame {
     private final Map<PlayerId, String> playerNames;
     private Map<PlayerId, CardSet> playerHands;
     private PlayerId firstPlayerTurn;
+    private final int NUMBER_OF_PLAYERS = PlayerId.COUNT;
 
     /**
      * Constructs a Jass game with the given seed, players and player names.
      *
-     * @param rngSeed
-     *            the given seed.
-     * @param players
-     *            the given players.
-     * @param playerNames
-     *            the given player names.
+     * @param rngSeed the given seed.
+     * @param players the given players.
+     * @param playerNames the given player names.
      */
     public JassGame(long rngSeed, Map<PlayerId, Player> players,
                     Map<PlayerId, String> playerNames) {
@@ -51,9 +49,8 @@ public final class JassGame {
 
     public boolean isGameOver() {
 
-        return turnState != null ? ((turnState.score().totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS)
-                || (turnState.score().totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS))
-                : false;
+        return turnState != null && ((turnState.score().totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS)
+                || (turnState.score().totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS));
 
     }
 
@@ -159,7 +156,7 @@ public final class JassGame {
     private void shuffleAndDistribute() {
         List<Card> deck = constructCardList();
         Collections.shuffle(deck, shuffleRng);
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < NUMBER_OF_PLAYERS; ++i) {
             PlayerId pl = PlayerId.values()[i];
             playerHands.put(pl, CardSet.of(
                     deck.subList(i * HAND_SIZE, i * HAND_SIZE + HAND_SIZE)));
@@ -218,7 +215,7 @@ public final class JassGame {
     private void updateFirstPlayer() {
         if (firstPlayerTurn == null) {
 
-            for (int i = 0; i < 4; ++i) {
+            for (int i = 0; i < NUMBER_OF_PLAYERS; ++i) {
                 PlayerId pl = PlayerId.values()[i];
                 if (playerHands.get(pl).contains(
                         Card.of(Card.Color.DIAMOND, Card.Rank.SEVEN))) {
@@ -228,7 +225,7 @@ public final class JassGame {
 
         } else {
             firstPlayerTurn = PlayerId.values()[(firstPlayerTurn.ordinal() + 1)
-                    % 4];
+                    % NUMBER_OF_PLAYERS];
         }
     }
 }

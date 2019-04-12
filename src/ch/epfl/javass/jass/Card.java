@@ -26,10 +26,8 @@ public final class Card {
     /**
      * Returns the card of the given Color and given Rank.
      *
-     * @param c
-     *            the given Color.
-     * @param r
-     *            the given Rank.
+     * @param c the given Color.
+     * @param r the given Rank.
      * @return the card of the given Color and given Rank.
      */
     public static Card of(Color c, Rank r) {
@@ -40,8 +38,7 @@ public final class Card {
      * Returns the Card of the given packed version of the same Card. Throws
      * IllegalArgument Exception if packed is not valid.
      *
-     * @param packed
-     *            the packed version of the card.
+     * @param packed the packed version of the card.
      * @return the Card of the given packed version of the same Card.
      */
     public static Card ofPacked(int packed) {
@@ -82,10 +79,8 @@ public final class Card {
      * Returns true if and only if "this" is a better Card than "that" knowing
      * that the trump color is "trump".
      *
-     * @param trump
-     *            the trump color.
-     * @param that
-     *            the card to be compared with "this".
+     * @param trump the trump color.
+     * @param that the card to be compared with "this".
      * @return whether the card the method is applied to is better than the card
      *         in argument.
      */
@@ -103,8 +98,7 @@ public final class Card {
     /**
      * Returns the points of the card knowing that the trump color is trump.
      *
-     * @param trump
-     *            the trump color.
+     * @param trump the trump color.
      * @return the points of the card.
      */
     public int points(Color trump) {
@@ -181,6 +175,7 @@ public final class Card {
          */
         public static final List<Rank> ALL = Collections
                 .unmodifiableList(Arrays.asList(values()));
+
         /**
          * The number of different ranks.
          */

@@ -36,4 +36,27 @@ public final class StringSerializer {
         return new String(bytes, UTF_8);
     }
 
+    public static String combine(String delimiter, String... strings) {
+        return String.join(delimiter, strings);
+    }
+
+    public static String[] split(String string, String delimiter) {
+        return string.split(delimiter);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

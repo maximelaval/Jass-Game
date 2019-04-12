@@ -17,20 +17,15 @@ import static ch.epfl.javass.Preconditions.checkArgument;
 public final class MctsPlayer implements Player {
     private static SplittableRandom mctsRng;
     private static PlayerId playerId;
-    private int iterations;
-    private int CONSTANT_V = 40;
+    private final int iterations;
 
     /**
      * Constructs a MCTS player with the given seed, number of iterations of
      * turns and identity.
      *
-     * @param ownId
-     *            the given identity.
-     * @param rngSeed
-     *            the given seed.
-     * @param iterations
-     *            the given number of iterations of turns that the player will
-     *            simulate.
+     * @param ownId the given identity.
+     * @param rngSeed the given seed.
+     * @param iterations the given number of iterations of turns that the player will simulate.
      */
     public MctsPlayer(PlayerId ownId, long rngSeed, int iterations) {
         checkArgument(iterations >= HAND_SIZE);
@@ -84,6 +79,7 @@ public final class MctsPlayer implements Player {
         p.add(root);
         while (!n.hasNoChild() && n.isFullyExpanded()) {
 
+            int CONSTANT_V = 40;
             n = n.bestChild(CONSTANT_V);
             p.add(n);
         }
@@ -96,8 +92,8 @@ public final class MctsPlayer implements Player {
 
     private static class Node {
 
-        private TurnState turnState;
-        private Node[] children;
+        private final TurnState turnState;
+        private final Node[] children;
         private Node parent;
         private long upcomingChildrenCards;
         private int points;
