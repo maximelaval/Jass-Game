@@ -61,8 +61,11 @@ public final class Trick {
      * the first player being the winning player of the given trick.
      */
     public Trick nextEmpty() {
-        checkArgument(this.isFull());
-        return new Trick(PackedTrick.nextEmpty(pkTrick));
+        if (this.isFull()) {
+            return new Trick(PackedTrick.nextEmpty(pkTrick));
+        } else {
+            throw new IllegalStateException();
+        }
     }
 
     /**
