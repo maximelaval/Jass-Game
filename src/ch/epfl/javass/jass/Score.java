@@ -88,11 +88,8 @@ public final class Score {
      * @return the updated score.
      */
     public Score withAdditionalTrick(TeamId winningTeam, int trickPoints) {
-        if (trickPoints < 0) {
-            throw new IllegalArgumentException();
-        } else {
+        Preconditions.checkArgument(trickPoints >= 0);
             return new Score(PackedScore.withAdditionalTrick(pkScore, winningTeam, trickPoints));
-        }
     }
 
     /**
