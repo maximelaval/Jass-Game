@@ -1,6 +1,5 @@
 package ch.epfl.javass.net;
 
-import java.nio.ByteBuffer;
 import java.util.Base64;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -11,19 +10,20 @@ public final class StringSerializer {
 
 
     public static String serializeInt(int i) {
-        return Integer.toUnsignedString(i);
+        //return Integer.toUnsignedString((i));
+        return Integer.toHexString(i);
     }
 
     public static int deserializeInt(String s) {
-        return Integer.parseUnsignedInt(s);
+        return Integer.parseInt(s, 16);
     }
 
     public static String serializeLong(long l) {
-        return Long.toUnsignedString(l);
+        return Long.toHexString(l);
     }
 
     public static long deserializeLong(String s) {
-        return Long.parseUnsignedLong(s);
+        return Long.parseLong(s, 16);
     }
 
 
@@ -32,15 +32,16 @@ public final class StringSerializer {
     }
 
     public static String deserializeString(String s) {
-        byte[] bytes = s.getBytes(UTF_8);
-        return new String(bytes, UTF_8);
+
+        byte[] decodedBytes = Base64.getDecoder().decode(s);
+        return new String(decodedBytes, UTF_8);
     }
 
     public static String combine(String delimiter, String... strings) {
         return String.join(delimiter, strings);
     }
 
-    public static String[] split(String string, String delimiter) {
+    public static String[] split(String delimiter, String string) {
         return string.split(delimiter);
     }
 

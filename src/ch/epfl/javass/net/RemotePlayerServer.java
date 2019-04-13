@@ -11,7 +11,7 @@ import java.util.Map;
 import static ch.epfl.javass.net.StringSerializer.*;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
-public class RemotePlayerServer {
+public final class RemotePlayerServer {
 
     private final Player localPlayer;
 
@@ -49,7 +49,6 @@ public class RemotePlayerServer {
 
                     for (int i = 0; i < PlayerId.COUNT; ++i) {
                         playersMap.put(PlayerId.values()[i], deserializeString(parametersArray[i]));
-
                     }
 
                     localPlayer.setPlayers(ownId, playersMap);
@@ -67,8 +66,10 @@ public class RemotePlayerServer {
                     break;
 
                 case "TRCK":
-
-                    localPlayer.updateTrick();
+//                    colorOrdinal =
+//                    Trick trick = PackedTrick.firstEmpty(Card.Color.values()[colorOrdinal])
+//                    localPlayer.updateTrick();
+                    break;
                 case "CARD":
                     parametersString = stringArray[1];
                     parametersArray = split(parametersString, ",");
@@ -79,7 +80,11 @@ public class RemotePlayerServer {
 
                     TurnState turnState = TurnState.ofPackedComponents(pkScore, pkUplayedCards, pkTrick);
                     codedHand = stringArray[2];
-                    localPlayer.cardToPlay(turnState, CardSet.ofPacked(deserializeLong(codedHand)));
+                    Card card = localPlayer.cardToPlay(turnState, CardSet.ofPacked(deserializeLong(codedHand)));
+                    int pkCard = card.packed();
+                    w.write(pkCard);
+                    w.write('\n');
+                    w.flush();
                     break;
 
                 case "SCOR":
@@ -89,18 +94,14 @@ public class RemotePlayerServer {
                     break;
 
                 case "WINR":
+                    int winningTeamOrdinal = Integer.parseUnsignedInt(stringArray[1]);
+                    localPlayer.setWinningTeam(TeamId.values()[winningTeamOrdinal]);
+                    break;
 
-
-                    localPlayer.setWinningTeam();
                 default:
                     throw new Error("Invalid method name for a player");
             }
 
-            int i = Integer.parseInt(r.readLine());
-            int i1 = i + 1;
-            w.write(String.valueOf(i1));
-            w.write('\n');
-            w.flush();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
