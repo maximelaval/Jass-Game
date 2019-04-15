@@ -11,11 +11,12 @@ public final class StringSerializer {
 
     public static String serializeInt(int i) {
         //return Integer.toUnsignedString((i));
-        return Integer.toHexString(i);
+        return Integer.toUnsignedString(i, 16);
+        //return Integer.toHexString(i);
     }
 
     public static int deserializeInt(String s) {
-        return Integer.parseInt(s, 16);
+        return Integer.parseUnsignedInt(s, 16);
     }
 
     public static String serializeLong(long l) {

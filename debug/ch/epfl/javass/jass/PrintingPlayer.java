@@ -27,11 +27,11 @@ public final class PrintingPlayer implements Player {
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         System.out.println("Les joueurs sont : ");
-        for (PlayerId pId : PlayerId.ALL) {
-            if (pId.equals(ownId)) {
-                System.out.println(ownId + " (moi)");
+        for (Map.Entry<PlayerId, String> entry : playerNames.entrySet()) {
+            if (entry.getKey().equals(ownId)) {
+                System.out.println(entry.getValue() + " (moi)");
             } else {
-                System.out.println(pId);
+                System.out.println(entry.getValue());
             }
         }
     }
