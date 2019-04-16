@@ -31,6 +31,7 @@ public final class RemotePlayerServer {
 
                  while (true) {
                      String receivedString = r.readLine();
+                     // gerer null lorsque le client ferme
                      System.out.println("received string : " + receivedString);
                      String[] stringArray = split(" ", receivedString);
                      String condensedMethodName = stringArray[0];

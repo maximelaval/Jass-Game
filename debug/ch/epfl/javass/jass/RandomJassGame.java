@@ -14,6 +14,7 @@ import java.util.StringJoiner;
 
 public final class RandomJassGame {
     public static void main(String[] args) {
+
         Map<PlayerId, Player> players = new HashMap<>();
         Map<PlayerId, String> playerNames = new HashMap<>();
 //        Random rng = new Random(2019);
@@ -23,7 +24,7 @@ public final class RandomJassGame {
 //                player = new PrintingPlayer(player);
 //            }
             if (pId == PlayerId.PLAYER_2) {
-                player = new RemotePlayerClient("localhost");
+                player = new RemotePlayerClient("128.179.179.154");
             }
 //          else {
 //              player = new PacedPlayer(player, 1000);
