@@ -8,14 +8,30 @@ import javafx.beans.property.SimpleObjectProperty;
 
 public final class ScoreBean {
 
-    private SimpleIntegerProperty turnPoints;
-    private SimpleIntegerProperty gamePoints;
-    private SimpleIntegerProperty totalPoints;
+    private SimpleIntegerProperty turnPointsT1;
+    private SimpleIntegerProperty turnPointsT2;
+
+    private SimpleIntegerProperty gamePointsT1;
+    private SimpleIntegerProperty gamePointsT2;
+
+    private SimpleIntegerProperty totalPointsT1;
+    private SimpleIntegerProperty totalPointsT2;
+
     private SimpleObjectProperty winnigTeam;
 
 
-    public ReadOnlyIntegerProperty turnPointsProperty(TeamId team) {
+    private ScoreBean() {
+        turnPointsT1 = new SimpleIntegerProperty();
+        turnPointsT2 = new SimpleIntegerProperty();
+        gamePointsT1 = new SimpleIntegerProperty();
+        gamePointsT2 = new SimpleIntegerProperty();
+        totalPointsT1 = new SimpleIntegerProperty();
+        totalPointsT2 = new SimpleIntegerProperty();
+        winnigTeam = new SimpleObjectProperty();
+    }
 
+    public ReadOnlyIntegerProperty turnPointsProperty(TeamId team) {
+        return team.equals(TeamId.TEAM_1) ? turnPointsT1 : turnPointsT2;
     }
 
     public void setTurnPoints(TeamId team, int newTurnPoints) {
@@ -23,7 +39,7 @@ public final class ScoreBean {
     }
 
     public ReadOnlyIntegerProperty gamePointsProperty(TeamId team) {
-
+        return team.equals(TeamId.TEAM_1) ? gamePointsT1 : gamePointsT2;
     }
 
     public void setGamePoints(TeamId team) {
@@ -31,7 +47,7 @@ public final class ScoreBean {
     }
 
     public ReadOnlyIntegerProperty totalPointsProperty(TeamId team) {
-
+        return team.equals(TeamId.TEAM_1) ? totalPointsT1 : totalPointsT2;
     }
 
     public ReadOnlyObjectProperty<TeamId> winningTeamProperty() {

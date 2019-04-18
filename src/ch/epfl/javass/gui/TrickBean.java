@@ -7,10 +7,15 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableMap;
 
-public class TrickBean {
+public final class TrickBean {
 
-    private SimpleObjectProperty trump;
+    private ObservableMap trump;
     private SimpleObjectProperty trick;
+
+    public TrickBean() {
+        trump = new
+        trick = new SimpleObjectProperty();
+    }
 
 
     public ReadOnlyObjectProperty trumpProperty(Card.Color color) {
