@@ -2,20 +2,21 @@ package ch.epfl.javass.gui;
 
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.CardSet;
-import ch.epfl.javass.jass.Jass;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
+import javafx.collections.*;
+
+import java.util.stream.IntStream;
 
 import static ch.epfl.javass.jass.Jass.HAND_SIZE;
 
 public class HandBean {
 
-    private ObservableList<Card> hand;
-    private ObservableSet<Card> playableCards;
+    private ObservableList<Card> hand ;
+    private ObservableSet<Card> playableCards ;
+    //private ObservableList<Card> handList;
 
     public HandBean() {
-
-
+        hand = FXCollections.observableArrayList();
+        IntStream.range(0, HAND_SIZE).forEach(i -> hand.add(null));
     }
 
     public ObservableList<Card> hand() {
@@ -25,12 +26,12 @@ public class HandBean {
     public void setHand(CardSet newHand) {
         if (newHand.size() != HAND_SIZE) {
             for (int i = 0; i < hand.size(); i++) {
-                if (!newHand.contains(hand.get(i)) && hand.get(i) != null) {
+                if ( hand.get(i) != null && !newHand.contains(hand.get(i))) {
                     hand.set(i, null);
                 }
             }
         } else {
-            for (int i = 0; i < hand.size(); i++) {
+            for (int i = 0; i < newHand.size(); i++) {
                 hand.set(i, newHand.get(i));
             }
         }
@@ -41,6 +42,9 @@ public class HandBean {
     }
 
     public void setPlayableCards(CardSet newPlayableCards) {
-
+        playableCards.clear();
+        for (int i = 0; i < newPlayableCards.size(); i++) {
+            playableCards.add(newPlayableCards.get(i));
+        }
     }
 }

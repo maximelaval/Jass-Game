@@ -54,7 +54,6 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
         codedState.add(codedScore);
         codedState.add(codedUnplayedCards);
         codedState.add(codedTrick);
-        System.out.println(codedTrick);
 
         joiner.add(codedState.toString());
         joiner.add(serializeLong(hand.packed()));

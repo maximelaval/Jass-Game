@@ -17,7 +17,7 @@ public final class ScoreBean {
     private SimpleIntegerProperty totalPointsT1;
     private SimpleIntegerProperty totalPointsT2;
 
-    private SimpleObjectProperty winnigTeam;
+    private SimpleObjectProperty winningTeam;
 
 
     private ScoreBean() {
@@ -27,7 +27,7 @@ public final class ScoreBean {
         gamePointsT2 = new SimpleIntegerProperty();
         totalPointsT1 = new SimpleIntegerProperty();
         totalPointsT2 = new SimpleIntegerProperty();
-        winnigTeam = new SimpleObjectProperty();
+        winningTeam = new SimpleObjectProperty();
     }
 
     public ReadOnlyIntegerProperty turnPointsProperty(TeamId team) {
@@ -35,27 +35,43 @@ public final class ScoreBean {
     }
 
     public void setTurnPoints(TeamId team, int newTurnPoints) {
-
+        if (team.equals(TeamId.TEAM_1)) {
+            turnPointsT1.set(newTurnPoints);
+        } else {
+            turnPointsT2.set(newTurnPoints);
+        }
     }
 
     public ReadOnlyIntegerProperty gamePointsProperty(TeamId team) {
         return team.equals(TeamId.TEAM_1) ? gamePointsT1 : gamePointsT2;
     }
 
-    public void setGamePoints(TeamId team) {
-
+    public void setGamePoints(TeamId team, int newGamePoints) {
+        if (team.equals(TeamId.TEAM_1)) {
+            gamePointsT1.set(newGamePoints);
+        } else {
+            gamePointsT2.set(newGamePoints);
+        }
     }
 
     public ReadOnlyIntegerProperty totalPointsProperty(TeamId team) {
         return team.equals(TeamId.TEAM_1) ? totalPointsT1 : totalPointsT2;
     }
 
-    public ReadOnlyObjectProperty<TeamId> winningTeamProperty() {
+    public void setTotalPoints(TeamId team, int newTotalPoints) {
+        if (team.equals(TeamId.TEAM_1)) {
+            totalPointsT1.set(newTotalPoints);
+        } else {
+            totalPointsT2.set(newTotalPoints);
+        }
+    }
 
+    public ReadOnlyObjectProperty<TeamId> winningTeamProperty() {
+        return winningTeam;     //???????????????????????
     }
 
     public void setWinnigTeam(TeamId winningTeam) {
-
+        this.winningTeam.set(winningTeam);
     }
 
 }

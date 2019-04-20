@@ -5,8 +5,12 @@
 
 package ch.epfl.javass.jass;
 
+import ch.epfl.javass.gui.HandBean;
+import ch.epfl.javass.jass.Card.Color;
+import ch.epfl.javass.jass.Card.Rank;
 import ch.epfl.javass.net.JassCommand;
 import ch.epfl.javass.net.RemotePlayerClient;
+import javafx.collections.ListChangeListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +18,7 @@ import java.util.StringJoiner;
 
 public final class RandomJassGame {
     public static void main(String[] args) {
+
 
         Map<PlayerId, Player> players = new HashMap<>();
         Map<PlayerId, String> playerNames = new HashMap<>();
@@ -37,11 +42,10 @@ public final class RandomJassGame {
         playerNames.put(PlayerId.PLAYER_3, "Kazuma_Player3");
         playerNames.put(PlayerId.PLAYER_4, "Alexy_Player4");
         JassGame g = new JassGame(2019, players, playerNames);
-        //g.advanceToEndOfNextTrick();
+
 
         while (!g.isGameOver()) {
             g.advanceToEndOfNextTrick();
-
 
             // TESTS
             System.out.println(Card.Rank.valueOf("SIX"));
@@ -54,9 +58,32 @@ public final class RandomJassGame {
             joiner.add("comment");
             System.out.println(joiner.toString());
 
+
+            //BEANS
+
+            HandBean hb = new HandBean();
+            ListChangeListener<Card> listener = e -> System.out.println(e);
+            hb.hand().addListener(listener);
+
+            CardSet h = CardSet.EMPTY
+                    .add(Card.of(Color.SPADE, Rank.SIX))
+                    .add(Card.of(Color.SPADE, Rank.NINE))
+                    .add(Card.of(Color.SPADE, Rank.JACK))
+                    .add(Card.of(Color.HEART, Rank.SEVEN))
+                    .add(Card.of(Color.HEART, Rank.ACE))
+                    .add(Card.of(Color.DIAMOND, Rank.KING))
+                    .add(Card.of(Color.DIAMOND, Rank.ACE))
+                    .add(Card.of(Color.CLUB, Rank.TEN))
+                    .add(Card.of(Color.CLUB, Rank.QUEEN));
+            hb.setHand(h);
+            while (!h.isEmpty()) {
+                h = h.remove(h.get(0));
+                hb.setHand(h);
+            }
             // TESTS
 
             //System.out.println("----");
+            // }
         }
     }
 }
