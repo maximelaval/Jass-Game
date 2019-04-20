@@ -8,7 +8,7 @@ public class main {
     public static void main(String[] args) {
         HandBean hb = new HandBean();
         ListChangeListener<Card> listener = e -> System.out.println(e);
-        hb.hand().addListener(listener);
+        hb.handProperty().addListener(listener);
 
         CardSet h = CardSet.EMPTY
                 .add(Card.of(Card.Color.SPADE, Card.Rank.SIX))

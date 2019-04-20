@@ -12,14 +12,13 @@ public class HandBean {
 
     private ObservableList<Card> hand ;
     private ObservableSet<Card> playableCards ;
-    //private ObservableList<Card> handList;
 
     public HandBean() {
         hand = FXCollections.observableArrayList();
         IntStream.range(0, HAND_SIZE).forEach(i -> hand.add(null));
     }
 
-    public ObservableList<Card> hand() {
+    public ObservableList<Card> handProperty() {
         return hand;
     }
 
@@ -37,7 +36,7 @@ public class HandBean {
         }
     }
 
-    public ObservableSet<Card> playableCards() {
+    public ObservableSet<Card> playableCardsProperty() {
         return playableCards;
     }
 

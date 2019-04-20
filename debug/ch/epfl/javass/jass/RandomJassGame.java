@@ -63,7 +63,7 @@ public final class RandomJassGame {
 
             HandBean hb = new HandBean();
             ListChangeListener<Card> listener = e -> System.out.println(e);
-            hb.hand().addListener(listener);
+            hb.handProperty().addListener(listener);
 
             CardSet h = CardSet.EMPTY
                     .add(Card.of(Color.SPADE, Rank.SIX))
