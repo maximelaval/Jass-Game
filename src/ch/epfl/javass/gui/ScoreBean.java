@@ -20,7 +20,7 @@ public final class ScoreBean {
     private SimpleObjectProperty winningTeam;
 
 
-    private ScoreBean() {
+    public ScoreBean() {
         turnPointsT1 = new SimpleIntegerProperty();
         turnPointsT2 = new SimpleIntegerProperty();
         gamePointsT1 = new SimpleIntegerProperty();
