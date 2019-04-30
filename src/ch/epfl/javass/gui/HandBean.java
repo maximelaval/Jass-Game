@@ -19,18 +19,21 @@ public class HandBean {
     }
 
     public ObservableList<Card> handProperty() {
+//        hand = FXCollections.observableArrayList();
+//        IntStream.range(0, HAND_SIZE).forEach(i -> hand.add(null));
         return hand;
     }
 
     public void setHand(CardSet newHand) {
+
         if (newHand.size() != HAND_SIZE) {
-            for (int i = 0; i < hand.size(); i++) {
+            for (int i = 0; i < HAND_SIZE; i++) {
                 if ( hand.get(i) != null && !newHand.contains(hand.get(i))) {
                     hand.set(i, null);
                 }
             }
         } else {
-            for (int i = 0; i < newHand.size(); i++) {
+            for (int i = 0; i < HAND_SIZE; i++) {
                 hand.set(i, newHand.get(i));
             }
         }

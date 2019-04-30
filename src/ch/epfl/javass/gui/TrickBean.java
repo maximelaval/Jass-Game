@@ -1,6 +1,7 @@
 package ch.epfl.javass.gui;
 
 import ch.epfl.javass.jass.Card;
+import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.Trick;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -8,27 +9,15 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
-import java.util.stream.IntStream;
-
 public final class TrickBean {
 
-    private SimpleObjectProperty trump;
-    private ObservableMap<PlayerId, Card> trick;
-    private SimpleObjectProperty winningPlayer;
+    private SimpleObjectProperty<Color> trump;
+    private ObservableMap<PlayerId, Card> trick = FXCollections
+            .observableHashMap();
 
-    public TrickBean(Trick trick) {
-        if (trick.isEmpty()) {
-            winningPlayer = null;
-        }
-        trump.set(trick.trump());
-        this.trick = FXCollections.observableHashMap();
-        for (int i = 0; i < trick.size(); i++) {
-            this.trick.put(trick.player(i), trick.card(i));
-        }
-        // GERER le cas lorsque tout le monde n'a pas encore jpoue du coup la map nest pas complete ??????????
-    }
+    private SimpleObjectProperty<PlayerId> winningPlayer;
 
-    public ReadOnlyObjectProperty trumpProperty() {
+    public ReadOnlyObjectProperty<Color> trumpProperty() {
         return trump;
     }
 
@@ -38,21 +27,22 @@ public final class TrickBean {
 
     public void setTrick(Trick newTrick) {
         if (newTrick.isEmpty()) {
-            winningPlayer = null;
+            winningPlayer.set(null);
         } else {
-            for (int i = 0; i < trick.size(); i++) {
+            for (int i = 0; i < newTrick.size(); i++) {
                 this.trick.put(newTrick.player(i), newTrick.card(i));
             }
-            // GERER le cas lorsque tout le monde n'a pas encore jpoue du coup la map nest pas complete ??????????
+
             winningPlayer.set(newTrick.winningPlayer());
         }
     }
 
-    public ReadOnlyObjectProperty winningPlayerProperty() {
+    public void setTrump(Color trump) {
+        this.trump.set(trump);
+    }
+
+    public ReadOnlyObjectProperty<PlayerId> winningPlayerProperty() {
         return winningPlayer;
     }
 
-
 }
-
-
