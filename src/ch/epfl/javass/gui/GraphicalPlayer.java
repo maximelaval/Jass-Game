@@ -66,7 +66,7 @@ public class GraphicalPlayer {
 
 
         Text pointsLastTrickOwnId = new Text("(+" + Bindings.convert(differenceTurnPointsOwnId).get() + ")");
-        Text pointsLastTrickOther = new Text("(+" + Bindings.convert(differenceTurnPointsOther).get() + ")");
+        Text pointsLastTrickOther = new Text("(+" + Bindings.convert(  differenceTurnPointsOther).get() +")");
 
 
         scorePane.add(team1Name, 0, 0);
@@ -85,6 +85,7 @@ public class GraphicalPlayer {
         scorePane.add(gamePointsOtherId, 4, 1);
 
 
+
         scorePane.setStyle("-fx-font: 16 Optima;" +
                 "-fx-background-color: lightgray;" +
                 "-fx-padding: 5px;" +
@@ -94,7 +95,7 @@ public class GraphicalPlayer {
         return scorePane;
     }
 
-    private GridPane createTrickPane(PlayerId ownId, Map<PlayerId, String> playerNames, TrickBean trickBean) {
+    private GridPane createTrickPane(PlayerId ownId, Map<PlayerId, String > playerNames, TrickBean trickBean) {
         GridPane trickPane = new GridPane();
 
         final Map<Position, PlayerId> playerPosition = new HashMap<>();
@@ -111,14 +112,15 @@ public class GraphicalPlayer {
             }
         }
 
-        // Bindings.valueAt(cardImageMap, trickBean.trickProperty().get());
+//        Bindings.valueAt(cardImageMap, trickBean.trickProperty().get());
 
 
-        ImageView leftImage = trickBean.trickProperty() == null ? new ImageView() : new ImageView("/card_0_0_160.png");
+        ImageView leftImage =  trickBean.trickProperty() == null ? new ImageView() : new ImageView("/card_0_0_160.png");
         ImageView topImage = new ImageView("/card_0_1_160.png");
         ImageView rightImage = new ImageView("/card_0_2_160.png");
         ImageView bottomImage = new ImageView("/card_0_3_160.png");
         ImageView trumpImage = new ImageView("/trump_0.png");
+
 
 
 //        System.out.println(trickBean.trumpProperty().toString());
@@ -140,7 +142,8 @@ public class GraphicalPlayer {
 //        imageCardToCard.put()
 
 
-        VBox left = new VBox(leftImage, new Text(playerNames.get(playerPosition.get(leftImage))));
+
+        VBox left = new VBox(leftImage , new Text(playerNames.get(playerPosition.get(leftImage))));
         VBox top = new VBox(topImage, new Text(playerNames.get(playerPosition.get(topImage))));
         VBox right = new VBox(rightImage, new Text(playerNames.get(playerPosition.get(rightImage))));
         VBox bottom = new VBox(bottomImage, new Text(playerNames.get(ownId)));
@@ -164,7 +167,7 @@ public class GraphicalPlayer {
 
     }
 
-    private StackPane createVictoryPanes(Map<PlayerId, String> playerNames, ScoreBean scoreBean) {
+        private StackPane createVictoryPanes(Map<PlayerId, String> playerNames, ScoreBean scoreBean) {
 
 //        Text text = new Text(getTeamName(scoreBean.winningTeamProperty().get(), playerNames) + " ont gagné avec " +
 //                scoreBean.totalPointsProperty(scoreBean.winningTeamProperty().get()) + " points contre " +
@@ -180,8 +183,8 @@ public class GraphicalPlayer {
     private String getTeamName(TeamId teamId, Map<PlayerId, String> playerNames) {
         return teamId.equals(TeamId.TEAM_1) ?
                 playerNames.get(PlayerId.PLAYER_1) + " et " +
-                        playerNames.get(PlayerId.PLAYER_3) + " : " :
+                playerNames.get(PlayerId.PLAYER_3) + " : " :
                 playerNames.get(PlayerId.PLAYER_2) + " et " +
-                        playerNames.get(PlayerId.PLAYER_4) + " : ";
+                playerNames.get(PlayerId.PLAYER_4) + " : ";
     }
 }
