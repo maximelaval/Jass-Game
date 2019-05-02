@@ -11,11 +11,10 @@ import javafx.collections.ObservableMap;
 
 public final class TrickBean {
 
-    private SimpleObjectProperty<Color> trump;
-    private ObservableMap<PlayerId, Card> trick = FXCollections
-            .observableHashMap();
+    private SimpleObjectProperty<Color> trump = new SimpleObjectProperty<>();
+    private ObservableMap<PlayerId, Card> trick = FXCollections.observableHashMap();
 
-    private SimpleObjectProperty<PlayerId> winningPlayer;
+    private ReadOnlyObjectProperty<PlayerId> winningPlayer;
 
     public ReadOnlyObjectProperty<Color> trumpProperty() {
         return trump;
@@ -27,17 +26,17 @@ public final class TrickBean {
 
     public void setTrick(Trick newTrick) {
         if (newTrick.isEmpty()) {
-            winningPlayer.set(null);
+            winningPlayer = new SimpleObjectProperty<>(null);
         } else {
             for (int i = 0; i < newTrick.size(); i++) {
                 this.trick.put(newTrick.player(i), newTrick.card(i));
             }
-
-            winningPlayer.set(newTrick.winningPlayer());
+            winningPlayer = new SimpleObjectProperty<>(newTrick.winningPlayer());
         }
     }
 
     public void setTrump(Color trump) {
+        System.out.println("set trump");
         this.trump.set(trump);
     }
 
