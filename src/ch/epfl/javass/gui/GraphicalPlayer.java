@@ -112,7 +112,7 @@ public class GraphicalPlayer {
             }
         }
 
-        Bindings.valueAt(cardImageMap, trickBean.trickProperty().get());
+//        Bindings.valueAt(cardImageMap, trickBean.trickProperty().get());
 
 
         ImageView leftImage =  trickBean.trickProperty() == null ? new ImageView() : new ImageView("/card_0_0_160.png");
