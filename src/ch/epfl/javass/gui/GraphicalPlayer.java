@@ -5,7 +5,9 @@ import ch.epfl.javass.jass.Player;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
@@ -41,14 +43,15 @@ public class GraphicalPlayer {
     private GridPane createScorePane(ScoreBean scoreBean, Map<PlayerId, String> playerNames, PlayerId ownId) {
         GridPane scorePane = new GridPane();
 
+        IntegerProperty differenceTurnPointsOwnId = new SimpleIntegerProperty();
+        IntegerProperty differenceTurnPointsOther = new SimpleIntegerProperty();
+
+        scoreBean.turnPointsProperty(ownId.team()).addListener((o, oV, nV) -> differenceTurnPointsOwnId.set(nV.intValue() - oV.intValue()));
+        scoreBean.turnPointsProperty(ownId.team().other()).addListener((o, oV, nV) -> differenceTurnPointsOther.set(nV.intValue() - oV.intValue()));
+
+
 //         ReadOnlyIntegerProperty lastTrickProperty = ;
 //         scoreBean.turnPointsProperty(ownId.team()).addListener();
-
-        String team1NameString = playerNames.get(PlayerId.PLAYER_1) + " et " +
-                playerNames.get(PlayerId.PLAYER_3) + " : ";
-
-        String team2NameString = playerNames.get(PlayerId.PLAYER_2) + " et " +
-                playerNames.get(PlayerId.PLAYER_4) + " : ";
 
 
         Text turnPointsOwnId = new Text(Bindings.convert(scoreBean.turnPointsProperty(ownId.team())).get());
@@ -59,17 +62,26 @@ public class GraphicalPlayer {
         Text gamePointsOtherId = new Text(Bindings.convert(scoreBean.gamePointsProperty(ownId.team().other())).get());
 
 
+        Text pointsLastTrickOwnId = new Text("(+" + Bindings.convert(differenceTurnPointsOwnId).get() + ")");
+        Text pointsLastTrickOther = new Text("(+" + Bindings.convert(  differenceTurnPointsOther).get() +")");
+
+
         scorePane.add(team1Name, 0, 0);
         scorePane.add(team2Name, 0, 1);
 
         scorePane.add(turnPointsOwnId, 1, 0);
         scorePane.add(turnPointsOtherId, 1, 1);
 
+        scorePane.add(pointsLastTrickOwnId, 2, 0);
+        scorePane.add(pointsLastTrickOther, 2, 1);
+
         scorePane.add(new Text(" / Total : "), 3, 0);
         scorePane.add(new Text(" / Total : "), 3, 1);
 
         scorePane.add(gamePointOwnId, 4, 0);
         scorePane.add(gamePointsOtherId, 4, 1);
+
+
 
         scorePane.setStyle("-fx-font: 16 Optima;" +
                 "-fx-background-color: lightgray;" +
@@ -138,7 +150,7 @@ public class GraphicalPlayer {
 
     }
 
-    private StackPane createVictoryPanes(Map<PlayerId, String> playerNames, ScoreBean scoreBean) {
+        private StackPane createVictoryPanes(Map<PlayerId, String> playerNames, ScoreBean scoreBean) {
 
 //        Text text = new Text(getTeamName(scoreBean.winningTeamProperty().get(), playerNames) + " ont gagné avec " +
 //                scoreBean.totalPointsProperty(scoreBean.winningTeamProperty().get()) + " points contre " +
