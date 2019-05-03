@@ -1,17 +1,19 @@
 package ch.epfl.javass.gui;
 
 import ch.epfl.javass.jass.Card;
-import ch.epfl.javass.jass.Player;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
-import com.sun.javafx.collections.ObservableMapWrapper;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -20,13 +22,16 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringJoiner;
 
 public class GraphicalPlayer {
 
-    private BorderPane mainPane;
+    private final BorderPane mainPane;
+    private ObservableMap<Card, Image> cardImageMap = FXCollections.observableHashMap();
+    private ObservableMap<Card.Color, Image> colorImageMap = FXCollections.observableHashMap();
+    private Map<Position, PlayerId> playerPosition = new HashMap<>();
 
     public GraphicalPlayer(PlayerId ownId, Map<PlayerId, String> playerNames, ScoreBean scoreBean, TrickBean trickBean) {
         mainPane = new BorderPane(createTrickPane(ownId, playerNames, trickBean), createScorePane(scoreBean, playerNames),
@@ -73,39 +78,21 @@ public class GraphicalPlayer {
         return scorePane;
     }
 
-    private GridPane createTrickPane(PlayerId ownId, Map<PlayerId, String > playerNames, TrickBean trickBean) {
+    private GridPane createTrickPane(PlayerId ownId, Map<PlayerId, String> playerNames, TrickBean trickBean) {
         GridPane trickPane = new GridPane();
+        creatRequiredMaps(ownId);
 
-        final Map<Position, PlayerId> playerPosition = new HashMap<>();
-        playerPosition.put(Position.BOTTOM, ownId);
-        playerPosition.put(Position.RIGHT, PlayerId.ALL.get((ownId.ordinal() + 1) % 4));
-        playerPosition.put(Position.TOP, PlayerId.ALL.get((ownId.ordinal() + 2) % 4));
-        playerPosition.put(Position.LEFT, PlayerId.ALL.get((ownId.ordinal() + 3) % 4));
+        ImageView leftImage = new ImageView();
+        ImageView topImage = new ImageView();
+        ImageView rightImage = new ImageView();
+        ImageView bottomImage = new ImageView();
+        ImageView trumpImage = new ImageView();
 
-        ObservableMap<Card, ImageView> cardImageMap = FXCollections.observableHashMap();
-        for (int c = 0; c < 4; c++) {
-            for (int r = 0; r < 9; r++) {
-                cardImageMap.put(Card.of(Card.Color.ALL.get(c), Card.Rank.ALL.get(r)),
-                        new ImageView("/card_" + c + "_" + r + "_160.png"));
-            }
-        }
-
-
-       // Bindings.valueAt(cardImageMap, leftImage.imageProperty());
-
-
-        ImageView leftImage = new ImageView("/card_0_0_160.png");
-//        leftImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), PlayerId.PLAYER_1)));
-        ImageView topImage = new ImageView("/card_0_1_160.png");
-        ImageView rightImage = new ImageView("/card_0_2_160.png");
-        ImageView bottomImage = new ImageView("/card_0_3_160.png");
-        ImageView trumpImage = new ImageView("/trump_0.png");
-
-
-
-
-//        System.out.println(trickBean.trumpProperty().toString());
-//        ImageView trumpImage = new ImageView(trickBean.trumpProperty().getName());
+        leftImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), playerPosition.get(Position.LEFT))));
+        topImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), playerPosition.get(Position.TOP))));
+        rightImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), playerPosition.get(Position.RIGHT))));
+        bottomImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), playerPosition.get(Position.BOTTOM))));
+        trumpImage.imageProperty().bind(Bindings.valueAt(colorImageMap, trickBean.trumpProperty()));
 
         leftImage.setFitHeight(180);
         topImage.setFitHeight(180);
@@ -117,17 +104,20 @@ public class GraphicalPlayer {
         bottomImage.setFitWidth(120);
         trumpImage.setFitWidth(101);
         trumpImage.setFitHeight(101);
+
+
+//        Rectangle rectangle = new Rectangle();
+//        BorderPane bp = new BorderPane();
+//        Image rec = new Image(rectangle);
+//        StackPane sp = new StackPane(leftImage, )
+
+
         GridPane.setHalignment(trumpImage, HPos.CENTER);
 
-        final ObservableMap<ImageView, Card> imageCardToCard = FXCollections.observableHashMap();
-//        imageCardToCard.put()
-
-
-
-        VBox left = new VBox(leftImage , new Text(playerNames.get(playerPosition.get(leftImage))));
-        VBox top = new VBox(topImage, new Text(playerNames.get(playerPosition.get(topImage))));
-        VBox right = new VBox(rightImage, new Text(playerNames.get(playerPosition.get(rightImage))));
-        VBox bottom = new VBox(bottomImage, new Text(playerNames.get(ownId)));
+        VBox left = new VBox(new Text(playerNames.get(playerPosition.get(Position.LEFT))), leftImage);
+        VBox top = new VBox(new Text(playerNames.get(playerPosition.get(Position.TOP))), topImage);
+        VBox right = new VBox(new Text(playerNames.get(playerPosition.get(Position.RIGHT))), rightImage);
+        VBox bottom = new VBox(bottomImage, new Text(playerNames.get(playerPosition.get(Position.BOTTOM))));
 
 
         trickPane.add(left, 0, 1, 1, 1);
@@ -148,7 +138,22 @@ public class GraphicalPlayer {
 
     }
 
-        private StackPane createVictoryPanes(Map<PlayerId, String> playerNames, ScoreBean scoreBean) {
+    private void creatRequiredMaps(PlayerId ownId) {
+
+        for (int i = 0; i < PlayerId.COUNT; i++) {
+        playerPosition.put(Position.ALL.get(i), PlayerId.ALL.get((ownId.ordinal() + i) % PlayerId.COUNT));
+        }
+
+        for (int c = 0; c < 4; c++) {
+            for (int r = 0; r < 9; r++) {
+                cardImageMap.put(Card.of(Card.Color.ALL.get(c), Card.Rank.ALL.get(r)),
+                        new Image("/card_" + c + "_" + r + "_160.png"));
+            }
+            colorImageMap.put(Card.Color.ALL.get(c), new Image("/trump_" + c + ".png"));
+        }
+    }
+
+    private StackPane createVictoryPanes(Map<PlayerId, String> playerNames, ScoreBean scoreBean) {
 
 //        Text text = new Text(getTeamName(scoreBean.winningTeamProperty().get(), playerNames) + " ont gagné avec " +
 //                scoreBean.totalPointsProperty(scoreBean.winningTeamProperty().get()) + " points contre " +
@@ -164,8 +169,8 @@ public class GraphicalPlayer {
     private String getTeamName(TeamId teamId, Map<PlayerId, String> playerNames) {
         return teamId.equals(TeamId.TEAM_1) ?
                 playerNames.get(PlayerId.PLAYER_1) + " et " +
-                playerNames.get(PlayerId.PLAYER_3) + " : " :
+                        playerNames.get(PlayerId.PLAYER_3) + " : " :
                 playerNames.get(PlayerId.PLAYER_2) + " et " +
-                playerNames.get(PlayerId.PLAYER_4) + " : ";
+                        playerNames.get(PlayerId.PLAYER_4) + " : ";
     }
 }

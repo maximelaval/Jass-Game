@@ -16,11 +16,11 @@ public final class GuiTest extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Map<PlayerId, String> ns = new EnumMap<>(PlayerId.class);
-//        PlayerId.ALL.forEach(p -> ns.put(p, p.name()));
-        ns.put(PlayerId.PLAYER_1, "Marie");
-        ns.put(PlayerId.PLAYER_2, "David");
-        ns.put(PlayerId.PLAYER_3, "Jean");
-        ns.put(PlayerId.PLAYER_4, "Alice");
+        PlayerId.ALL.forEach(p -> ns.put(p, p.name()));
+//        ns.put(PlayerId.PLAYER_1, "Marie");
+//        ns.put(PlayerId.PLAYER_2, "David");
+//        ns.put(PlayerId.PLAYER_3, "Jean");
+//        ns.put(PlayerId.PLAYER_4, "Alice");
 
         ScoreBean sB = new ScoreBean();
         TrickBean tB = new TrickBean();
