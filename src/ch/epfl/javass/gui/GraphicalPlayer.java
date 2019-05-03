@@ -1,11 +1,13 @@
 package ch.epfl.javass.gui;
 
 import ch.epfl.javass.jass.Card;
+import ch.epfl.javass.jass.Player;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
+import com.sun.javafx.collections.ObservableMapWrapper;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.*;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
@@ -20,13 +22,14 @@ import javafx.stage.Stage;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public class GraphicalPlayer {
 
     private BorderPane mainPane;
 
     public GraphicalPlayer(PlayerId ownId, Map<PlayerId, String> playerNames, ScoreBean scoreBean, TrickBean trickBean) {
-        mainPane = new BorderPane(createTrickPane(ownId, playerNames, trickBean), createScorePane(scoreBean, playerNames, ownId),
+        mainPane = new BorderPane(createTrickPane(ownId, playerNames, trickBean), createScorePane(scoreBean, playerNames),
                 null, null, null);
         StackPane victoryPanes = createVictoryPanes(playerNames, scoreBean);
 
@@ -39,55 +42,34 @@ public class GraphicalPlayer {
         return stage;
     }
 
-    private GridPane createScorePane(ScoreBean scoreBean, Map<PlayerId, String> playerNames, PlayerId ownId) {
+    private GridPane createScorePane(ScoreBean scoreBean, Map<PlayerId, String> playerNames) {
         GridPane scorePane = new GridPane();
 
-        IntegerProperty differenceTurnPointsOwnId = new SimpleIntegerProperty();
-        IntegerProperty differenceTurnPointsOther = new SimpleIntegerProperty();
+        for (TeamId teamId : TeamId.ALL) {
+            IntegerProperty differenceTurnPoints = new SimpleIntegerProperty();
+            Text turnPoints = new Text();
+            Text gamePoint = new Text();
+            scoreBean.turnPointsProperty(teamId).addListener((o, oV, nV) -> differenceTurnPoints.set(nV.intValue() - oV.intValue()));
 
-        scoreBean.turnPointsProperty(ownId.team()).addListener((o, oV, nV) -> differenceTurnPointsOwnId.set(nV.intValue() - oV.intValue()));
-        scoreBean.turnPointsProperty(ownId.team().other()).addListener((o, oV, nV) -> differenceTurnPointsOther.set(nV.intValue() - oV.intValue()));
+            Text team1Name = new Text(getTeamName(teamId, playerNames));
+            turnPoints.textProperty().bind(Bindings.convert(scoreBean.turnPointsProperty(teamId)));
+            StringProperty s = new SimpleStringProperty();
+            differenceTurnPoints.addListener((o, oV, nV) -> s.set("(+" + o.getValue() + " )"));
+            Text pointsLastTrick = new Text();
+            pointsLastTrick.textProperty().bind(s);
+            gamePoint.textProperty().bind(Bindings.convert(scoreBean.gamePointsProperty(teamId)));
 
-
-//         ReadOnlyIntegerProperty lastTrickProperty = ;
-//         scoreBean.turnPointsProperty(ownId.team()).addListener();
-
-
-        Text turnPointsOwnId = new Text(Bindings.convert(scoreBean.turnPointsProperty(ownId.team())).get());
-        Text turnPointsOtherId = new Text(Bindings.convert(scoreBean.turnPointsProperty(ownId.team().other())).get());
-        Text team1Name = new Text(getTeamName(TeamId.TEAM_1, playerNames));
-        Text team2Name = new Text(getTeamName(TeamId.TEAM_2, playerNames));
-        Text gamePointOwnId = new Text(Bindings.convert(scoreBean.gamePointsProperty(ownId.team())).get());
-        Text gamePointsOtherId = new Text(Bindings.convert(scoreBean.gamePointsProperty(ownId.team().other())).get());
-
-
-        Text pointsLastTrickOwnId = new Text("(+" + Bindings.convert(differenceTurnPointsOwnId).get() + ")");
-        Text pointsLastTrickOther = new Text("(+" + Bindings.convert(  differenceTurnPointsOther).get() +")");
-
-
-        scorePane.add(team1Name, 0, 0);
-        scorePane.add(team2Name, 0, 1);
-
-        scorePane.add(turnPointsOwnId, 1, 0);
-        scorePane.add(turnPointsOtherId, 1, 1);
-
-        scorePane.add(pointsLastTrickOwnId, 2, 0);
-        scorePane.add(pointsLastTrickOther, 2, 1);
-
-        scorePane.add(new Text(" / Total : "), 3, 0);
-        scorePane.add(new Text(" / Total : "), 3, 1);
-
-        scorePane.add(gamePointOwnId, 4, 0);
-        scorePane.add(gamePointsOtherId, 4, 1);
-
-
+            scorePane.add(team1Name, 0, teamId.ordinal());
+            scorePane.add(turnPoints, 1, teamId.ordinal());
+            scorePane.add(pointsLastTrick, 2, teamId.ordinal());
+            scorePane.add(new Text(" / Total : "), 3, teamId.ordinal());
+            scorePane.add(gamePoint, 4, teamId.ordinal());
+        }
 
         scorePane.setStyle("-fx-font: 16 Optima;" +
                 "-fx-background-color: lightgray;" +
                 "-fx-padding: 5px;" +
                 "-fx-alignment: center");
-
-
         return scorePane;
     }
 
@@ -108,14 +90,17 @@ public class GraphicalPlayer {
             }
         }
 
-//        Bindings.valueAt(cardImageMap, trickBean.trickProperty().get());
+
+       // Bindings.valueAt(cardImageMap, leftImage.imageProperty());
 
 
-        ImageView leftImage =  trickBean.trickProperty() == null ? new ImageView() : new ImageView("/card_0_0_160.png");
+        ImageView leftImage = new ImageView("/card_0_0_160.png");
+//        leftImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), PlayerId.PLAYER_1)));
         ImageView topImage = new ImageView("/card_0_1_160.png");
         ImageView rightImage = new ImageView("/card_0_2_160.png");
         ImageView bottomImage = new ImageView("/card_0_3_160.png");
         ImageView trumpImage = new ImageView("/trump_0.png");
+
 
 
 
