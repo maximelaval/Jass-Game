@@ -6,9 +6,7 @@ import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
 import com.sun.javafx.collections.ObservableMapWrapper;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
@@ -55,8 +53,10 @@ public class GraphicalPlayer {
 
             Text team1Name = new Text(getTeamName(teamId, playerNames));
             turnPoints.textProperty().bind(Bindings.convert(scoreBean.turnPointsProperty(teamId)));
-            Text pointsLastTrick = new Text("(+" + ")");
-            pointsLastTrick.textProperty().bind(Bindings.convert(differenceTurnPoints));
+            StringProperty s = new SimpleStringProperty();
+            differenceTurnPoints.addListener((o, oV, nV) -> s.set("(+" + o.getValue() + " )"));
+            Text pointsLastTrick = new Text();
+            pointsLastTrick.textProperty().bind(s);
             gamePoint.textProperty().bind(Bindings.convert(scoreBean.gamePointsProperty(teamId)));
 
             scorePane.add(team1Name, 0, teamId.ordinal());
@@ -95,7 +95,7 @@ public class GraphicalPlayer {
 
 
         ImageView leftImage = new ImageView("/card_0_0_160.png");
-        leftImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), PlayerId.PLAYER_1)));
+//        leftImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), PlayerId.PLAYER_1)));
         ImageView topImage = new ImageView("/card_0_1_160.png");
         ImageView rightImage = new ImageView("/card_0_2_160.png");
         ImageView bottomImage = new ImageView("/card_0_3_160.png");
