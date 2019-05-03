@@ -36,7 +36,6 @@ public final class TrickBean {
     }
 
     public void setTrump(Color trump) {
-        System.out.println("set trump");
         this.trump.set(trump);
     }
 

@@ -8,21 +8,21 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,15 +106,22 @@ public class GraphicalPlayer {
         trumpImage.setFitHeight(101);
 
 
-//        Rectangle rectangle = new Rectangle();
-//        BorderPane bp = new BorderPane();
-//        Image rec = new Image(rectangle);
-//        StackPane sp = new StackPane(leftImage, )
+        Rectangle rectangle = new Rectangle(120, 180);
+        StackPane sp = new StackPane(rectangle);
 
+        sp.setStyle("-fx-arc-width: 20;" +
+                " -fx-arc-height: 20;" +
+                " -fx-fill: transparent;" +
+                " -fx-stroke: lightpink;" +
+                " -fx-stroke-width: 5;" +
+                " -fx-opacity: 0.5");
+
+        sp.setEffect(new GaussianBlur(4));
+        StackPane spp = new StackPane(sp, leftImage);
 
         GridPane.setHalignment(trumpImage, HPos.CENTER);
 
-        VBox left = new VBox(new Text(playerNames.get(playerPosition.get(Position.LEFT))), leftImage);
+        VBox left = new VBox(new Text(playerNames.get(playerPosition.get(Position.LEFT))), spp);
         VBox top = new VBox(new Text(playerNames.get(playerPosition.get(Position.TOP))), topImage);
         VBox right = new VBox(new Text(playerNames.get(playerPosition.get(Position.RIGHT))), rightImage);
         VBox bottom = new VBox(bottomImage, new Text(playerNames.get(playerPosition.get(Position.BOTTOM))));
@@ -141,7 +148,7 @@ public class GraphicalPlayer {
     private void creatRequiredMaps(PlayerId ownId) {
 
         for (int i = 0; i < PlayerId.COUNT; i++) {
-        playerPosition.put(Position.ALL.get(i), PlayerId.ALL.get((ownId.ordinal() + i) % PlayerId.COUNT));
+            playerPosition.put(Position.ALL.get(i), PlayerId.ALL.get((ownId.ordinal() + i) % PlayerId.COUNT));
         }
 
         for (int c = 0; c < 4; c++) {
