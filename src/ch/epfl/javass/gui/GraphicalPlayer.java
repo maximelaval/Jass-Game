@@ -104,23 +104,24 @@ public class GraphicalPlayer {
         trumpImage.setFitWidth(101);
         trumpImage.setFitHeight(101);
 
+//        StackPane[] stackPanes = new StackPane[4];
+//        Rectangle[] rectangles = new Rectangle[4];
+//        for (int i = 0; i < 4; i++) {
+//             rectangles[i] = new Rectangle(120, 180);
+//            rectangles[i].setStyle("-fx-arc-width: 20;-fx-arc-height: 20;-fx-fill: transparent;-fx-stroke: lightpink;-fx-stroke-width: 5;-fx-opacity: 0.5;");
+//            rectangles[i].setEffect(new GaussianBlur(4));
+//            stackPanes[i]
+//        }
 
-        Rectangle rectangle = new Rectangle(120, 180);
-        StackPane sp = new StackPane(rectangle);
 
-        sp.setStyle("-fx-arc-width: 20;" +
-                " -fx-arc-height: 20;" +
-                " -fx-fill: transparent;" +
-                " -fx-stroke: lightpink;" +
-                " -fx-stroke-width: 5;" +
-                " -fx-opacity: 0.5");
+//        StackPane sp = new StackPane(rectangle, leftImage);
+//        sp
 
-        sp.setEffect(new GaussianBlur(4));
-        StackPane spp = new StackPane(sp, leftImage);
+
 
         GridPane.setHalignment(trumpImage, HPos.CENTER);
 
-        VBox left = new VBox(new Text(playerNames.get(playerPosition.get(Position.LEFT))), spp);
+        VBox left = new VBox(new Text(playerNames.get(playerPosition.get(Position.LEFT))), leftImage);
         VBox top = new VBox(new Text(playerNames.get(playerPosition.get(Position.TOP))), topImage);
         VBox right = new VBox(new Text(playerNames.get(playerPosition.get(Position.RIGHT))), rightImage);
         VBox bottom = new VBox(bottomImage, new Text(playerNames.get(playerPosition.get(Position.BOTTOM))));
