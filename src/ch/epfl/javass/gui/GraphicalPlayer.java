@@ -95,7 +95,7 @@ public class GraphicalPlayer {
 
 
         ImageView leftImage = new ImageView("/card_0_0_160.png");
-//        leftImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), PlayerId.PLAYER_1)));
+       // leftImage.imageProperty().bind(Bindings.valueAt(cardImageMap, (Bindings.valueAt(trickBean.trickProperty(), PlayerId.PLAYER_1))));
         ImageView topImage = new ImageView("/card_0_1_160.png");
         ImageView rightImage = new ImageView("/card_0_2_160.png");
         ImageView bottomImage = new ImageView("/card_0_3_160.png");
@@ -150,13 +150,22 @@ public class GraphicalPlayer {
 
         private StackPane createVictoryPanes(Map<PlayerId, String> playerNames, ScoreBean scoreBean) {
 
-//        Text text = new Text(getTeamName(scoreBean.winningTeamProperty().get(), playerNames) + " ont gagné avec " +
-//                scoreBean.totalPointsProperty(scoreBean.winningTeamProperty().get()) + " points contre " +
-//                scoreBean.totalPointsProperty(scoreBean.winningTeamProperty().get().other())); // faux car winningteam correspond a l'equipe qui mene le pli actuel
-//        BorderPane pane1 = new BorderPane();
-//        BorderPane pane2 = new BorderPane();
-//        StackPane victoryPane = new StackPane(pane1, pane2);
-//
+
+        Text textTeam1 = new Text();
+        textTeam1.textProperty().bind(Bindings.format(" %s et %s ont gagné avec %d points contre %d"  ,
+                playerNames.get(PlayerId.PLAYER_1),playerNames.get(PlayerId.PLAYER_3),scoreBean.totalPointsProperty(TeamId.TEAM_1),
+                scoreBean.totalPointsProperty(TeamId.TEAM_2)));
+        Text textTeam2 = new Text();
+            textTeam2.textProperty().bind(Bindings.format(" %s et %s ont gagné avec %d points contre %d"  ,
+                    playerNames.get(PlayerId.PLAYER_2),playerNames.get(PlayerId.PLAYER_4),scoreBean.totalPointsProperty(TeamId.TEAM_2),
+                    scoreBean.totalPointsProperty(TeamId.TEAM_1)));
+        BorderPane pane1 = new BorderPane(textTeam1);
+       BorderPane pane2 = new BorderPane(textTeam2);
+
+       pane1.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_1));
+       pane2.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_2));
+
+
 
         return null;
     }

@@ -9,6 +9,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
+import java.util.HashMap;
+
 public final class TrickBean {
 
     private SimpleObjectProperty<Color> trump = new SimpleObjectProperty<>();

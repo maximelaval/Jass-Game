@@ -4,24 +4,22 @@ import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.CardSet;
 import javafx.collections.*;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.stream.IntStream;
 
 import static ch.epfl.javass.jass.Jass.HAND_SIZE;
 
 public class HandBean {
 
-    private ObservableList<Card> hand ;
-    private ObservableSet<Card> playableCards ;
+    private final  ObservableList<Card> hand =FXCollections.observableArrayList(Collections.nCopies(9,null)) ;
+    private final  ObservableSet<Card> playableCards =FXCollections.observableSet(new HashSet<>()) ;
 
-    public HandBean() {
-        hand = FXCollections.observableArrayList();
-        IntStream.range(0, HAND_SIZE).forEach(i -> hand.add(null));
-    }
+
 
     public ObservableList<Card> handProperty() {
-//        hand = FXCollections.observableArrayList();
-//        IntStream.range(0, HAND_SIZE).forEach(i -> hand.add(null));
-        return hand;
+
+        return FXCollections.unmodifiableObservableList(hand);
     }
 
     public void setHand(CardSet newHand) {
@@ -40,10 +38,11 @@ public class HandBean {
     }
 
     public ObservableSet<Card> playableCardsProperty() {
-        return playableCards;
+        return FXCollections.unmodifiableObservableSet(playableCards);
     }
 
     public void setPlayableCards(CardSet newPlayableCards) {
+
         playableCards.clear();
         for (int i = 0; i < newPlayableCards.size(); i++) {
             playableCards.add(newPlayableCards.get(i));
