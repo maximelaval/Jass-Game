@@ -31,7 +31,6 @@ public final class ScoreBean {
         } else {
             turnPointsT2.set(newTurnPoints);
         }
-
     }
 
     public ReadOnlyIntegerProperty gamePointsProperty(TeamId team) {
