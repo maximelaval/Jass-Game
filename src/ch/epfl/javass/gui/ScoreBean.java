@@ -1,45 +1,37 @@
 package ch.epfl.javass.gui;
 
 import ch.epfl.javass.jass.TeamId;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 
 public final class ScoreBean {
 
-    private SimpleIntegerProperty turnPointsT1;
-    private SimpleIntegerProperty turnPointsT2;
+    private IntegerProperty turnPointsT1 =  new SimpleIntegerProperty()  ;
+    private IntegerProperty turnPointsT2 = new SimpleIntegerProperty();
 
-    private SimpleIntegerProperty gamePointsT1;
-    private SimpleIntegerProperty gamePointsT2;
+    private IntegerProperty gamePointsT1 = new SimpleIntegerProperty();
+    private IntegerProperty gamePointsT2 = new SimpleIntegerProperty() ;
 
-    private SimpleIntegerProperty totalPointsT1;
-    private SimpleIntegerProperty totalPointsT2;
+    private IntegerProperty totalPointsT1 = new SimpleIntegerProperty();
+    private IntegerProperty totalPointsT2 = new SimpleIntegerProperty();
 
-    private SimpleObjectProperty winningTeam;
+    private ObjectProperty<TeamId> winningTeam = new SimpleObjectProperty<>();
 
 
-    public ScoreBean() {
-        turnPointsT1 = new SimpleIntegerProperty();
-        turnPointsT2 = new SimpleIntegerProperty();
-        gamePointsT1 = new SimpleIntegerProperty();
-        gamePointsT2 = new SimpleIntegerProperty();
-        totalPointsT1 = new SimpleIntegerProperty();
-        totalPointsT2 = new SimpleIntegerProperty();
-        winningTeam = new SimpleObjectProperty();
-    }
 
     public ReadOnlyIntegerProperty turnPointsProperty(TeamId team) {
+
         return team.equals(TeamId.TEAM_1) ? turnPointsT1 : turnPointsT2;
     }
 
     public void setTurnPoints(TeamId team, int newTurnPoints) {
+
         if (team.equals(TeamId.TEAM_1)) {
             turnPointsT1.set(newTurnPoints);
         } else {
             turnPointsT2.set(newTurnPoints);
         }
+
     }
 
     public ReadOnlyIntegerProperty gamePointsProperty(TeamId team) {
@@ -67,7 +59,7 @@ public final class ScoreBean {
     }
 
     public ReadOnlyObjectProperty<TeamId> winningTeamProperty() {
-        return winningTeam;     //???????????????????????
+        return winningTeam;
     }
 
     public void setWinnigTeam(TeamId winningTeam) {
