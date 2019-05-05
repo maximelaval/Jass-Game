@@ -3,13 +3,9 @@ package ch.epfl.javass.gui;
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
@@ -27,6 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents a window that contains the GUI of the local player..
+ *
+ * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
+ */
 public class GraphicalPlayer {
 
     private final StackPane mainStack;
@@ -35,10 +37,17 @@ public class GraphicalPlayer {
     private Map<Position, PlayerId> playerPosition = new HashMap<>();
     private BorderPane victoryPane1, victoryPane2;
 
+    /**
+     * Construct a graphical player with the given identity, the list of the player names, the bean score and the bean trick.
+     *
+     * @param ownId       the given identity.
+     * @param playerNames the given list of player names.
+     * @param scoreBean   the bean score.
+     * @param trickBean   the bean trick.
+     */
     public GraphicalPlayer(PlayerId ownId, Map<PlayerId, String> playerNames, ScoreBean scoreBean, TrickBean trickBean) {
         Pane mainPane = new BorderPane(createTrickPane(ownId, playerNames, trickBean), createScorePane(scoreBean, playerNames),
                 null, null, null);
-//        StackPane victoryPanes = createVictoryPanes(playerNames, scoreBean);
         createVictoryPanes(playerNames, scoreBean);
 
         mainStack = new StackPane();
@@ -47,6 +56,11 @@ public class GraphicalPlayer {
         mainStack.getChildren().add(victoryPane2);
     }
 
+    /**
+     * Returns the stage of the window.
+     *
+     * @return the stage of the window.
+     */
     public Stage createStage() {
         Scene scene = new Scene(mainStack);
         Stage stage = new Stage();
@@ -111,7 +125,6 @@ public class GraphicalPlayer {
     }
 
     private void creatRequiredMaps(PlayerId ownId) {
-
         for (int i = 0; i < PlayerId.COUNT; i++) {
             playerPosition.put(Position.ALL.get(i), PlayerId.ALL.get((ownId.ordinal() + i) % PlayerId.COUNT));
         }
@@ -162,8 +175,8 @@ public class GraphicalPlayer {
         textTeam2.textProperty().bind(Bindings.format(" %s et %s ont gagné avec %d points contre %d",
                 playerNames.get(PlayerId.PLAYER_2), playerNames.get(PlayerId.PLAYER_4), scoreBean.totalPointsProperty(TeamId.TEAM_2),
                 scoreBean.totalPointsProperty(TeamId.TEAM_1)));
-         victoryPane1 = new BorderPane(textTeam1);
-         victoryPane2 = new BorderPane(textTeam2);
+        victoryPane1 = new BorderPane(textTeam1);
+        victoryPane2 = new BorderPane(textTeam2);
 
         victoryPane1.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_1));
         victoryPane2.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_2));
