@@ -3,9 +3,13 @@ package ch.epfl.javass.gui;
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
@@ -13,10 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -28,20 +29,26 @@ import java.util.Map;
 
 public class GraphicalPlayer {
 
-    private final BorderPane mainPane;
+    private final StackPane mainStack;
     private ObservableMap<Card, Image> cardImageMap = FXCollections.observableHashMap();
     private ObservableMap<Card.Color, Image> colorImageMap = FXCollections.observableHashMap();
     private Map<Position, PlayerId> playerPosition = new HashMap<>();
+    private BorderPane victoryPane1, victoryPane2;
 
     public GraphicalPlayer(PlayerId ownId, Map<PlayerId, String> playerNames, ScoreBean scoreBean, TrickBean trickBean) {
-        mainPane = new BorderPane(createTrickPane(ownId, playerNames, trickBean), createScorePane(scoreBean, playerNames),
+        Pane mainPane = new BorderPane(createTrickPane(ownId, playerNames, trickBean), createScorePane(scoreBean, playerNames),
                 null, null, null);
-        StackPane victoryPanes = createVictoryPanes(playerNames, scoreBean);
+//        StackPane victoryPanes = createVictoryPanes(playerNames, scoreBean);
+        createVictoryPanes(playerNames, scoreBean);
 
+        mainStack = new StackPane();
+        mainStack.getChildren().add(mainPane);
+        mainStack.getChildren().add(victoryPane1);
+        mainStack.getChildren().add(victoryPane2);
     }
 
     public Stage createStage() {
-        Scene scene = new Scene(mainPane);
+        Scene scene = new Scene(mainStack);
         Stage stage = new Stage();
         stage.setScene(scene);
         return stage;
@@ -138,7 +145,7 @@ public class GraphicalPlayer {
             Rectangle rectangle = new Rectangle(120, 180);
             rectangle.setStyle("-fx-arc-width: 20;-fx-arc-height: 20;-fx-fill: transparent;-fx-stroke: lightpink;-fx-stroke-width: 5;-fx-opacity: 0.5;");
             rectangle.setEffect(new GaussianBlur(4));
-//            rectangle.visibleProperty().bind(trickBean.winningPlayerProperty().getValue().equals(playerPosition.get(Position.ALL.get(i))));
+//            rectangle.visibleProperty().bind(trickBean.winningPlayerProperty() == null ? null : trickBean.winningPlayerProperty().isEqualTo(playerPosition.get(Position.ALL.get(i))));
             stackPaneList.add(new StackPane(imageViewListList.get(i), rectangle));
             vBoxes.add(new VBox(new Text(playerNames.get(playerPosition.get(Position.ALL.get(i)))), stackPaneList.get(i)));
             vBoxes.get(i).setStyle("-fx-padding: 5px; -fx-alignment: center;");
@@ -146,7 +153,7 @@ public class GraphicalPlayer {
         return vBoxes;
     }
 
-    private StackPane createVictoryPanes(Map<PlayerId, String> playerNames, ScoreBean scoreBean) {
+    private void createVictoryPanes(Map<PlayerId, String> playerNames, ScoreBean scoreBean) {
         Text textTeam1 = new Text();
         textTeam1.textProperty().bind(Bindings.format(" %s et %s ont gagné avec %d points contre %d",
                 playerNames.get(PlayerId.PLAYER_1), playerNames.get(PlayerId.PLAYER_3), scoreBean.totalPointsProperty(TeamId.TEAM_1),
@@ -155,15 +162,13 @@ public class GraphicalPlayer {
         textTeam2.textProperty().bind(Bindings.format(" %s et %s ont gagné avec %d points contre %d",
                 playerNames.get(PlayerId.PLAYER_2), playerNames.get(PlayerId.PLAYER_4), scoreBean.totalPointsProperty(TeamId.TEAM_2),
                 scoreBean.totalPointsProperty(TeamId.TEAM_1)));
-        BorderPane pane1 = new BorderPane(textTeam1);
-        BorderPane pane2 = new BorderPane(textTeam2);
+         victoryPane1 = new BorderPane(textTeam1);
+         victoryPane2 = new BorderPane(textTeam2);
 
-        pane1.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_1));
-        pane2.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_2));
-        pane1.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
-        pane2.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
-
-        return new StackPane(pane1, pane2);
+        victoryPane1.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_1));
+        victoryPane2.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_2));
+        victoryPane1.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
+        victoryPane2.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
     }
 
     private String getTeamName(TeamId teamId, Map<PlayerId, String> playerNames) {

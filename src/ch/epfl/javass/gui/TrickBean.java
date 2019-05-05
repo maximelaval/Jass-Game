@@ -27,6 +27,9 @@ public final class TrickBean {
     }
 
     public void setTrick(Trick newTrick) {
+        if (!this.trick.isEmpty()) {
+            this.trick.clear();
+        }
         if (newTrick.isEmpty()) {
             winningPlayer = new SimpleObjectProperty<>(null);
         } else {
