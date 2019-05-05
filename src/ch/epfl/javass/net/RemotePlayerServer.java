@@ -11,17 +11,29 @@ import java.util.Map;
 import static ch.epfl.javass.net.StringSerializer.*;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
+/**
+ * Represents a server player.
+ *
+ * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
+ */
 public final class RemotePlayerServer {
 
     private final Player localPlayer;
 
+    /**
+     * Constructs a remote server player attached to the given local player.
+     *
+     * @param localPlayer the given local player.
+     */
     public RemotePlayerServer(Player localPlayer) {
         this.localPlayer = localPlayer;
     }
 
+    /**
+     * run the server indefinitely until the game isi ended.
+     */
     public void run() {
-
-
 
 //        while (true) {
             try (ServerSocket s0 = new ServerSocket(5108);

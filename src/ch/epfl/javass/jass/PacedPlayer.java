@@ -4,9 +4,9 @@ import java.util.Map;
 
 /**
  * Represents a player that will wait a while before playing.
- * <p>
- * * @author Lucas Meier (283726)
- * * @author Maxime Laval (287323)
+ *
+ * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
  */
 public final class PacedPlayer implements Player {
 

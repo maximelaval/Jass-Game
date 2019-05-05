@@ -10,7 +10,9 @@ import javafx.stage.Stage;
 import java.util.EnumMap;
 import java.util.Map;
 
+@SuppressWarnings("JavaDoc")
 public final class GuiTest extends Application {
+    @SuppressWarnings("JavaDoc")
     public static void main(String[] args) { launch(args); }
 
     @Override

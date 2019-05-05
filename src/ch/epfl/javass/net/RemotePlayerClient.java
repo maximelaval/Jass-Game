@@ -10,12 +10,23 @@ import java.util.StringJoiner;
 import static ch.epfl.javass.net.StringSerializer.*;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
+/**
+ * Represents the client player.
+ *
+ * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
+ */
 public final class RemotePlayerClient implements Player, AutoCloseable {
 
     private Socket s;
     private BufferedReader r;
     private BufferedWriter w;
 
+    /**
+     * Constructs a remote client player with the given host name.
+     *
+     * @param hostName the given host name.
+     */
     public RemotePlayerClient(String hostName) {
 
         try {
@@ -26,7 +37,6 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
             throw new UncheckedIOException(e);
         }
     }
-
 
     private void forward(String codedString) {
 
