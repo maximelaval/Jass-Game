@@ -6,8 +6,6 @@ import ch.epfl.javass.jass.TeamId;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
@@ -23,7 +21,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GraphicalPlayer {
@@ -80,58 +80,19 @@ public class GraphicalPlayer {
     private GridPane createTrickPane(PlayerId ownId, Map<PlayerId, String> playerNames, TrickBean trickBean) {
         GridPane trickPane = new GridPane();
         creatRequiredMaps(ownId);
+        List<VBox> vBoxes = createVboxes(trickBean, playerNames);
 
-        ImageView leftImage = new ImageView();
-        ImageView topImage = new ImageView();
-        ImageView rightImage = new ImageView();
-        ImageView bottomImage = new ImageView();
         ImageView trumpImage = new ImageView();
-
-        leftImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), playerPosition.get(Position.LEFT))));
-        topImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), playerPosition.get(Position.TOP))));
-        rightImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), playerPosition.get(Position.RIGHT))));
-        bottomImage.imageProperty().bind(Bindings.valueAt(cardImageMap, Bindings.valueAt(trickBean.trickProperty(), playerPosition.get(Position.BOTTOM))));
         trumpImage.imageProperty().bind(Bindings.valueAt(colorImageMap, trickBean.trumpProperty()));
-
-        leftImage.setFitHeight(180);
-        topImage.setFitHeight(180);
-        rightImage.setFitHeight(180);
-        bottomImage.setFitHeight(180);
-        leftImage.setFitWidth(120);
-        topImage.setFitWidth(120);
-        rightImage.setFitWidth(120);
-        bottomImage.setFitWidth(120);
         trumpImage.setFitWidth(101);
         trumpImage.setFitHeight(101);
-
-//        StackPane[] stackPanes = new StackPane[4];
-//        Rectangle[] rectangles = new Rectangle[4];
-//        for (int i = 0; i < 4; i++) {
-//             rectangles[i] = new Rectangle(120, 180);
-//            rectangles[i].setStyle("-fx-arc-width: 20;-fx-arc-height: 20;-fx-fill: transparent;-fx-stroke: lightpink;-fx-stroke-width: 5;-fx-opacity: 0.5;");
-//            rectangles[i].setEffect(new GaussianBlur(4));
-//            stackPanes[i]
-//        }
-
-
-//        StackPane sp = new StackPane(rectangle, leftImage);
-//        sp
-
-
-
         GridPane.setHalignment(trumpImage, HPos.CENTER);
 
-        VBox left = new VBox(new Text(playerNames.get(playerPosition.get(Position.LEFT))), leftImage);
-        VBox top = new VBox(new Text(playerNames.get(playerPosition.get(Position.TOP))), topImage);
-        VBox right = new VBox(new Text(playerNames.get(playerPosition.get(Position.RIGHT))), rightImage);
-        VBox bottom = new VBox(bottomImage, new Text(playerNames.get(playerPosition.get(Position.BOTTOM))));
-
-
-        trickPane.add(left, 0, 1, 1, 1);
-        trickPane.add(top, 1, 0);
+        trickPane.add(vBoxes.get(3), 0, 1, 1, 1);
+        trickPane.add(vBoxes.get(2), 1, 0);
         trickPane.add(trumpImage, 1, 1);
-        trickPane.add(bottom, 1, 2);
-        trickPane.add(right, 2, 1, 1, 1);
+        trickPane.add(vBoxes.get(0), 1, 2);
+        trickPane.add(vBoxes.get(1), 2, 1, 1, 1);
 
         trickPane.setStyle("-fx-background-color: whitesmoke;" +
                 "-fx-padding: 5px;" +
@@ -157,22 +118,50 @@ public class GraphicalPlayer {
         }
     }
 
+    private List<VBox> createVboxes(TrickBean trickBean, Map<PlayerId, String> playerNames) {
+        List<ImageView> imageViewListList = new ArrayList<>();
+        List<VBox> vBoxes = new ArrayList<>();
+        List<StackPane> stackPaneList = new ArrayList<>();
+
+        ImageView trumpImage = new ImageView();
+        trumpImage.imageProperty().bind(Bindings.valueAt(colorImageMap, trickBean.trumpProperty()));
+        trumpImage.setFitWidth(101);
+        trumpImage.setFitHeight(101);
+        GridPane.setHalignment(trumpImage, HPos.CENTER);
+
+        for (int i = 0; i < 4; i++) {
+            imageViewListList.add(new ImageView());
+            imageViewListList.get(i).imageProperty().bind(Bindings.valueAt(cardImageMap,
+                    Bindings.valueAt(trickBean.trickProperty(), playerPosition.get(Position.ALL.get(i)))));
+            imageViewListList.get(i).setFitHeight(180);
+            imageViewListList.get(i).setFitWidth(120);
+            Rectangle rectangle = new Rectangle(120, 180);
+            rectangle.setStyle("-fx-arc-width: 20;-fx-arc-height: 20;-fx-fill: transparent;-fx-stroke: lightpink;-fx-stroke-width: 5;-fx-opacity: 0.5;");
+            rectangle.setEffect(new GaussianBlur(4));
+//            rectangle.visibleProperty().bind(trickBean.winningPlayerProperty().getValue().equals(playerPosition.get(Position.ALL.get(i))));
+            stackPaneList.add(new StackPane(imageViewListList.get(i), rectangle));
+            vBoxes.add(new VBox(new Text(playerNames.get(playerPosition.get(Position.ALL.get(i)))), stackPaneList.get(i)));
+            vBoxes.get(i).setStyle("-fx-padding: 5px; -fx-alignment: center;");
+        }
+        return vBoxes;
+    }
+
     private StackPane createVictoryPanes(Map<PlayerId, String> playerNames, ScoreBean scoreBean) {
-
-
         Text textTeam1 = new Text();
-        textTeam1.textProperty().bind(Bindings.format(" %s et %s ont gagné avec %d points contre %d"  ,
-                playerNames.get(PlayerId.PLAYER_1),playerNames.get(PlayerId.PLAYER_3),scoreBean.totalPointsProperty(TeamId.TEAM_1),
+        textTeam1.textProperty().bind(Bindings.format(" %s et %s ont gagné avec %d points contre %d",
+                playerNames.get(PlayerId.PLAYER_1), playerNames.get(PlayerId.PLAYER_3), scoreBean.totalPointsProperty(TeamId.TEAM_1),
                 scoreBean.totalPointsProperty(TeamId.TEAM_2)));
         Text textTeam2 = new Text();
-        textTeam2.textProperty().bind(Bindings.format(" %s et %s ont gagné avec %d points contre %d"  ,
-                playerNames.get(PlayerId.PLAYER_2),playerNames.get(PlayerId.PLAYER_4),scoreBean.totalPointsProperty(TeamId.TEAM_2),
+        textTeam2.textProperty().bind(Bindings.format(" %s et %s ont gagné avec %d points contre %d",
+                playerNames.get(PlayerId.PLAYER_2), playerNames.get(PlayerId.PLAYER_4), scoreBean.totalPointsProperty(TeamId.TEAM_2),
                 scoreBean.totalPointsProperty(TeamId.TEAM_1)));
         BorderPane pane1 = new BorderPane(textTeam1);
         BorderPane pane2 = new BorderPane(textTeam2);
 
         pane1.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_1));
         pane2.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_2));
+        pane1.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
+        pane2.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
 
         return new StackPane(pane1, pane2);
     }
