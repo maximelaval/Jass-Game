@@ -5,6 +5,7 @@ import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
@@ -158,7 +159,7 @@ public class GraphicalPlayer {
             Rectangle rectangle = new Rectangle(120, 180);
             rectangle.setStyle("-fx-arc-width: 20;-fx-arc-height: 20;-fx-fill: transparent;-fx-stroke: lightpink;-fx-stroke-width: 5;-fx-opacity: 0.5;");
             rectangle.setEffect(new GaussianBlur(4));
-//            rectangle.visibleProperty().bind(trickBean.winningPlayerProperty() == null ? null : trickBean.winningPlayerProperty().isEqualTo(playerPosition.get(Position.ALL.get(i))));
+            rectangle.visibleProperty().bind(trickBean.winningPlayerProperty().isEqualTo(playerPosition.get(Position.ALL.get(i))));
             stackPaneList.add(new StackPane(imageViewListList.get(i), rectangle));
             vBoxes.add(new VBox(new Text(playerNames.get(playerPosition.get(Position.ALL.get(i)))), stackPaneList.get(i)));
             vBoxes.get(i).setStyle("-fx-padding: 5px; -fx-alignment: center;");
