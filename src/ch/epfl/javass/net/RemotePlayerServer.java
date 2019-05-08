@@ -83,6 +83,9 @@ public final class RemotePlayerServer {
 //                    colorOrdinal =
 //                    Trick trick = PackedTrick.firstEmpty(Card.Color.values()[colorOrdinal])
 //                    localPlayer.updateTrick();
+                             int packedTrick = deserializeInt(stringArray[1]);
+                             localPlayer.updateTrick(Trick.ofPacked(packedTrick));
+                             System.out.println("TRCKK");
                              break;
                          case "CARD":
                              parametersString = stringArray[1];

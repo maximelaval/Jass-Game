@@ -127,11 +127,9 @@ public final class MctsPlayer implements Player {
                                     TurnState turnState) {
 
             long playableCardsMcts = PackedTrick.playableCards(
-                    turnState.packedTrick(), PackedCardSet.intersection(
-                            turnState.packedUnplayedCards(), mctsPlayerHand));
+                    turnState.packedTrick(), mctsPlayerHand);
             long playableCardsOther = PackedTrick.playableCards(
-                    turnState.packedTrick(), PackedCardSet.difference(
-                            turnState.packedUnplayedCards(), mctsPlayerHand));
+                    turnState.packedTrick(), PackedCardSet.difference(turnState.packedUnplayedCards(), mctsPlayerHand));
 
             return (Id == playerId) ? playableCardsMcts : playableCardsOther;
 
@@ -142,25 +140,23 @@ public final class MctsPlayer implements Player {
          * score obtained at the end of this turnState simulated.
          */
         private Score scoreOfRandomTurnState(long mctsPlayerHand) {
-            TurnState turnStateSimulated = turnState;
+
             if (isTerminal())
                 return turnState.score();
 
-            int size = PackedCardSet.size(upcomingChildrenCards);
+            TurnState turnStateSimulated = TurnState.ofPackedComponents(turnState.packedScore(), turnState.packedUnplayedCards(), turnState.packedTrick());
+            int size;
+            Score turnPoints = Score.ofPacked(0);
             while (!turnStateSimulated.isTerminal()) {
-                long pkCardSet = potentialCards(mctsPlayerHand,
-                        turnStateSimulated.nextPlayer(), turnStateSimulated);
+                turnPoints = turnStateSimulated.score();
+                long pkCardSet = potentialCards(mctsPlayerHand, turnStateSimulated.nextPlayer(), turnStateSimulated);
                 size = PackedCardSet.size(pkCardSet);
-                int pkCardRandom = PackedCardSet.get(pkCardSet,
-                        mctsRng.nextInt(size));
+                int pkCardRandom = PackedCardSet.get(pkCardSet, mctsRng.nextInt(size));
 
-                turnStateSimulated = turnStateSimulated
-                        .withNewCardPlayedAndTrickCollected(
-                                Card.ofPacked(pkCardRandom));
-
+                turnStateSimulated = turnStateSimulated.withNewCardPlayedAndTrickCollected(Card.ofPacked(pkCardRandom));
             }
 
-            return turnStateSimulated.score();
+            return turnPoints;
         }
 
         /*

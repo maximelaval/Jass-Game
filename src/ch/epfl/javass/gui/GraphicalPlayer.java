@@ -1,9 +1,11 @@
 package ch.epfl.javass.gui;
 
 import ch.epfl.javass.jass.Card;
+import ch.epfl.javass.jass.Jass;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Represents a window that contains the GUI of the local player..
@@ -46,9 +49,10 @@ public class GraphicalPlayer {
      * @param scoreBean   the bean score.
      * @param trickBean   the bean trick.
      */
-    public GraphicalPlayer(PlayerId ownId, Map<PlayerId, String> playerNames, ScoreBean scoreBean, TrickBean trickBean) {
+    public GraphicalPlayer(PlayerId ownId, Map<PlayerId, String> playerNames, ScoreBean scoreBean, TrickBean trickBean,
+                           HandBean handBean, ArrayBlockingQueue<Card> queue) {
         Pane mainPane = new BorderPane(createTrickPane(ownId, playerNames, trickBean), createScorePane(scoreBean, playerNames),
-                null, null, null);
+                null, createHandPane(ownId, handBean, queue), null);
         createVictoryPanes(playerNames, scoreBean);
 
         mainStack = new StackPane();
@@ -102,7 +106,7 @@ public class GraphicalPlayer {
     private GridPane createTrickPane(PlayerId ownId, Map<PlayerId, String> playerNames, TrickBean trickBean) {
         GridPane trickPane = new GridPane();
         creatRequiredMaps(ownId);
-        List<VBox> vBoxes = createVboxes(trickBean, playerNames);
+        List<VBox> vBoxes = createTrickVboxes(trickBean, playerNames);
 
         ImageView trumpImage = new ImageView();
         trumpImage.imageProperty().bind(Bindings.valueAt(colorImageMap, trickBean.trumpProperty()));
@@ -139,7 +143,7 @@ public class GraphicalPlayer {
         }
     }
 
-    private List<VBox> createVboxes(TrickBean trickBean, Map<PlayerId, String> playerNames) {
+    private List<VBox> createTrickVboxes(TrickBean trickBean, Map<PlayerId, String> playerNames) {
         List<ImageView> imageViewListList = new ArrayList<>();
         List<VBox> vBoxes = new ArrayList<>();
         List<StackPane> stackPaneList = new ArrayList<>();
@@ -150,7 +154,7 @@ public class GraphicalPlayer {
         trumpImage.setFitHeight(101);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < PlayerId.COUNT; i++) {
             imageViewListList.add(new ImageView());
             imageViewListList.get(i).imageProperty().bind(Bindings.valueAt(cardImageMap,
                     Bindings.valueAt(trickBean.trickProperty(), playerPosition.get(Position.ALL.get(i)))));
@@ -161,7 +165,11 @@ public class GraphicalPlayer {
             rectangle.setEffect(new GaussianBlur(4));
             rectangle.visibleProperty().bind(trickBean.winningPlayerProperty().isEqualTo(playerPosition.get(Position.ALL.get(i))));
             stackPaneList.add(new StackPane(imageViewListList.get(i), rectangle));
-            vBoxes.add(new VBox(new Text(playerNames.get(playerPosition.get(Position.ALL.get(i)))), stackPaneList.get(i)));
+            if (i == 0) {
+                vBoxes.add(new VBox(stackPaneList.get(i), new VBox(new Text(playerNames.get(playerPosition.get(Position.ALL.get(i)))))));
+            } else {
+                vBoxes.add(new VBox(new Text(playerNames.get(playerPosition.get(Position.ALL.get(i)))), stackPaneList.get(i)));
+            }
             vBoxes.get(i).setStyle("-fx-padding: 5px; -fx-alignment: center;");
         }
         return vBoxes;
@@ -183,6 +191,35 @@ public class GraphicalPlayer {
         victoryPane2.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_2));
         victoryPane1.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
         victoryPane2.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
+    }
+
+    private HBox createHandPane(PlayerId ownId, HandBean handBean, ArrayBlockingQueue<Card> queue) {
+        HBox pane = new HBox();
+
+        List<ImageView> imageViewListList = new ArrayList<>(4);
+        for (int i = 0; i < Jass.HAND_SIZE; i++) {
+            int j = i;
+            imageViewListList.add(new ImageView());
+            imageViewListList.get(i).imageProperty().bind(Bindings.valueAt(cardImageMap,
+                    Bindings.valueAt(handBean.handProperty(), i)));
+            imageViewListList.get(i).setFitHeight(120);
+            imageViewListList.get(i).setFitWidth(80);
+            pane.getChildren().add(imageViewListList.get(i));
+
+
+            BooleanProperty isPlayable = new SimpleBooleanProperty();
+            Bindings.createBooleanBinding(() -> handBean.playableCardsProperty().contains(handBean.handProperty().get(j)), isPlayable);
+            System.out.println(isPlayable);
+            imageViewListList.get(i).opacityProperty().bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
+            imageViewListList.get(i).setOnMouseClicked(e -> queue.add(handBean.handProperty().get(j)));
+//            imageViewListList.get(i).disableProperty().bind(Bindings.when(isPlayable).then(false).otherwise(true));
+
+
+        }
+
+        pane.setStyle("-fx-background-color: lightgray; -fx-spacing: 5px; -fx-padding: 5px;");
+
+        return pane;
     }
 
     private String getTeamName(TeamId teamId, Map<PlayerId, String> playerNames) {

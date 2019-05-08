@@ -67,7 +67,6 @@ public class HandBean {
      * @param newPlayableCards the given playable cards.
      */
     public void setPlayableCards(CardSet newPlayableCards) {
-
         playableCards.clear();
         for (int i = 0; i < newPlayableCards.size(); i++) {
             playableCards.add(newPlayableCards.get(i));

@@ -9,27 +9,41 @@ import static javafx.application.Platform.runLater;
 
 public class GraphicalPlayerAdapter implements Player {
 
+    private GraphicalPlayer graphicalPlayer;
+    private ArrayBlockingQueue<Card> queue;
     private HandBean handBean;
     private ScoreBean scoreBean;
     private TrickBean trickBean;
-    GraphicalPlayer graphicalPlayer;
-    ArrayBlockingQueue<Card> queue = new ArrayBlockingQueue<>(1);
 
 
     public GraphicalPlayerAdapter() {
-//        handBean = new HandBean();
-
+        handBean = new HandBean();
+        scoreBean = new ScoreBean();
+        trickBean = new TrickBean();
+        queue = new ArrayBlockingQueue<>(1);
     }
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        return null;
+
+        Card card = null;
+        try {
+            handBean.setPlayableCards(state.trick().playableCards(hand));
+            System.out.println(handBean.playableCardsProperty());
+            card = queue.take();
+            handBean.setPlayableCards(CardSet.EMPTY);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return card;
     }
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        graphicalPlayer = new GraphicalPlayer(ownId, playerNames, scoreBean, trickBean);
-        runLater(() -> { graphicalPlayer.createStage().show(); });
+        graphicalPlayer = new GraphicalPlayer(ownId, playerNames, scoreBean, trickBean, handBean, queue);
+        runLater(() -> {
+            graphicalPlayer.createStage().show();
+        });
     }
 
     @Override
@@ -49,10 +63,13 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public void updateScore(Score score) {
-//        runLater(() -> {scoreBean.setTurnPoints(, score.turnPoints()));
-//            scoreBean.setTotalPoints(, score.turnPoints()));
-//             scoreBean.setTotalPoints(, score.turnPoints())); });
-
+        runLater(() -> {
+            for (TeamId teamId : TeamId.ALL) {
+                scoreBean.setTurnPoints(teamId, score.turnPoints(teamId));
+                scoreBean.setGamePoints(teamId, score.turnPoints(teamId));
+                scoreBean.setTotalPoints(teamId, score.turnPoints(teamId));
+            }
+        });
     }
 
     @Override
