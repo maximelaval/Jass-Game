@@ -85,14 +85,7 @@ public final class Card {
      *         in argument.
      */
     public boolean isBetter(Color trump, Card that) {
-        if (this.color().equals(that.color())) {
-            return this.color().equals(trump)
-                    ? this.rank().trumpOrdinal() > that.rank().trumpOrdinal()
-                    : this.rank().ordinal() > that.rank().ordinal();
-
-        } else {
-            return this.color().equals(trump);
-        }
+        return PackedCard.isBetter(trump, pkCard, that.packed());
     }
 
     /**
@@ -138,7 +131,7 @@ public final class Card {
          * The number of different colours.
          */
         public static final int COUNT = 4;
-        public final String symbol;
+        protected final String symbol;
 
         Color(String symbol) {
             this.symbol = symbol;

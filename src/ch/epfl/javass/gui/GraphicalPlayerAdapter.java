@@ -26,14 +26,14 @@ public class GraphicalPlayerAdapter implements Player {
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
 
-        Card card = null;
+        Card card;
         try {
             handBean.setPlayableCards(state.trick().playableCards(hand));
             System.out.println(handBean.playableCardsProperty());
             card = queue.take();
             handBean.setPlayableCards(CardSet.EMPTY);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new Error(e);
         }
         return card;
     }

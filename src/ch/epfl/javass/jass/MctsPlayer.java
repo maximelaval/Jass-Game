@@ -96,7 +96,7 @@ public final class MctsPlayer implements Player {
         return p;
     }
 
-    private static class Node {
+    private final static class Node {
 
         private TurnState turnState;
         private Node[] children;

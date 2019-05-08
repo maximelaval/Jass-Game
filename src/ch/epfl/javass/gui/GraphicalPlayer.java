@@ -52,7 +52,7 @@ public class GraphicalPlayer {
     public GraphicalPlayer(PlayerId ownId, Map<PlayerId, String> playerNames, ScoreBean scoreBean, TrickBean trickBean,
                            HandBean handBean, ArrayBlockingQueue<Card> queue) {
         Pane mainPane = new BorderPane(createTrickPane(ownId, playerNames, trickBean), createScorePane(scoreBean, playerNames),
-                null, createHandPane(ownId, handBean, queue), null);
+                null, createHandPane(handBean, queue), null);
         createVictoryPanes(playerNames, scoreBean);
 
         mainStack = new StackPane();
@@ -193,7 +193,7 @@ public class GraphicalPlayer {
         victoryPane2.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
     }
 
-    private HBox createHandPane(PlayerId ownId, HandBean handBean, ArrayBlockingQueue<Card> queue) {
+    private HBox createHandPane(HandBean handBean, ArrayBlockingQueue<Card> queue) {
         HBox pane = new HBox();
 
         List<ImageView> imageViewListList = new ArrayList<>(4);
@@ -206,19 +206,17 @@ public class GraphicalPlayer {
             imageViewListList.get(i).setFitWidth(80);
             pane.getChildren().add(imageViewListList.get(i));
 
-
             BooleanProperty isPlayable = new SimpleBooleanProperty();
-            Bindings.createBooleanBinding(() -> handBean.playableCardsProperty().contains(handBean.handProperty().get(j)), isPlayable);
+            isPlayable.bind(Bindings.createBooleanBinding(() ->
+                    handBean.playableCardsProperty().contains(handBean.handProperty().get(j)),
+                    handBean.playableCardsProperty(), handBean.handProperty()));
             System.out.println(isPlayable);
             imageViewListList.get(i).opacityProperty().bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
             imageViewListList.get(i).setOnMouseClicked(e -> queue.add(handBean.handProperty().get(j)));
-//            imageViewListList.get(i).disableProperty().bind(Bindings.when(isPlayable).then(false).otherwise(true));
-
-
+            imageViewListList.get(i).disableProperty().bind(Bindings.when(isPlayable).then(false).otherwise(true));
         }
 
         pane.setStyle("-fx-background-color: lightgray; -fx-spacing: 5px; -fx-padding: 5px;");
-
         return pane;
     }
 
