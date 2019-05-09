@@ -66,14 +66,15 @@ public class GraphicalPlayerAdapter implements Player {
         runLater(() -> {
             for (TeamId teamId : TeamId.ALL) {
                 scoreBean.setTurnPoints(teamId, score.turnPoints(teamId));
-                scoreBean.setGamePoints(teamId, score.turnPoints(teamId));
-                scoreBean.setTotalPoints(teamId, score.turnPoints(teamId));
+                scoreBean.setGamePoints(teamId, score.gamePoints(teamId));
+                scoreBean.setTotalPoints(teamId, score.totalPoints(teamId));
             }
         });
     }
 
     @Override
     public void setWinningTeam(TeamId winningTeam) {
+        System.out.println("in graphical player setting winning temam preoperty");
         runLater(() -> scoreBean.setWinnigTeam(winningTeam));
     }
 }

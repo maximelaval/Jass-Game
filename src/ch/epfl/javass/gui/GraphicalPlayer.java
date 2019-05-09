@@ -187,8 +187,10 @@ public class GraphicalPlayer {
         victoryPane1 = new BorderPane(textTeam1);
         victoryPane2 = new BorderPane(textTeam2);
 
-        victoryPane1.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_1));
-        victoryPane2.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_2));
+        victoryPane1.visibleProperty().bind(scoreBean.totalPointsProperty(TeamId.TEAM_1).greaterThan(Jass.WINNING_POINTS));
+        victoryPane2.visibleProperty().bind(scoreBean.totalPointsProperty(TeamId.TEAM_2).greaterThan(Jass.WINNING_POINTS));
+//        victoryPane1.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_1));
+//        victoryPane2.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_2));
         victoryPane1.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
         victoryPane2.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
     }
@@ -210,7 +212,7 @@ public class GraphicalPlayer {
             isPlayable.bind(Bindings.createBooleanBinding(() ->
                     handBean.playableCardsProperty().contains(handBean.handProperty().get(j)),
                     handBean.playableCardsProperty(), handBean.handProperty()));
-            System.out.println(isPlayable);
+//            System.out.println(isPlayable);
             imageViewListList.get(i).opacityProperty().bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
             imageViewListList.get(i).setOnMouseClicked(e -> queue.add(handBean.handProperty().get(j)));
             imageViewListList.get(i).disableProperty().bind(Bindings.when(isPlayable).then(false).otherwise(true));

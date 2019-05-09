@@ -18,7 +18,7 @@ public final class MctsPlayer implements Player {
     private static SplittableRandom mctsRng;
     private static PlayerId playerId;
     private int iterations;
-    int CONSTANT_V = 40;
+    private int CONSTANT_V = 40;
 
     /**
      * Constructs a MCTS player with the given seed, number of iterations of
@@ -71,7 +71,6 @@ public final class MctsPlayer implements Player {
                         actualTeam = n.turnState.nextPlayer().team();
                     }
                 }
-
             }
 
             int pkCard = PackedCardSet.get(pkHand, root.promisingNodeIndex(0));
@@ -222,9 +221,6 @@ public final class MctsPlayer implements Player {
                     * Math.sqrt(2 * Math.log(parent.finishedRandomTurns)
                     / (double) finishedRandomTurns))
                     : Double.POSITIVE_INFINITY;
-
         }
-
     }
-
 }
