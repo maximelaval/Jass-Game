@@ -21,6 +21,8 @@ public final class PacedPlayer implements Player {
      * @param minTime          the minimum time the player will have to wait before playing.
      */
     public PacedPlayer(Player underlyingPlayer, double minTime) {
+        if (minTime < 0)
+            throw new IllegalArgumentException();
         this.underlyingPlayer = underlyingPlayer;
         this.minTime = (long) (minTime * NB_OF_MILLISEC_IN_ONE_SEC);
     }

@@ -22,9 +22,9 @@ public final class TestMain extends Application {
         Player player3 = new MctsPlayer(PLAYER_3, 456, 10_000);
         Player player4 = new MctsPlayer(PLAYER_4, 789, 10_000);
 
-        ps.put(PLAYER_2, new PacedPlayer(player2, 0));
-        ps.put(PLAYER_3, new PacedPlayer(player3, 0));
-        ps.put(PLAYER_4, new PacedPlayer(player4, 0));
+        ps.put(PLAYER_2, new PacedPlayer(player2, 1));
+        ps.put(PLAYER_3, new PacedPlayer(player3, 1));
+        ps.put(PLAYER_4, new PacedPlayer(player4, 1));
 
 //        ps.put(PLAYER_2, new MctsPlayer(PLAYER_2, 123, 10_000));
 //        ps.put(PLAYER_3, new MctsPlayer(PLAYER_3, 456, 10_000));

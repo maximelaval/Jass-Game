@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
@@ -19,6 +20,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -114,11 +116,11 @@ public class GraphicalPlayer {
         trumpImage.setFitHeight(101);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
 
-        trickPane.add(vBoxes.get(3), 0, 1, 1, 1);
+        trickPane.add(vBoxes.get(3), 0, 0, 1, 3);
         trickPane.add(vBoxes.get(2), 1, 0);
         trickPane.add(trumpImage, 1, 1);
         trickPane.add(vBoxes.get(0), 1, 2);
-        trickPane.add(vBoxes.get(1), 2, 1, 1, 1);
+        trickPane.add(vBoxes.get(1), 2, 0, 1, 3);
 
         trickPane.setStyle("-fx-background-color: whitesmoke;" +
                 "-fx-padding: 5px;" +
@@ -165,10 +167,12 @@ public class GraphicalPlayer {
             rectangle.setEffect(new GaussianBlur(4));
             rectangle.visibleProperty().bind(trickBean.winningPlayerProperty().isEqualTo(playerPosition.get(Position.ALL.get(i))));
             stackPaneList.add(new StackPane(imageViewListList.get(i), rectangle));
+            Text text = new Text(playerNames.get(playerPosition.get(Position.ALL.get(i))));
+            text.setStyle("-fx-font: 14 Optima;");
             if (i == 0) {
-                vBoxes.add(new VBox(stackPaneList.get(i), new VBox(new Text(playerNames.get(playerPosition.get(Position.ALL.get(i)))))));
+                vBoxes.add(new VBox(stackPaneList.get(i), text));
             } else {
-                vBoxes.add(new VBox(new Text(playerNames.get(playerPosition.get(Position.ALL.get(i)))), stackPaneList.get(i)));
+                vBoxes.add(new VBox(text, stackPaneList.get(i)));
             }
             vBoxes.get(i).setStyle("-fx-padding: 5px; -fx-alignment: center;");
         }
