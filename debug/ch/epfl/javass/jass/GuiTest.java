@@ -56,7 +56,7 @@ public final class GuiTest extends Application {
                 if (s.trick().isFull()) {
                     s = s.withTrickCollected();
                     if (s.trick().index() == 1) {
-                        sB.setTotalPoints(TeamId.TEAM_1, 1002);
+                        sB.setTotalPoints(TeamId.TEAM_1 , 1002);
                         System.out.println(sB.totalPointsProperty(TeamId.TEAM_2));
                     }
                     for (TeamId t : TeamId.ALL)
