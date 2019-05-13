@@ -7,6 +7,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import static javafx.application.Platform.runLater;
 
+/**
+ * Represents a player that can be used in a graphical interface.
+ *
+ * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
+ */
 public class GraphicalPlayerAdapter implements Player {
 
     private GraphicalPlayer graphicalPlayer;
@@ -16,6 +22,9 @@ public class GraphicalPlayerAdapter implements Player {
     private TrickBean trickBean;
 
 
+    /**
+     * Construct
+     */
     public GraphicalPlayerAdapter() {
         handBean = new HandBean();
         scoreBean = new ScoreBean();

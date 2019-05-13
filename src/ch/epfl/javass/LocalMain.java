@@ -7,6 +7,8 @@ import ch.epfl.javass.net.StringSerializer;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import java.io.IOError;
+import java.sql.SQLOutput;
 import java.util.*;
 
 public class LocalMain extends Application {
@@ -15,8 +17,9 @@ public class LocalMain extends Application {
     private final static String[] DEFAULT_NAMES = new String[]{"Aline", "Bastien", "Colette", "David"};
     private final static String DEFAULT_HOST_NAME = "localHost";
     private final static int DEFAULT_ITERATIONS = 10_000;
-    private final static double MIN_TIME_PACED_PLAYER = 1.;
-    private final static long WAITING_TIME_END_TRICK = 1000;
+    private final static double MIN_TIME_PACED_PLAYER = 0;
+    private final static long WAITING_TIME_END_TRICK = 000;
+    private final static int MINIMUM_ITERATIONS = 10;
 
     private Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);
     private Map<PlayerId, String> ns = new EnumMap<>(PlayerId.class);
@@ -28,32 +31,34 @@ public class LocalMain extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Random randomGenerator;
+        Random randomGenerator = new Random();
 
         List<String> argsList = this.getParameters().getRaw();
         System.out.println(argsList);
 
 
-        if (!(argsList.size() >= 4 && argsList.size() <= 5)) {
+        if ((argsList.size() < 4 || argsList.size() > 5)) {
             System.err.println(helpText());
             System.exit(1);
         }
 
         if (argsList.size() == 5) {
-            randomGenerator = new Random(Long.parseLong(argsList.get(4)));
-        } else {
-            randomGenerator = new Random();
+            try {
+                long seed = Long.parseLong(argsList.get(4) );
+                randomGenerator = new Random(seed);
+                if (seed <= 0) throw new NumberFormatException();
+            } catch (NumberFormatException e) {
+                System.err.println("Erreur : la graine spécifiée n'est pas un entier <long> valide");
+                System.exit(1);
+            }
         }
-        Long jassGameRngSeed = randomGenerator.nextLong();
-
+        long jassGameRngSeed = randomGenerator.nextLong();
 
         try {
             createPlayers(argsList, randomGenerator);
-        } catch (Error e) {
-            System.err.println("Erreur : spécification de joueur invalide : " + e.getMessage());
+        } catch (Error | NumberFormatException e) {
+            System.err.println("Erreur : " + e.getMessage());
             System.exit(1);
-        } catch (NumberFormatException e) {
-            System.err.println("Erreur : le nombre d'itération n'est pas un nombre valide.");
         }
 
         Thread gameThread = new Thread(() -> {
@@ -79,77 +84,83 @@ public class LocalMain extends Application {
     }
 
     private void createPlayers(List<String> argsList, Random randomGenerator) {
-        String[] playerTypes = new String[4];
-        String[] playerNames = new String[4];
-        String[] hostNames = new String[4];
-        Integer[] iterations = new Integer[4];
-
 
         for (int i = 0; i < PlayerId.COUNT; i++) {
             String arg = argsList.get(i);
             String[] playerParameters = StringSerializer.split(DELIMITER, arg);
 
             String playerType = playerParameters[0];
+            String playerName;
+            String hostName = "";
+            int iterations = 0;
+
             if (!(playerType.equals("s") || playerType.equals("h") || playerType.equals("r"))) {
-                throw new Error(playerType);
+                throw new Error("Spécification de joueur invalide : " + playerType);
             }
-            playerTypes[i] = playerType;
 
             if (playerParameters.length >= 2) {
                 if (playerParameters[1].equals("")) {
-                    playerNames[i] = DEFAULT_NAMES[i];
+                    playerName = DEFAULT_NAMES[i];
                 } else {
-                    playerNames[i] = (playerParameters[1]);
+                    playerName = (playerParameters[1]);
                 }
             } else {
-                playerNames[i] = (DEFAULT_NAMES[i]);
+                playerName = (DEFAULT_NAMES[i]);
+            }
+
+            if (playerType.equals("h")) {
+                if (playerParameters.length >= 3) {
+                    throw new Error("Le nombre de paramètres passés pour un joueur humain est trop grand.");
+                }
             }
 
             if (playerType.equals("r")) {
-                if (playerParameters.length >= 3) {
-                    hostNames[i] = playerParameters[2];
+                if (playerParameters.length > 3)
+                    throw new Error("Le nombre d'arguments passés pour un joueur distant est trop grand.");
+                if (playerParameters.length == 3) {
+                    hostName = playerParameters[2];
                 } else {
-                    hostNames[i] = DEFAULT_HOST_NAME;
+                    hostName = DEFAULT_HOST_NAME;
                 }
             }
 
             if (playerType.equals("s")) {
-                if (playerParameters.length >= 3) {
-                    iterations[i] = Integer.parseInt(playerParameters[2]);
+                if (playerParameters.length > 3)
+                    throw new Error("Le nombre d'arguments passés pour un joueur simulé est trop grand.");
+                if (playerParameters.length == 3) {
+                    if (Integer.parseInt(playerParameters[2]) < MINIMUM_ITERATIONS)
+                        throw new NumberFormatException("Erreur : le nombre d'itération n'est pas un nombre valide.");
+                    iterations= Integer.parseInt(playerParameters[2]);
                 } else {
-                    iterations[i] = DEFAULT_ITERATIONS;
+                    iterations = DEFAULT_ITERATIONS;
                 }
             }
 
-
-        }
-        System.out.println(Arrays.toString(playerTypes));
-        System.out.println(Arrays.toString(playerNames));
-        System.out.println(Arrays.toString(hostNames));
-        System.out.println(Arrays.toString(iterations));
-
-        for (int i = 0; i < PlayerId.COUNT; i++) {
             int j = i;
-            switch (playerTypes[i]) {
+            switch (playerType) {
                 case "h":
                     ps.put(PlayerId.ALL.get(i), new GraphicalPlayerAdapter());
                     break;
                 case "s":
                     ps.put(PlayerId.ALL.get(i), new PacedPlayer(
-                            new MctsPlayer(PlayerId.ALL.get(i), randomGenerator.nextLong(), iterations[i]),
+                            new MctsPlayer(PlayerId.ALL.get(i), randomGenerator.nextLong(), iterations),
                             MIN_TIME_PACED_PLAYER));
                     break;
                 case "r":
-                    ps.put(PlayerId.ALL.get(i), new RemotePlayerClient(hostNames[i]));
+                    try {
+                        ps.put(PlayerId.ALL.get(i), new RemotePlayerClient(hostName));
+                    } catch (IOError e) {
+                        System.err.println("Erreur : impossible de se connecter au serveur (" + e.getMessage() + ")");
+                        System.exit(1);
+                    }
                     break;
                 default:
                     throw new Error();
             }
-            ns.put(PlayerId.ALL.get(i), playerNames[i]);
-//            PlayerId.ALL.forEach(k -> ns.put(k, playerNames));
+            ns.put(PlayerId.ALL.get(i), playerName);
+
+            System.out.println(playerType + " "+ playerName + " " + hostName + " " + iterations);
+
         }
-
-
-
     }
 }

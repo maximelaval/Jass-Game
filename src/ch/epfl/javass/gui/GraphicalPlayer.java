@@ -44,12 +44,15 @@ public class GraphicalPlayer {
     private BorderPane victoryPane1, victoryPane2;
 
     /**
-     * Construct a graphical player with the given identity, the list of the player names, the bean score and the bean trick.
+     * Constructs a graphical player with the given identity, the list of the player names, the bean score,
+     * the bean trick, the bean hand and the queue that allows the class to communicate with the GraphicalPlayerAdapter.
      *
      * @param ownId       the given identity.
      * @param playerNames the given list of player names.
      * @param scoreBean   the bean score.
      * @param trickBean   the bean trick.
+     * @param handBean      the bean hand.
+     * @param queue
      */
     public GraphicalPlayer(PlayerId ownId, Map<PlayerId, String> playerNames, ScoreBean scoreBean, TrickBean trickBean,
                            HandBean handBean, ArrayBlockingQueue<Card> queue) {
@@ -216,7 +219,6 @@ public class GraphicalPlayer {
             isPlayable.bind(Bindings.createBooleanBinding(() ->
                     handBean.playableCardsProperty().contains(handBean.handProperty().get(j)),
                     handBean.playableCardsProperty(), handBean.handProperty()));
-//            System.out.println(isPlayable);
             imageViewListList.get(i).opacityProperty().bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
             imageViewListList.get(i).setOnMouseClicked(e -> queue.add(handBean.handProperty().get(j)));
             imageViewListList.get(i).disableProperty().bind(Bindings.when(isPlayable).then(false).otherwise(true));
