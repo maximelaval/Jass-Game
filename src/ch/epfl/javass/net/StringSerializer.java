@@ -44,7 +44,7 @@ public final class StringSerializer {
      * @return the serialized integer.
      */
     public static String serializeLong(long l) {
-        return Long.toHexString(l);
+        return Long.toUnsignedString(l, 16);
     }
 
     /**
@@ -54,7 +54,7 @@ public final class StringSerializer {
      * @return the deserialized integer.
      */
     public static long deserializeLong(String s) {
-        return Long.parseLong(s, 16);
+        return Long.parseUnsignedLong(s, 16);
     }
 
     /**
@@ -75,8 +75,7 @@ public final class StringSerializer {
      */
     public static String deserializeString(String s) {
 
-        byte[] decodedBytes = Base64.getDecoder().decode(s);
-        return new String(decodedBytes, UTF_8);
+        return new String(Base64.getDecoder().decode(s.getBytes(UTF_8)));
     }
 
     /**

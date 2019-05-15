@@ -7,9 +7,10 @@ import ch.epfl.javass.net.StringSerializer;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-import java.io.IOError;
-import java.sql.SQLOutput;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class LocalMain extends Application {
 
@@ -44,7 +45,7 @@ public class LocalMain extends Application {
 
         if (argsList.size() == 5) {
             try {
-                long seed = Long.parseLong(argsList.get(4) );
+                long seed = Long.parseLong(argsList.get(4));
                 randomGenerator = new Random(seed);
                 if (seed <= 0) throw new NumberFormatException();
             } catch (NumberFormatException e) {
@@ -63,9 +64,12 @@ public class LocalMain extends Application {
 
         Thread gameThread = new Thread(() -> {
             JassGame g = new JassGame(jassGameRngSeed, ps, ns);
-            while (! g.isGameOver()) {
+            while (!g.isGameOver()) {
                 g.advanceToEndOfNextTrick();
-                try { Thread.sleep(WAITING_TIME_END_TRICK); } catch (Exception e) {}
+                try {
+                    Thread.sleep(WAITING_TIME_END_TRICK);
+                } catch (Exception e) {
+                }
             }
         });
         gameThread.setDaemon(true);
@@ -130,7 +134,7 @@ public class LocalMain extends Application {
                 if (playerParameters.length == 3) {
                     if (Integer.parseInt(playerParameters[2]) < MINIMUM_ITERATIONS)
                         throw new NumberFormatException("Erreur : le nombre d'itération n'est pas un nombre valide.");
-                    iterations= Integer.parseInt(playerParameters[2]);
+                    iterations = Integer.parseInt(playerParameters[2]);
                 } else {
                     iterations = DEFAULT_ITERATIONS;
                 }
@@ -147,19 +151,14 @@ public class LocalMain extends Application {
                             MIN_TIME_PACED_PLAYER));
                     break;
                 case "r":
-                    try {
-                        ps.put(PlayerId.ALL.get(i), new RemotePlayerClient(hostName));
-                    } catch (IOError e) {
-                        System.err.println("Erreur : impossible de se connecter au serveur (" + e.getMessage() + ")");
-                        System.exit(1);
-                    }
+                    ps.put(PlayerId.ALL.get(i), new RemotePlayerClient(hostName));
                     break;
                 default:
                     throw new Error();
             }
             ns.put(PlayerId.ALL.get(i), playerName);
 
-            System.out.println(playerType + " "+ playerName + " " + hostName + " " + iterations);
+            System.out.println(playerType + " " + playerName + " " + hostName + " " + iterations);
 
         }
     }

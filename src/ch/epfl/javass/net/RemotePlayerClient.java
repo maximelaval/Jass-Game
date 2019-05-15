@@ -27,7 +27,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
      *
      * @param hostName the given host name.
      */
-    public RemotePlayerClient(String hostName) {
+    public RemotePlayerClient(String hostName)  {
 
         try {
             s = new Socket(hostName, 5108);
