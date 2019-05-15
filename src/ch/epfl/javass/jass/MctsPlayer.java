@@ -140,8 +140,10 @@ public final class MctsPlayer implements Player {
          */
         private Score scoreOfRandomTurnState(long mctsPlayerHand) {
 
-            if (isTerminal())
+            if (isTerminal()) {
+                System.out.println(turnState.score());
                 return turnState.score();
+            }
 
             TurnState turnStateSimulated = TurnState.ofPackedComponents(turnState.packedScore(), turnState.packedUnplayedCards(), turnState.packedTrick());
             int size;

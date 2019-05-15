@@ -38,7 +38,6 @@ public class GraphicalPlayerAdapter implements Player {
         Card card;
         try {
             handBean.setPlayableCards(state.trick().playableCards(hand));
-            System.out.println(handBean.playableCardsProperty());
             card = queue.take();
             handBean.setPlayableCards(CardSet.EMPTY);
         } catch (InterruptedException e) {

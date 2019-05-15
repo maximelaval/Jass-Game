@@ -18,8 +18,10 @@ public class LocalMain extends Application {
     private final static String[] DEFAULT_NAMES = new String[]{"Aline", "Bastien", "Colette", "David"};
     private final static String DEFAULT_HOST_NAME = "localHost";
     private final static int DEFAULT_ITERATIONS = 10_000;
-    private final static double MIN_TIME_PACED_PLAYER = 0;
-    private final static long WAITING_TIME_END_TRICK = 000;
+    // Unit : second
+    private final static double MIN_TIME_PACED_PLAYER = 0.5;
+    //Unit : millisecond
+    private final static long WAITING_TIME_END_TRICK = 500;
     private final static int MINIMUM_ITERATIONS = 10;
 
     private Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);

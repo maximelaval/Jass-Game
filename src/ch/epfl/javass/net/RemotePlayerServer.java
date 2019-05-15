@@ -89,7 +89,6 @@ public final class RemotePlayerServer {
 
                              long pkScore = deserializeLong(parametersArray[0]);
                              long pkUplayedCards = deserializeLong(parametersArray[1]);
-                                        System.out.println(parametersArray[2]);
                              int pkTrick = deserializeInt(parametersArray[2]);
 
                              TurnState turnState = TurnState.ofPackedComponents(pkScore, pkUplayedCards, pkTrick);

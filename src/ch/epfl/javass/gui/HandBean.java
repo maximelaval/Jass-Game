@@ -40,12 +40,17 @@ public class HandBean {
      */
     public void setHand(CardSet newHand) {
         if (newHand.size() != HAND_SIZE) {
+            System.out.println("Size of new hand should NOT be 9: " + newHand.size());
+
             for (int i = 0; i < HAND_SIZE; i++) {
                 if (hand.get(i) != null && !newHand.contains(hand.get(i))) {
                     hand.set(i, null);
                 }
             }
         } else {
+            System.out.println("Size of new hand should be 9 : " + newHand.size());
+            System.out.println("content of new hand : " + newHand);
+
             for (int i = 0; i < HAND_SIZE; i++) {
                 hand.set(i, newHand.get(i));
             }
