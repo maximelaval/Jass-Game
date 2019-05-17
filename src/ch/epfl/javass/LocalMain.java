@@ -25,7 +25,7 @@ public class LocalMain extends Application {
     private final static String DEFAULT_HOST_NAME = "localHost";
     private final static int DEFAULT_ITERATIONS = 10_000;
     // Unit : second
-    private final static double MIN_TIME_PACED_PLAYER = 0.05;
+    private final static double MIN_TIME_PACED_PLAYER = 0.01;
     //Unit : millisecond
     private final static long WAITING_TIME_END_TRICK = 001;
     private final static int MINIMUM_ITERATIONS = 10;
@@ -35,7 +35,7 @@ public class LocalMain extends Application {
 
 
     /**
-     * The main method of the local player program.
+     * The main method of the local player's program.
      *
      * @param args the program arguments.
      */
@@ -154,18 +154,17 @@ public class LocalMain extends Application {
                 }
             }
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            int j = i;
             switch (playerType) {
                 case "h":
                     ps.put(PlayerId.ALL.get(i), new GraphicalPlayerAdapter());
                     break;
                 case "s":
-//                    ps.put(PlayerId.ALL.get(i), new PacedPlayer(
-//                            new MctsPlayer(PlayerId.ALL.get(i), randomGenerator.nextLong(), iterations),
-//                            MIN_TIME_PACED_PLAYER));
                     ps.put(PlayerId.ALL.get(i), new PacedPlayer(
-                            new RandomPlayer(randomGenerator.nextLong()),
+                            new MctsPlayer(PlayerId.ALL.get(i), randomGenerator.nextLong(), iterations),
                             MIN_TIME_PACED_PLAYER));
+//                    ps.put(PlayerId.ALL.get(i), new PacedPlayer(
+//                            new RandomPlayer(randomGenerator.nextLong()),
+//                            MIN_TIME_PACED_PLAYER));
                     break;
                 case "r":
                     ps.put(PlayerId.ALL.get(i), new RemotePlayerClient(hostName));
@@ -176,7 +175,6 @@ public class LocalMain extends Application {
             ns.put(PlayerId.ALL.get(i), playerName);
 
             System.out.println(playerType + " " + playerName + " " + hostName + " " + iterations);
-
         }
     }
 }

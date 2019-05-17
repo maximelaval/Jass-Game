@@ -203,23 +203,31 @@ public class GraphicalPlayer {
     private HBox createHandPane(HandBean handBean, ArrayBlockingQueue<Card> queue) {
         HBox pane = new HBox();
 
-        List<ImageView> imageViewListList = new ArrayList<>(4);
+        List<ImageView> imageViewList = new ArrayList<>(4);
         for (int i = 0; i < Jass.HAND_SIZE; i++) {
             int j = i;
-            imageViewListList.add(new ImageView());
-            imageViewListList.get(i).imageProperty().bind(Bindings.valueAt(cardImageMap,
+            imageViewList.add(new ImageView());
+            imageViewList.get(i).imageProperty().bind(Bindings.valueAt(cardImageMap,
                     Bindings.valueAt(handBean.handProperty(), i)));
-            imageViewListList.get(i).setFitHeight(120);
-            imageViewListList.get(i).setFitWidth(80);
-            pane.getChildren().add(imageViewListList.get(i));
+            imageViewList.get(i).setFitHeight(120);
+            imageViewList.get(i).setFitWidth(80);
+            pane.getChildren().add(imageViewList.get(i));
 
             BooleanProperty isPlayable = new SimpleBooleanProperty();
             isPlayable.bind(Bindings.createBooleanBinding(() ->
                             handBean.playableCardsProperty().contains(handBean.handProperty().get(j)),
                     handBean.playableCardsProperty(), handBean.handProperty()));
-            imageViewListList.get(i).opacityProperty().bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
-            imageViewListList.get(i).setOnMouseClicked(e -> queue.add(handBean.handProperty().get(j)));
-            imageViewListList.get(i).disableProperty().bind(Bindings.when(isPlayable).then(false).otherwise(true));
+            imageViewList.get(i).opacityProperty().bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
+
+                imageViewList.get(i).setOnMouseClicked(e -> {
+                    try {
+                        queue.put(handBean.handProperty().get(j));
+                    } catch (InterruptedException x) {
+                        throw new Error(x);
+                    }
+                });
+
+            imageViewList.get(i).disableProperty().bind(Bindings.when(isPlayable).then(false).otherwise(true));
         }
 
         pane.setStyle("-fx-background-color: lightgray; -fx-spacing: 5px; -fx-padding: 5px;");
