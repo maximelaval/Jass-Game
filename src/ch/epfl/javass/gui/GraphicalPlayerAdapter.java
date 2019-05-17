@@ -23,7 +23,7 @@ public class GraphicalPlayerAdapter implements Player {
 
 
     /**
-     * Construct
+     * Constructs a graphical player adapter by creating its required fields.
      */
     public GraphicalPlayerAdapter() {
         handBean = new HandBean();
@@ -56,7 +56,11 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public void updateHand(CardSet newHand) {
-        runLater(() -> handBean.setHand(newHand));
+        runLater(() -> {
+            System.out.println("new hand : " + newHand);
+            handBean.setHand(newHand);
+                }
+        );
     }
 
     @Override

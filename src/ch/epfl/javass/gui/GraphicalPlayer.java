@@ -12,7 +12,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
@@ -20,7 +19,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -30,7 +28,7 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * Represents a window that contains the GUI of the local player..
+ * Represents a window that contains the GUI of the local player.
  *
  * @author Lucas Meier (283726)
  * @author Maxime Laval (287323)
@@ -51,8 +49,8 @@ public class GraphicalPlayer {
      * @param playerNames the given list of player names.
      * @param scoreBean   the bean score.
      * @param trickBean   the bean trick.
-     * @param handBean      the bean hand.
-     * @param queue
+     * @param handBean    the bean hand.
+     * @param queue       the given queue.
      */
     public GraphicalPlayer(PlayerId ownId, Map<PlayerId, String> playerNames, ScoreBean scoreBean, TrickBean trickBean,
                            HandBean handBean, ArrayBlockingQueue<Card> queue) {
@@ -217,7 +215,7 @@ public class GraphicalPlayer {
 
             BooleanProperty isPlayable = new SimpleBooleanProperty();
             isPlayable.bind(Bindings.createBooleanBinding(() ->
-                    handBean.playableCardsProperty().contains(handBean.handProperty().get(j)),
+                            handBean.playableCardsProperty().contains(handBean.handProperty().get(j)),
                     handBean.playableCardsProperty(), handBean.handProperty()));
             imageViewListList.get(i).opacityProperty().bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
             imageViewListList.get(i).setOnMouseClicked(e -> queue.add(handBean.handProperty().get(j)));

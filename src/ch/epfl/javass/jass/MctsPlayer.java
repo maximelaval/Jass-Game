@@ -141,7 +141,6 @@ public final class MctsPlayer implements Player {
         private Score scoreOfRandomTurnState(long mctsPlayerHand) {
 
             if (isTerminal()) {
-                System.out.println(turnState.score());
                 return turnState.score();
             }
 

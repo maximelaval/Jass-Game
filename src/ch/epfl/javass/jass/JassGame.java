@@ -170,10 +170,8 @@ public final class JassGame {
      */
     private void play() {
         Card card = nextPlayerCard();
-        playerHands.put(turnState.nextPlayer(),
-                playerHands.get(turnState.nextPlayer()).remove(card));
-        players.get(turnState.nextPlayer())
-                .updateHand(playerHands.get(turnState.nextPlayer()));
+        playerHands.put(turnState.nextPlayer(), playerHands.get(turnState.nextPlayer()).remove(card));
+        players.get(turnState.nextPlayer()).updateHand(playerHands.get(turnState.nextPlayer()));
         turnState = turnState.withNewCardPlayed(card);
 
     }

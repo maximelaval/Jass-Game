@@ -12,6 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * This class is meant to be used by the local player on the machine where the game will run.
+ *
+ * @author Lucas Meier (283726)
+ * @author Maxime Laval (287323)
+ */
 public class LocalMain extends Application {
 
     private final static String DELIMITER = ":";
@@ -19,15 +25,20 @@ public class LocalMain extends Application {
     private final static String DEFAULT_HOST_NAME = "localHost";
     private final static int DEFAULT_ITERATIONS = 10_000;
     // Unit : second
-    private final static double MIN_TIME_PACED_PLAYER = 0.5;
+    private final static double MIN_TIME_PACED_PLAYER = 0.05;
     //Unit : millisecond
-    private final static long WAITING_TIME_END_TRICK = 500;
+    private final static long WAITING_TIME_END_TRICK = 001;
     private final static int MINIMUM_ITERATIONS = 10;
 
     private Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);
     private Map<PlayerId, String> ns = new EnumMap<>(PlayerId.class);
 
 
+    /**
+     * The main method of the local player program.
+     *
+     * @param args the program arguments.
+     */
     public static void main(String[] args) {
         launch(args);
     }
@@ -70,7 +81,8 @@ public class LocalMain extends Application {
                 g.advanceToEndOfNextTrick();
                 try {
                     Thread.sleep(WAITING_TIME_END_TRICK);
-                } catch (Exception e) {
+                } catch (InterruptedException e) {
+                    throw new Error(e);
                 }
             }
         });
@@ -141,15 +153,18 @@ public class LocalMain extends Application {
                     iterations = DEFAULT_ITERATIONS;
                 }
             }
-
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             int j = i;
             switch (playerType) {
                 case "h":
                     ps.put(PlayerId.ALL.get(i), new GraphicalPlayerAdapter());
                     break;
                 case "s":
+//                    ps.put(PlayerId.ALL.get(i), new PacedPlayer(
+//                            new MctsPlayer(PlayerId.ALL.get(i), randomGenerator.nextLong(), iterations),
+//                            MIN_TIME_PACED_PLAYER));
                     ps.put(PlayerId.ALL.get(i), new PacedPlayer(
-                            new MctsPlayer(PlayerId.ALL.get(i), randomGenerator.nextLong(), iterations),
+                            new RandomPlayer(randomGenerator.nextLong()),
                             MIN_TIME_PACED_PLAYER));
                     break;
                 case "r":
