@@ -170,8 +170,10 @@ public final class JassGame {
      */
     private void play() {
         Card card = nextPlayerCard();
-        playerHands.put(turnState.nextPlayer(), playerHands.get(turnState.nextPlayer()).remove(card));
-        players.get(turnState.nextPlayer()).updateHand(playerHands.get(turnState.nextPlayer()));
+        playerHands.put(turnState.nextPlayer(),
+                playerHands.get(turnState.nextPlayer()).remove(card));
+        players.get(turnState.nextPlayer())
+                .updateHand(playerHands.get(turnState.nextPlayer()));
         turnState = turnState.withNewCardPlayed(card);
 
     }
@@ -181,8 +183,7 @@ public final class JassGame {
      *
      */
     private Card nextPlayerCard() {
-        CardSet S = turnState.trick()
-                .playableCards(playerHands.get(turnState.nextPlayer()));
+        CardSet S = playerHands.get(turnState.nextPlayer());
         return players.get(turnState.nextPlayer()).cardToPlay(turnState, S);
     }
 
