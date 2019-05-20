@@ -59,7 +59,6 @@ public class GraphicalPlayerAdapter implements Player {
     @Override
     public void updateHand(CardSet newHand) {
         runLater(() -> {
-            System.out.println("new hand : " + newHand);
             handBean.setHand(newHand);
                 }
         );
@@ -88,7 +87,6 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public void setWinningTeam(TeamId winningTeam) {
-        System.out.println("in graphical player setting winning temam preoperty");
         runLater(() -> scoreBean.setWinnigTeam(winningTeam));
     }
 }

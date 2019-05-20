@@ -25,9 +25,9 @@ public class LocalMain extends Application {
     private final static String DEFAULT_HOST_NAME = "localHost";
     private final static int DEFAULT_ITERATIONS = 10_000;
     // Unit : second
-    private final static double MIN_TIME_PACED_PLAYER = 0.01;
+    private final static double MIN_TIME_PACED_PLAYER = 2;
     //Unit : millisecond
-    private final static long WAITING_TIME_END_TRICK = 001;
+    private final static long WAITING_TIME_END_TRICK = 1000;
     private final static int MINIMUM_ITERATIONS = 10;
 
     private Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);
@@ -45,10 +45,11 @@ public class LocalMain extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
+
         Random randomGenerator = new Random();
 
         List<String> argsList = this.getParameters().getRaw();
-        System.out.println(argsList);
 
 
         if ((argsList.size() < 4 || argsList.size() > 5)) {
@@ -96,7 +97,7 @@ public class LocalMain extends Application {
                 "où :\n" +
                 "<jn> spécifie le joueur n, ainsi:\n" +
                 "  h:<nom>  un joueur humain nommé <nom>\n" +
-                "  s:<nom> un joueur simulé nommé <nom>\n" +
+                "  s:<nom>:<itérations> un joueur simulé nommé <nom> avec <itérations> itérations.\n" +
                 "  r:<nom>:<host_name> un joueur distant nommé <nom>\n" +
                 "<graine> spécifie la graine aléatoire du jeu";
     }
@@ -174,7 +175,6 @@ public class LocalMain extends Application {
             }
             ns.put(PlayerId.ALL.get(i), playerName);
 
-            System.out.println(playerType + " " + playerName + " " + hostName + " " + iterations);
         }
     }
 }
