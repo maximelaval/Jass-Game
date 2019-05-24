@@ -19,7 +19,7 @@ import static ch.epfl.javass.jass.Jass.HAND_SIZE;
  */
 public class HandBean {
 
-    private final ObservableList<Card> hand = FXCollections.observableArrayList(Collections.nCopies(9, null));
+    private final ObservableList<Card> hand = FXCollections.observableArrayList(Collections.nCopies(HAND_SIZE, null));
     private final ObservableSet<Card> playableCards = FXCollections.observableSet(new HashSet<>());
 
 

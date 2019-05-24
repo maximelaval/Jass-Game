@@ -25,13 +25,13 @@ public class LocalMain extends Application {
     private final static String DEFAULT_HOST_NAME = "localHost";
     private final static int DEFAULT_ITERATIONS = 10_000;
     // Unit : second
-    private final static double MIN_TIME_PACED_PLAYER = 2;
+    private final static double MIN_TIME_PACED_PLAYER = 0.1;
     //Unit : millisecond
-    private final static long WAITING_TIME_END_TRICK = 1000;
+    private final static long WAITING_TIME_END_TRICK = 200;
     private final static int MINIMUM_ITERATIONS = 10;
 
-    private Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);
-    private Map<PlayerId, String> ns = new EnumMap<>(PlayerId.class);
+    private final Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);
+    private final Map<PlayerId, String> ns = new EnumMap<>(PlayerId.class);
 
 
     /**
@@ -154,7 +154,6 @@ public class LocalMain extends Application {
                     iterations = DEFAULT_ITERATIONS;
                 }
             }
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             switch (playerType) {
                 case "h":
                     ps.put(PlayerId.ALL.get(i), new GraphicalPlayerAdapter());
@@ -163,9 +162,6 @@ public class LocalMain extends Application {
                     ps.put(PlayerId.ALL.get(i), new PacedPlayer(
                             new MctsPlayer(PlayerId.ALL.get(i), randomGenerator.nextLong(), iterations),
                             MIN_TIME_PACED_PLAYER));
-//                    ps.put(PlayerId.ALL.get(i), new PacedPlayer(
-//                            new RandomPlayer(randomGenerator.nextLong()),
-//                            MIN_TIME_PACED_PLAYER));
                     break;
                 case "r":
                     ps.put(PlayerId.ALL.get(i), new RemotePlayerClient(hostName));

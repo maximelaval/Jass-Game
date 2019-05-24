@@ -18,9 +18,9 @@ import javafx.collections.ObservableMap;
  */
 public final class TrickBean {
 
-    private ObjectProperty<Color> trump = new SimpleObjectProperty<>();
-    private ObservableMap<PlayerId, Card> trick = FXCollections.observableHashMap();
-    private ObjectProperty<PlayerId> winningPlayer = new SimpleObjectProperty<>();
+    private final ObjectProperty<Color> trump = new SimpleObjectProperty<>();
+    private final ObservableMap<PlayerId, Card> trick = FXCollections.observableHashMap();
+    private final ObjectProperty<PlayerId> winningPlayer = new SimpleObjectProperty<>();
 
     /**
      * Returns the bean property of the trump.

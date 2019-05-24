@@ -15,9 +15,9 @@ import static ch.epfl.javass.Preconditions.checkArgument;
  * @author Maxime Laval (287323)
  */
 public final class MctsPlayer implements Player {
-    private  SplittableRandom mctsRng;
-    private  PlayerId ownId;
-    private int iterations;
+    private final SplittableRandom mctsRng;
+    private final PlayerId ownId;
+    private final int iterations;
 
 
     /**
@@ -142,8 +142,8 @@ public final class MctsPlayer implements Player {
     }
     private static class Node {
 
-        private TurnState turnState;
-        private Node[] children;
+        private final TurnState turnState;
+        private final Node[] children;
         private Node parent;
         private long upcomingChildrenCards;
         private int points;

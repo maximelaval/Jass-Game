@@ -19,7 +19,6 @@ public enum JassCommand {
     SCOR(),
     WINR();
 
-
     /**
      * Represents the total number of commands.
      */

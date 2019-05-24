@@ -18,6 +18,8 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  */
 public final class RemotePlayerClient implements Player, AutoCloseable {
 
+    private static final String PLAYERS_OR_CARDS_DELIMITER = ",";
+    private static final String ARGS_DELIMITER = " ";
     private Socket s;
     private BufferedReader r;
     private BufferedWriter w;
@@ -52,13 +54,13 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        StringJoiner joiner = new StringJoiner(" ");
+        StringJoiner joiner = new StringJoiner(ARGS_DELIMITER);
         joiner.add(JassCommand.CARD.name());
 
         String codedTrick = serializeInt(state.packedTrick());
         String codedUnplayedCards = serializeLong(state.unplayedCards().packed());
         String codedScore = serializeLong(state.packedScore());
-        StringJoiner codedState = new StringJoiner(",");
+        StringJoiner codedState = new StringJoiner(PLAYERS_OR_CARDS_DELIMITER);
 
         codedState.add(codedScore);
         codedState.add(codedUnplayedCards);
@@ -74,16 +76,15 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        Card playedCard = Card.ofPacked(pkCard);
-        return playedCard;
+        return Card.ofPacked(pkCard);
     }
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        StringJoiner joiner = new StringJoiner(" ");
+        StringJoiner joiner = new StringJoiner(ARGS_DELIMITER);
         joiner.add(JassCommand.PLRS.name());
         joiner.add(StringSerializer.serializeInt(ownId.ordinal()));
-        StringJoiner names = new StringJoiner(",");
+        StringJoiner names = new StringJoiner(PLAYERS_OR_CARDS_DELIMITER);
         for (String value : playerNames.values()) {
             names.add(serializeString(value));
         }
@@ -93,7 +94,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 
     @Override
     public void updateHand(CardSet newHand) {
-        StringJoiner joiner = new StringJoiner(" ");
+        StringJoiner joiner = new StringJoiner(ARGS_DELIMITER);
         joiner.add(JassCommand.HAND.name());
         joiner.add(serializeLong(newHand.packed()));
         forward(joiner.toString());
@@ -101,7 +102,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 
     @Override
     public void setTrump(Card.Color trump) {
-        StringJoiner joiner = new StringJoiner(" ");
+        StringJoiner joiner = new StringJoiner(ARGS_DELIMITER);
         joiner.add(JassCommand.TRMP.name());
         joiner.add(serializeInt(trump.ordinal()));
         forward(joiner.toString());
@@ -109,7 +110,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 
     @Override
     public void updateTrick(Trick newTrick) {
-        StringJoiner joiner = new StringJoiner(" ");
+        StringJoiner joiner = new StringJoiner(ARGS_DELIMITER);
         joiner.add(JassCommand.TRCK.name());
         joiner.add(serializeInt(newTrick.packed()));
         forward(joiner.toString());
@@ -117,7 +118,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 
     @Override
     public void updateScore(Score score) {
-        StringJoiner joiner = new StringJoiner(" ");
+        StringJoiner joiner = new StringJoiner(ARGS_DELIMITER);
         joiner.add(JassCommand.SCOR.name());
         joiner.add(serializeLong(score.packed()));
         forward(joiner.toString());
@@ -125,7 +126,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 
     @Override
     public void setWinningTeam(TeamId winningTeam) {
-        StringJoiner joiner = new StringJoiner(" ");
+        StringJoiner joiner = new StringJoiner(ARGS_DELIMITER);
         joiner.add(JassCommand.WINR.name());
         joiner.add(serializeInt(winningTeam.ordinal()));
         forward(joiner.toString());

@@ -18,7 +18,7 @@ public final class JassGame {
     private final Random shuffleRng;
     private final Random trumpRng;
     private final Map<PlayerId, String> playerNames;
-    private Map<PlayerId, CardSet> playerHands;
+    private final Map<PlayerId, CardSet> playerHands;
     private PlayerId firstPlayerTurn;
     private final int NUMBER_OF_PLAYERS = PlayerId.COUNT;
 

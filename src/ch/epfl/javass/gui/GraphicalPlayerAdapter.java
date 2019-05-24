@@ -16,10 +16,10 @@ import static javafx.application.Platform.runLater;
 public class GraphicalPlayerAdapter implements Player {
 
     private GraphicalPlayer graphicalPlayer;
-    private ArrayBlockingQueue<Card> queue;
-    private HandBean handBean;
-    private ScoreBean scoreBean;
-    private TrickBean trickBean;
+    private final ArrayBlockingQueue<Card> queue;
+    private final HandBean handBean;
+    private final ScoreBean scoreBean;
+    private final TrickBean trickBean;
 
 
     /**
@@ -51,16 +51,12 @@ public class GraphicalPlayerAdapter implements Player {
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         graphicalPlayer = new GraphicalPlayer(ownId, playerNames, scoreBean, trickBean, handBean, queue);
-        runLater(() -> {
-            graphicalPlayer.createStage().show();
-        });
+        runLater(() -> graphicalPlayer.createStage().show());
     }
 
     @Override
     public void updateHand(CardSet newHand) {
-        runLater(() -> {
-            handBean.setHand(newHand);
-                }
+        runLater(() -> handBean.setHand(newHand)
         );
     }
 

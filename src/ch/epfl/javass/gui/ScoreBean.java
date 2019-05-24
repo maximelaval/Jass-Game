@@ -11,16 +11,16 @@ import javafx.beans.property.*;
  */
 public final class ScoreBean {
 
-    private IntegerProperty turnPointsT1 = new SimpleIntegerProperty();
-    private IntegerProperty turnPointsT2 = new SimpleIntegerProperty();
+    private final IntegerProperty turnPointsT1 = new SimpleIntegerProperty();
+    private final IntegerProperty turnPointsT2 = new SimpleIntegerProperty();
 
-    private IntegerProperty gamePointsT1 = new SimpleIntegerProperty();
-    private IntegerProperty gamePointsT2 = new SimpleIntegerProperty();
+    private final IntegerProperty gamePointsT1 = new SimpleIntegerProperty();
+    private final IntegerProperty gamePointsT2 = new SimpleIntegerProperty();
 
-    private IntegerProperty totalPointsT1 = new SimpleIntegerProperty();
-    private IntegerProperty totalPointsT2 = new SimpleIntegerProperty();
+    private final IntegerProperty totalPointsT1 = new SimpleIntegerProperty();
+    private final IntegerProperty totalPointsT2 = new SimpleIntegerProperty();
 
-    private ObjectProperty<TeamId> winningTeam = new SimpleObjectProperty<>();
+    private final ObjectProperty<TeamId> winningTeam = new SimpleObjectProperty<>();
 
 
     /**

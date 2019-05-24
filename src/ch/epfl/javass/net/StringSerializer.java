@@ -22,9 +22,7 @@ public final class StringSerializer {
      * @return the serialized integer.
      */
     public static String serializeInt(int i) {
-        //return Integer.toUnsignedString((i));
         return Integer.toUnsignedString(i, 16);
-        //return Integer.toHexString(i);
     }
 
     /**

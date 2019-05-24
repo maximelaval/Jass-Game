@@ -34,9 +34,7 @@ public final class RemotePlayerServer {
      * run the server indefinitely until the game isi ended.
      */
     public void run() {
-
-//        while (true) {
-            try (ServerSocket s0 = new ServerSocket(5108);
+         try (ServerSocket s0 = new ServerSocket(5108);
                  Socket s = s0.accept();
                  BufferedReader r =  new BufferedReader((new InputStreamReader(s.getInputStream(), US_ASCII)));
                  BufferedWriter w = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), US_ASCII))) {
@@ -44,7 +42,10 @@ public final class RemotePlayerServer {
                  while (true) {
                      String receivedString = r.readLine();
                      // gerer null lorsque le client ferme
-                     String[] stringArray = split(" ", receivedString);
+                     String ARGS_DELIMITER = " ";
+                     String PLAYERS_OR_CARDS_DELIMITER = ",";
+
+                     String[] stringArray = split(ARGS_DELIMITER, receivedString);
                      String condensedMethodName = stringArray[0];
 
                      String codedHand;
@@ -56,8 +57,7 @@ public final class RemotePlayerServer {
                              PlayerId ownId = PlayerId.values()[Integer.parseUnsignedInt(stringArray[1])];
 
                              parametersString = stringArray[2];
-                             parametersArray = split(",", parametersString);
-                             // ArrayList<String> decodedPlayerNames = new ArrayList<>(PlayerId.COUNT);
+                             parametersArray = split(PLAYERS_OR_CARDS_DELIMITER, parametersString);
                              Map<PlayerId, String> playersMap = new HashMap<>();
 
                              for (int i = 0; i < PlayerId.COUNT; ++i) {
@@ -84,7 +84,7 @@ public final class RemotePlayerServer {
                              break;
                          case "CARD":
                              parametersString = stringArray[1];
-                             parametersArray = split(",", parametersString);
+                             parametersArray = split(PLAYERS_OR_CARDS_DELIMITER, parametersString);
 
                              long pkScore = deserializeLong(parametersArray[0]);
                              long pkUplayedCards = deserializeLong(parametersArray[1]);

@@ -35,10 +35,16 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class GraphicalPlayer {
 
+    private final static int SET_TRUMP_IMAGE_DIMENSION = 101;
+    private final static int SET_CARD_TRICK_HEIGHT = 180;
+    private final static int SET_CARD_TRICK_WIDTH = 120;
+    private final static int SET_CARD_HAND_HEIGHT = 120;
+    private final static int SET_CARD_HAND_WIDTH = 80;
+
     private final StackPane mainStack;
-    private ObservableMap<Card, Image> cardImageMap = FXCollections.observableHashMap();
-    private ObservableMap<Card.Color, Image> colorImageMap = FXCollections.observableHashMap();
-    private Map<Position, PlayerId> playerPosition = new HashMap<>();
+    private final ObservableMap<Card, Image> cardImageMap = FXCollections.observableHashMap();
+    private final ObservableMap<Card.Color, Image> colorImageMap = FXCollections.observableHashMap();
+    private final Map<Position, PlayerId> playerPosition = new HashMap<>();
     private BorderPane victoryPane1, victoryPane2;
 
     /**
@@ -113,8 +119,8 @@ public class GraphicalPlayer {
 
         ImageView trumpImage = new ImageView();
         trumpImage.imageProperty().bind(Bindings.valueAt(colorImageMap, trickBean.trumpProperty()));
-        trumpImage.setFitWidth(101);
-        trumpImage.setFitHeight(101);
+        trumpImage.setFitWidth(SET_TRUMP_IMAGE_DIMENSION);
+        trumpImage.setFitHeight(SET_TRUMP_IMAGE_DIMENSION);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
 
         trickPane.add(vBoxes.get(3), 0, 0, 1, 3);
@@ -137,8 +143,8 @@ public class GraphicalPlayer {
             playerPosition.put(Position.ALL.get(i), PlayerId.ALL.get((ownId.ordinal() + i) % PlayerId.COUNT));
         }
 
-        for (int c = 0; c < 4; c++) {
-            for (int r = 0; r < 9; r++) {
+        for (int c = 0; c < Card.Color.COUNT; c++) {
+            for (int r = 0; r < Card.Rank.COUNT; r++) {
                 cardImageMap.put(Card.of(Card.Color.ALL.get(c), Card.Rank.ALL.get(r)),
                         new Image("/card_" + c + "_" + r + "_160.png"));
             }
@@ -151,19 +157,13 @@ public class GraphicalPlayer {
         List<VBox> vBoxes = new ArrayList<>();
         List<StackPane> stackPaneList = new ArrayList<>();
 
-        ImageView trumpImage = new ImageView();
-        trumpImage.imageProperty().bind(Bindings.valueAt(colorImageMap, trickBean.trumpProperty()));
-        trumpImage.setFitWidth(101);
-        trumpImage.setFitHeight(101);
-        GridPane.setHalignment(trumpImage, HPos.CENTER);
-
         for (int i = 0; i < PlayerId.COUNT; i++) {
             imageViewListList.add(new ImageView());
             imageViewListList.get(i).imageProperty().bind(Bindings.valueAt(cardImageMap,
                     Bindings.valueAt(trickBean.trickProperty(), playerPosition.get(Position.ALL.get(i)))));
-            imageViewListList.get(i).setFitHeight(180);
-            imageViewListList.get(i).setFitWidth(120);
-            Rectangle rectangle = new Rectangle(120, 180);
+            imageViewListList.get(i).setFitHeight(SET_CARD_TRICK_HEIGHT);
+            imageViewListList.get(i).setFitWidth(SET_CARD_TRICK_WIDTH);
+            Rectangle rectangle = new Rectangle(SET_CARD_TRICK_WIDTH, SET_CARD_TRICK_HEIGHT);
             rectangle.setStyle("-fx-arc-width: 20;-fx-arc-height: 20;-fx-fill: transparent;-fx-stroke: lightpink;-fx-stroke-width: 5;-fx-opacity: 0.5;");
             rectangle.setEffect(new GaussianBlur(4));
             rectangle.visibleProperty().bind(trickBean.winningPlayerProperty().isEqualTo(playerPosition.get(Position.ALL.get(i))));
@@ -192,10 +192,10 @@ public class GraphicalPlayer {
         victoryPane1 = new BorderPane(textTeam1);
         victoryPane2 = new BorderPane(textTeam2);
 
-        victoryPane1.visibleProperty().bind(scoreBean.totalPointsProperty(TeamId.TEAM_1).greaterThan(Jass.WINNING_POINTS));
-        victoryPane2.visibleProperty().bind(scoreBean.totalPointsProperty(TeamId.TEAM_2).greaterThan(Jass.WINNING_POINTS));
-//        victoryPane1.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_1));
-//        victoryPane2.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_2));
+//        victoryPane1.visibleProperty().bind(scoreBean.totalPointsProperty(TeamId.TEAM_1).greaterThan(Jass.WINNING_POINTS));
+//        victoryPane2.visibleProperty().bind(scoreBean.totalPointsProperty(TeamId.TEAM_2).greaterThan(Jass.WINNING_POINTS));
+        victoryPane1.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_1));
+        victoryPane2.visibleProperty().bind(scoreBean.winningTeamProperty().isEqualTo(TeamId.TEAM_2));
         victoryPane1.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
         victoryPane2.setStyle("-fx-font: 16 Optima; -fx-background-color: white");
     }
@@ -209,8 +209,8 @@ public class GraphicalPlayer {
             imageViewList.add(new ImageView());
             imageViewList.get(i).imageProperty().bind(Bindings.valueAt(cardImageMap,
                     Bindings.valueAt(handBean.handProperty(), i)));
-            imageViewList.get(i).setFitHeight(120);
-            imageViewList.get(i).setFitWidth(80);
+            imageViewList.get(i).setFitHeight(SET_CARD_HAND_HEIGHT);
+            imageViewList.get(i).setFitWidth(SET_CARD_HAND_WIDTH);
             pane.getChildren().add(imageViewList.get(i));
 
             BooleanProperty isPlayable = new SimpleBooleanProperty();
