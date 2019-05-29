@@ -218,7 +218,7 @@ if (!turnStateChildren.isTerminal()) {
         }
 
         private boolean isNotTerminal() {
-            return !turnState.isTerminal(); //
+            return !turnState.isTerminal();
         }
 
         private boolean isFullyExpanded() {

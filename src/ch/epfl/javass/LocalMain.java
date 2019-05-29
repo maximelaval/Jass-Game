@@ -25,9 +25,9 @@ public class LocalMain extends Application {
     private final static String DEFAULT_HOST_NAME = "localHost";
     private final static int DEFAULT_ITERATIONS = 10_000;
     // Unit : second
-    private final static double MIN_TIME_PACED_PLAYER = 0.1;
+    private final static double MIN_TIME_PACED_PLAYER = 2;
     //Unit : millisecond
-    private final static long WAITING_TIME_END_TRICK = 200;
+    private final static long WAITING_TIME_END_TRICK = 1_000;
     private final static int MINIMUM_ITERATIONS = 10;
 
     private final Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);
@@ -44,7 +44,7 @@ public class LocalMain extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
 
 
         Random randomGenerator = new Random();
@@ -63,7 +63,7 @@ public class LocalMain extends Application {
                 randomGenerator = new Random(seed);
                 if (seed <= 0) throw new NumberFormatException();
             } catch (NumberFormatException e) {
-                System.err.println("Erreur : la graine spécifiée n'est pas un entier <long> valide");
+                System.err.println("Erreur : la graine spécifiée n'est pas un entier <long> valide : " + argsList.get(4));
                 System.exit(1);
             }
         }
@@ -147,9 +147,13 @@ public class LocalMain extends Application {
                 if (playerParameters.length > 3)
                     throw new Error("Le nombre d'arguments passés pour un joueur simulé est trop grand.");
                 if (playerParameters.length == 3) {
+                    try {
+                        iterations = Integer.parseInt(playerParameters[2]);
+                    } catch (NumberFormatException e) {
+                        throw new NumberFormatException("Le nombre d'itérations n'est pas un entier <long> valide : " + playerParameters[2]);
+                    }
                     if (Integer.parseInt(playerParameters[2]) < MINIMUM_ITERATIONS)
-                        throw new NumberFormatException("Erreur : le nombre d'itération n'est pas un nombre valide.");
-                    iterations = Integer.parseInt(playerParameters[2]);
+                        throw new NumberFormatException("Le nombre d'itérations n'est pas un nombre entier d'itérations valide : " + playerParameters[2]);
                 } else {
                     iterations = DEFAULT_ITERATIONS;
                 }

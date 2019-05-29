@@ -43,7 +43,6 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
     private void forward(String codedString) {
 
         try {
-
             w.write(codedString);
             w.write('\n');
             w.flush();

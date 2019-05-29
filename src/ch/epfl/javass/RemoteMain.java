@@ -23,7 +23,7 @@ public class RemoteMain extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         Thread serverGame = new Thread(() -> {
             System.out.println("La partie commencera à la connexion du client...");
             RemotePlayerServer playerServer = new RemotePlayerServer(new GraphicalPlayerAdapter());

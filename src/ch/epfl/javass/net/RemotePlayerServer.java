@@ -31,7 +31,7 @@ public final class RemotePlayerServer {
     }
 
     /**
-     * run the server indefinitely until the game isi ended.
+     * run the server indefinitely until the game is ended.
      */
     public void run() {
          try (ServerSocket s0 = new ServerSocket(5108);
@@ -41,7 +41,6 @@ public final class RemotePlayerServer {
 
                  while (true) {
                      String receivedString = r.readLine();
-                     // gerer null lorsque le client ferme
                      String ARGS_DELIMITER = " ";
                      String PLAYERS_OR_CARDS_DELIMITER = ",";
 

@@ -15,7 +15,6 @@ import static javafx.application.Platform.runLater;
  */
 public class GraphicalPlayerAdapter implements Player {
 
-    private GraphicalPlayer graphicalPlayer;
     private final ArrayBlockingQueue<Card> queue;
     private final HandBean handBean;
     private final ScoreBean scoreBean;
@@ -34,7 +33,6 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-
         Card card;
 
         runLater(() -> handBean.setPlayableCards(state.trick().playableCards(hand)));
@@ -50,7 +48,7 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        graphicalPlayer = new GraphicalPlayer(ownId, playerNames, scoreBean, trickBean, handBean, queue);
+        GraphicalPlayer graphicalPlayer = new GraphicalPlayer(ownId, playerNames, scoreBean, trickBean, handBean, queue);
         runLater(() -> graphicalPlayer.createStage().show());
     }
 
