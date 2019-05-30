@@ -53,14 +53,14 @@ public final class RemotePlayerServer {
 
                      switch (condensedMethodName) {
                          case "PLRS":
-                             PlayerId ownId = PlayerId.values()[Integer.parseUnsignedInt(stringArray[1])];
+                             PlayerId ownId = PlayerId.ALL.get(deserializeInt(stringArray[1]));
 
                              parametersString = stringArray[2];
                              parametersArray = split(PLAYERS_OR_CARDS_DELIMITER, parametersString);
                              Map<PlayerId, String> playersMap = new HashMap<>();
 
                              for (int i = 0; i < PlayerId.COUNT; ++i) {
-                                 playersMap.put(PlayerId.values()[i], deserializeString(parametersArray[i]));
+                                 playersMap.put(PlayerId.ALL.get(i), deserializeString(parametersArray[i]));
                              }
 
                              localPlayer.setPlayers(ownId, playersMap);
