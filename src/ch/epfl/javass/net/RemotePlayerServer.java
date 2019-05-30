@@ -68,7 +68,7 @@ public final class RemotePlayerServer {
 
                          case "TRMP":
                              int colorOrdinal = deserializeInt(stringArray[1]);
-                             localPlayer.setTrump(Card.Color.values()[colorOrdinal]);
+                             localPlayer.setTrump(Card.Color.ALL.get(colorOrdinal));
                              break;
 
                          case "HAND":
@@ -106,7 +106,7 @@ public final class RemotePlayerServer {
 
                          case "WINR":
                              int winningTeamOrdinal = deserializeInt(stringArray[1]);
-                             localPlayer.setWinningTeam(TeamId.values()[winningTeamOrdinal]);
+                             localPlayer.setWinningTeam(TeamId.ALL.get(winningTeamOrdinal));
                              break;
 
                          default:

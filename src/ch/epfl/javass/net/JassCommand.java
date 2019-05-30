@@ -28,8 +28,4 @@ public enum JassCommand {
      */
     public static final List<JassCommand> ALL = Collections.unmodifiableList(Arrays.asList(values()));
 
-    JassCommand() {
-
-    }
-
 }
