@@ -39,8 +39,10 @@ public final class RemotePlayerServer {
                  BufferedReader r =  new BufferedReader((new InputStreamReader(s.getInputStream(), US_ASCII)));
                  BufferedWriter w = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), US_ASCII))) {
 
-                 while (true) {
-                     String receivedString = r.readLine();
+             String receivedString ;
+
+                 while ((receivedString = r.readLine()) != null) {
+
                      String ARGS_DELIMITER = " ";
                      String PLAYERS_OR_CARDS_DELIMITER = ",";
 
